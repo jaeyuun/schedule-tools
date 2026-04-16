@@ -1,0 +1,49 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.37111.16
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GirderSchedule.Domain", "GirderSchedule.Domain\GirderSchedule.Domain.csproj", "{192A08CE-802F-4220-9F9A-0D24406CCEFB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GirderSchedule.Application", "GirderSchedule.Application\GirderSchedule.Application.csproj", "{DF0859DB-A52A-41A8-BECE-3CA9CC04CD29}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GirderSchedule.Infrastructure", "GirderSchedule.Infrastructure\GirderSchedule.Infrastructure.csproj", "{724386F4-00BD-4CD4-BEB2-87D052C955A2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GirderSchedule.Renderer", "GirderSchedule.Renderer\GirderSchedule.Renderer.csproj", "{6DE38B16-32BE-46FE-B26C-9740880271D0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GirderSchedule.App", "GirderSchedule.App\GirderSchedule.App.csproj", "{2F1B089F-ED95-6037-10AA-2BF3EFF004F8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{192A08CE-802F-4220-9F9A-0D24406CCEFB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{192A08CE-802F-4220-9F9A-0D24406CCEFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{192A08CE-802F-4220-9F9A-0D24406CCEFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{192A08CE-802F-4220-9F9A-0D24406CCEFB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DF0859DB-A52A-41A8-BECE-3CA9CC04CD29}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DF0859DB-A52A-41A8-BECE-3CA9CC04CD29}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DF0859DB-A52A-41A8-BECE-3CA9CC04CD29}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DF0859DB-A52A-41A8-BECE-3CA9CC04CD29}.Release|Any CPU.Build.0 = Release|Any CPU
+		{724386F4-00BD-4CD4-BEB2-87D052C955A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{724386F4-00BD-4CD4-BEB2-87D052C955A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{724386F4-00BD-4CD4-BEB2-87D052C955A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{724386F4-00BD-4CD4-BEB2-87D052C955A2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6DE38B16-32BE-46FE-B26C-9740880271D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6DE38B16-32BE-46FE-B26C-9740880271D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6DE38B16-32BE-46FE-B26C-9740880271D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6DE38B16-32BE-46FE-B26C-9740880271D0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2F1B089F-ED95-6037-10AA-2BF3EFF004F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F1B089F-ED95-6037-10AA-2BF3EFF004F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F1B089F-ED95-6037-10AA-2BF3EFF004F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F1B089F-ED95-6037-10AA-2BF3EFF004F8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {94EE044A-DEEB-404B-836F-8BF3112B7A7E}
+	EndGlobalSection
+EndGlobal

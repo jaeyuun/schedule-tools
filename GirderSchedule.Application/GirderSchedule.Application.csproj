@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+    <ImplicitUsings>disable</ImplicitUsings>
+	<RootNamespace>GirderSchedule.Application</RootNamespace>
+	<AssemblyName>GirderSchedule.Application</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GirderSchedule.Domain\GirderSchedule.Domain.csproj" />
+  </ItemGroup>
+
+</Project>

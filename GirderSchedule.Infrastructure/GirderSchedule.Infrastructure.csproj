@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+    <ImplicitUsings>disable</ImplicitUsings>
+	<RootNamespace>GirderSchedule.Infrastructure</RootNamespace>
+	<AssemblyName>GirderSchedule.Infrastructure</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="netDxf" Version="2023.11.10" />
+    <PackageReference Include="PDFsharp" Version="6.2.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GirderSchedule.Application\GirderSchedule.Application.csproj" />
+    <ProjectReference Include="..\GirderSchedule.Domain\GirderSchedule.Domain.csproj" />
+  </ItemGroup>
+
+</Project>
