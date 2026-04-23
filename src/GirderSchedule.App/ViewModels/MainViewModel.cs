@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Windows.Input;
 using GirderSchedule.App.ViewModels.Export;
 using GirderSchedule.App.ViewModels.Preview;
@@ -58,6 +59,7 @@ namespace GirderSchedule.App.ViewModels
 		private bool _showForce = true;
 
 		public GirderSchedulePreviewViewModel Preview { get; } = new GirderSchedulePreviewViewModel();
+		public ObservableCollection<SectionColumnViewModel> Columns { get; private set; }
 
 		public ICommand RefreshCommand { get; private set; }
 		public ICommand OpenExportCommand { get; private set; }
@@ -66,7 +68,12 @@ namespace GirderSchedule.App.ViewModels
 		{
 			RefreshCommand = new RelayCommand(RefreshPreview);
 			OpenExportCommand = new RelayCommand(OpenExport);
-
+			Columns = new ObservableCollection<SectionColumnViewModel>
+			{
+				new SectionColumnViewModel(),
+				new SectionColumnViewModel(),
+				new SectionColumnViewModel()
+			};
 			RefreshPreview();
 		}
 

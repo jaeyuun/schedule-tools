@@ -1,24 +1,19 @@
 ﻿<UserControl x:Class="GirderSchedule.App.Views.Controls.GirderSchedulePreview"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:GirderSchedule.App.Views.Controls">
     <Viewbox Stretch="Uniform">
-        <Grid Width="1180"
-              Height="720"
+        <Grid Width="870"
+              Height="642"
               Background="#F7F7F7">
 
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="920"/>
-                <ColumnDefinition Width="260"/>
-            </Grid.ColumnDefinitions>
-
-            <Grid Grid.Column="0" Margin="20">
+            <Grid Margin="20">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="40"/>
                     <RowDefinition Height="40"/>
                     <RowDefinition Height="60"/>
                     <RowDefinition Height="320"/>
-                    <RowDefinition Height="28"/>
-                    <RowDefinition Height="28"/>
+                    <RowDefinition Height="56"/>
+                    <RowDefinition Height="56"/>
                     <RowDefinition Height="28"/>
                     <RowDefinition Height="28"/>
                 </Grid.RowDefinitions>
@@ -41,13 +36,13 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="60"/>
                         <RowDefinition Height="320"/>
-                        <RowDefinition Height="28"/>
-                        <RowDefinition Height="28"/>
+                        <RowDefinition Height="56"/>
+                        <RowDefinition Height="56"/>
                         <RowDefinition Height="28"/>
                         <RowDefinition Height="28"/>
                     </Grid.RowDefinitions>
 
-                    <Border Grid.Row="0" Grid.Column="0" BorderBrush="#B8B8B8" BorderThickness="1,1,1,1">
+                    <Border Grid.Row="0" Grid.Column="0" BorderBrush="#B8B8B8" BorderThickness="1">
                         <StackPanel VerticalAlignment="Center">
                             <TextBlock Text="부 재 명"
                                        HorizontalAlignment="Center"
@@ -59,7 +54,11 @@
                         </StackPanel>
                     </Border>
 
-                    <Border Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="3" BorderBrush="#B8B8B8" BorderThickness="0,1,1,1">
+                    <Border Grid.Row="0"
+                            Grid.Column="1"
+                            Grid.ColumnSpan="3"
+                            BorderBrush="#B8B8B8"
+                            BorderThickness="0,1,1,1">
                         <StackPanel VerticalAlignment="Center">
                             <TextBox Width="120"
                                      Height="24"
@@ -87,276 +86,98 @@
                         <TextBlock Text="단    면"
                                    HorizontalAlignment="Center"
                                    VerticalAlignment="Center"
-                                   FontSize="18"/>
+                                   FontSize="14"/>
                     </Border>
 
-                    <!-- 좌측 단면 -->
-                    <Border Grid.Row="1" Grid.Column="1" BorderBrush="#B8B8B8" BorderThickness="0,0,1,1">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="32"/>
-                                <RowDefinition Height="20"/>
-                                <RowDefinition Height="*"/>
-                            </Grid.RowDefinitions>
-
-                            <TextBox Grid.Row="0"
-                                     Margin="18,6,18,2"
-                                     Height="22"
-                                     Text="{Binding LeftTitle, UpdateSourceTrigger=PropertyChanged}"/>
-
-                            <DockPanel Grid.Row="1" Margin="12,0,12,0">
-                                <TextBlock Width="70" Text="M =" FontSize="12" VerticalAlignment="Center"/>
-                                <TextBox Width="70"
-                                         Height="18"
-                                         Text="{Binding LeftM, UpdateSourceTrigger=PropertyChanged}"/>
-                                <TextBlock Width="40" Margin="18,0,0,0" Text="V =" FontSize="12" VerticalAlignment="Center"/>
-                                <TextBox Width="70"
-                                         Height="18"
-                                         Text="{Binding LeftV, UpdateSourceTrigger=PropertyChanged}"/>
-                            </DockPanel>
-
-                            <Canvas x:Name="PART_LeftCanvas"
-                                    Grid.Row="2"
-                                    Margin="10,8,10,10"
-                                    Background="Transparent"/>
-                        </Grid>
-                    </Border>
-
-                    <!-- 가운데 단면 -->
-                    <Border Grid.Row="1" Grid.Column="2" BorderBrush="#B8B8B8" BorderThickness="0,0,1,1">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="32"/>
-                                <RowDefinition Height="20"/>
-                                <RowDefinition Height="*"/>
-                            </Grid.RowDefinitions>
-
-                            <TextBox Grid.Row="0"
-                                     Margin="18,6,18,2"
-                                     Height="22"
-                                     Text="{Binding CenterTitle, UpdateSourceTrigger=PropertyChanged}"/>
-
-                            <DockPanel Grid.Row="1" Margin="12,0,12,0">
-                                <TextBlock Width="70" Text="M =" FontSize="12" VerticalAlignment="Center"/>
-                                <TextBox Width="70"
-                                         Height="18"
-                                         Text="{Binding CenterM, UpdateSourceTrigger=PropertyChanged}"/>
-                                <TextBlock Width="40" Margin="18,0,0,0" Text="V =" FontSize="12" VerticalAlignment="Center"/>
-                                <TextBox Width="70"
-                                         Height="18"
-                                         Text="{Binding CenterV, UpdateSourceTrigger=PropertyChanged}"/>
-                            </DockPanel>
-
-                            <Canvas x:Name="PART_CenterCanvas"
-                                    Grid.Row="2"
-                                    Margin="10,8,10,10"
-                                    Background="Transparent"/>
-                        </Grid>
-                    </Border>
-
-                    <!-- 우측 단면 -->
-                    <Border Grid.Row="1" Grid.Column="3" BorderBrush="#B8B8B8" BorderThickness="0,0,1,1">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="32"/>
-                                <RowDefinition Height="20"/>
-                                <RowDefinition Height="*"/>
-                            </Grid.RowDefinitions>
-
-                            <TextBox Grid.Row="0"
-                                     Margin="18,6,18,2"
-                                     Height="22"
-                                     Text="{Binding RightTitle, UpdateSourceTrigger=PropertyChanged}"/>
-
-                            <DockPanel Grid.Row="1" Margin="12,0,12,0">
-                                <TextBlock Width="70" Text="M =" FontSize="12" VerticalAlignment="Center"/>
-                                <TextBox Width="70"
-                                         Height="18"
-                                         Text="{Binding RightM, UpdateSourceTrigger=PropertyChanged}"/>
-                                <TextBlock Width="40" Margin="18,0,0,0" Text="V =" FontSize="12" VerticalAlignment="Center"/>
-                                <TextBox Width="70"
-                                         Height="18"
-                                         Text="{Binding RightV, UpdateSourceTrigger=PropertyChanged}"/>
-                            </DockPanel>
-
-                            <Canvas x:Name="PART_RightCanvas"
-                                    Grid.Row="2"
-                                    Margin="10,8,10,10"
-                                    Background="Transparent"/>
-                        </Grid>
-                    </Border>
-
-                    <!-- 상부근 -->
                     <Border Grid.Row="2" Grid.Column="0" BorderBrush="#B8B8B8" BorderThickness="1,0,1,1">
-                        <TextBlock Text="상 부 근" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14"/>
+                        <TextBlock Text="상 부 근"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   FontSize="14"/>
                     </Border>
 
-                    <Border Grid.Row="2" Grid.Column="1" BorderBrush="#B8B8B8" BorderThickness="0,0,1,1">
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                            <TextBox Width="32" Height="20" Text="{Binding LeftTopCount, UpdateSourceTrigger=PropertyChanged}"/>
-                            <TextBlock Margin="4,0" VerticalAlignment="Center" Text="- HD"/>
-                            <TextBox Width="32" Height="20" Text="{Binding LeftTopDiameter, UpdateSourceTrigger=PropertyChanged}"/>
-                        </StackPanel>
-                    </Border>
-
-                    <Border Grid.Row="2" Grid.Column="2" BorderBrush="#B8B8B8" BorderThickness="0,0,1,1">
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                            <TextBox Width="32" Height="20" Text="{Binding CenterTopCount, UpdateSourceTrigger=PropertyChanged}"/>
-                            <TextBlock Margin="4,0" VerticalAlignment="Center" Text="- HD"/>
-                            <TextBox Width="32" Height="20" Text="{Binding CenterTopDiameter, UpdateSourceTrigger=PropertyChanged}"/>
-                        </StackPanel>
-                    </Border>
-
-                    <Border Grid.Row="2" Grid.Column="3" BorderBrush="#B8B8B8" BorderThickness="0,0,1,1">
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                            <TextBox Width="32" Height="20" Text="{Binding RightTopCount, UpdateSourceTrigger=PropertyChanged}"/>
-                            <TextBlock Margin="4,0" VerticalAlignment="Center" Text="- HD"/>
-                            <TextBox Width="32" Height="20" Text="{Binding RightTopDiameter, UpdateSourceTrigger=PropertyChanged}"/>
-                        </StackPanel>
-                    </Border>
-
-                    <!-- 하부근 -->
                     <Border Grid.Row="3" Grid.Column="0" BorderBrush="#B8B8B8" BorderThickness="1,0,1,1">
-                        <TextBlock Text="하 부 근" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14"/>
+                        <TextBlock Text="하 부 근"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   FontSize="14"/>
                     </Border>
 
-                    <Border Grid.Row="3" Grid.Column="1" BorderBrush="#B8B8B8" BorderThickness="0,0,1,1">
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                            <TextBox Width="32" Height="20" Text="{Binding LeftBottomCount, UpdateSourceTrigger=PropertyChanged}"/>
-                            <TextBlock Margin="4,0" VerticalAlignment="Center" Text="- HD"/>
-                            <TextBox Width="32" Height="20" Text="{Binding LeftBottomDiameter, UpdateSourceTrigger=PropertyChanged}"/>
-                        </StackPanel>
-                    </Border>
-
-                    <Border Grid.Row="3" Grid.Column="2" BorderBrush="#B8B8B8" BorderThickness="0,0,1,1">
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                            <TextBox Width="32" Height="20" Text="{Binding CenterBottomCount, UpdateSourceTrigger=PropertyChanged}"/>
-                            <TextBlock Margin="4,0" VerticalAlignment="Center" Text="- HD"/>
-                            <TextBox Width="32" Height="20" Text="{Binding CenterBottomDiameter, UpdateSourceTrigger=PropertyChanged}"/>
-                        </StackPanel>
-                    </Border>
-
-                    <Border Grid.Row="3" Grid.Column="3" BorderBrush="#B8B8B8" BorderThickness="0,0,1,1">
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                            <TextBox Width="32" Height="20" Text="{Binding RightBottomCount, UpdateSourceTrigger=PropertyChanged}"/>
-                            <TextBlock Margin="4,0" VerticalAlignment="Center" Text="- HD"/>
-                            <TextBox Width="32" Height="20" Text="{Binding RightBottomDiameter, UpdateSourceTrigger=PropertyChanged}"/>
-                        </StackPanel>
-                    </Border>
-
-                    <!-- 스터럽 -->
                     <Border Grid.Row="4" Grid.Column="0" BorderBrush="#B8B8B8" BorderThickness="1,0,1,1">
-                        <TextBlock Text="스 터 럽" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14"/>
+                        <TextBlock Text="스 터 럽"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   FontSize="14"/>
                     </Border>
 
-                    <Border Grid.Row="4" Grid.Column="1" BorderBrush="#B8B8B8" BorderThickness="0,0,1,1">
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                            <TextBox Width="28" Height="20" Text="{Binding LeftStirrupLegs, UpdateSourceTrigger=PropertyChanged}"/>
-                            <TextBlock Margin="4,0" VerticalAlignment="Center" Text="- HD"/>
-                            <TextBox Width="28" Height="20" Text="{Binding LeftStirrupDiameter, UpdateSourceTrigger=PropertyChanged}"/>
-                            <TextBlock Margin="4,0" VerticalAlignment="Center" Text="@"/>
-                            <TextBox Width="36" Height="20" Text="{Binding LeftStirrupSpacing, UpdateSourceTrigger=PropertyChanged}"/>
-                        </StackPanel>
-                    </Border>
-
-                    <Border Grid.Row="4" Grid.Column="2" BorderBrush="#B8B8B8" BorderThickness="0,0,1,1">
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                            <TextBox Width="28" Height="20" Text="{Binding CenterStirrupLegs, UpdateSourceTrigger=PropertyChanged}"/>
-                            <TextBlock Margin="4,0" VerticalAlignment="Center" Text="- HD"/>
-                            <TextBox Width="28" Height="20" Text="{Binding CenterStirrupDiameter, UpdateSourceTrigger=PropertyChanged}"/>
-                            <TextBlock Margin="4,0" VerticalAlignment="Center" Text="@"/>
-                            <TextBox Width="36" Height="20" Text="{Binding CenterStirrupSpacing, UpdateSourceTrigger=PropertyChanged}"/>
-                        </StackPanel>
-                    </Border>
-
-                    <Border Grid.Row="4" Grid.Column="3" BorderBrush="#B8B8B8" BorderThickness="0,0,1,1">
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                            <TextBox Width="28" Height="20" Text="{Binding RightStirrupLegs, UpdateSourceTrigger=PropertyChanged}"/>
-                            <TextBlock Margin="4,0" VerticalAlignment="Center" Text="- HD"/>
-                            <TextBox Width="28" Height="20" Text="{Binding RightStirrupDiameter, UpdateSourceTrigger=PropertyChanged}"/>
-                            <TextBlock Margin="4,0" VerticalAlignment="Center" Text="@"/>
-                            <TextBox Width="36" Height="20" Text="{Binding RightStirrupSpacing, UpdateSourceTrigger=PropertyChanged}"/>
-                        </StackPanel>
-                    </Border>
-
-                    <!-- 표피철근 -->
                     <Border Grid.Row="5" Grid.Column="0" BorderBrush="#B8B8B8" BorderThickness="1,0,1,1">
-                        <TextBlock Text="표피철근(X)" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14"/>
+                        <TextBlock Text="표피철근(X)"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   FontSize="14"/>
                     </Border>
 
-                    <Border Grid.Row="5" Grid.Column="1" BorderBrush="#B8B8B8" BorderThickness="0,0,1,1">
-                        <TextBox Width="70" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center" Text=""/>
-                    </Border>
+                    <controls:SectionColumnControl Grid.Row="1"
+                               Grid.RowSpan="5"
+                               Grid.Column="1"
+                               Title="{Binding LeftTitle, Mode=TwoWay}"
+                               MValue="{Binding LeftM, Mode=TwoWay}"
+                               VValue="{Binding LeftV, Mode=TwoWay}"
+                               TopCount1="{Binding LeftTopCount1, Mode=TwoWay}"
+                               TopCount2="{Binding LeftTopCount2, Mode=TwoWay}"
+                               TopDiameter="{Binding LeftTopDiameter, Mode=TwoWay}"
+                               BottomCount1="{Binding LeftBottomCount1, Mode=TwoWay}"
+                               BottomCount2="{Binding LeftBottomCount2, Mode=TwoWay}"
+                               BottomDiameter="{Binding LeftBottomDiameter, Mode=TwoWay}"
+                               StirrupLegs="{Binding LeftStirrupLegs, Mode=TwoWay}"
+                               StirrupDiameter="{Binding LeftStirrupDiameter, Mode=TwoWay}"
+                               StirrupSpacing="{Binding LeftStirrupSpacing, Mode=TwoWay}"
+                               SkinRebar="{Binding LeftSkinRebar, Mode=TwoWay}"
+                               PreviewWidth="{Binding WidthValue}"
+                               PreviewHeight="{Binding HeightValue}"
+                               IsPreviewVisible="{Binding ShowLeft}"/>
 
-                    <Border Grid.Row="5" Grid.Column="2" BorderBrush="#B8B8B8" BorderThickness="0,0,1,1">
-                        <TextBox Width="70" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center" Text=""/>
-                    </Border>
+                    <controls:SectionColumnControl Grid.Row="1"
+                               Grid.RowSpan="5"
+                               Grid.Column="2"
+                               Title="{Binding CenterTitle, Mode=TwoWay}"
+                               MValue="{Binding CenterM, Mode=TwoWay}"
+                               VValue="{Binding CenterV, Mode=TwoWay}"
+                               TopCount1="{Binding CenterTopCount1, Mode=TwoWay}"
+                               TopCount2="{Binding CenterTopCount2, Mode=TwoWay}"
+                               TopDiameter="{Binding CenterTopDiameter, Mode=TwoWay}"
+                               BottomCount1="{Binding CenterBottomCount1, Mode=TwoWay}"
+                               BottomCount2="{Binding CenterBottomCount2, Mode=TwoWay}"
+                               BottomDiameter="{Binding CenterBottomDiameter, Mode=TwoWay}"
+                               StirrupLegs="{Binding CenterStirrupLegs, Mode=TwoWay}"
+                               StirrupDiameter="{Binding CenterStirrupDiameter, Mode=TwoWay}"
+                               StirrupSpacing="{Binding CenterStirrupSpacing, Mode=TwoWay}"
+                               SkinRebar="{Binding CenterSkinRebar, Mode=TwoWay}"
+                               PreviewWidth="{Binding WidthValue}"
+                               PreviewHeight="{Binding HeightValue}"
+                               IsPreviewVisible="{Binding ShowCenter}"/>
 
-                    <Border Grid.Row="5" Grid.Column="3" BorderBrush="#B8B8B8" BorderThickness="0,0,1,1">
-                        <TextBox Width="70" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center" Text=""/>
-                    </Border>
+                    <controls:SectionColumnControl Grid.Row="1"
+                               Grid.RowSpan="5"
+                               Grid.Column="3"
+                               Title="{Binding RightTitle, Mode=TwoWay}"
+                               MValue="{Binding RightM, Mode=TwoWay}"
+                               VValue="{Binding RightV, Mode=TwoWay}"
+                               TopCount1="{Binding RightTopCount1, Mode=TwoWay}"
+                               TopCount2="{Binding RightTopCount2, Mode=TwoWay}"
+                               TopDiameter="{Binding RightTopDiameter, Mode=TwoWay}"
+                               BottomCount1="{Binding RightBottomCount1, Mode=TwoWay}"
+                               BottomCount2="{Binding RightBottomCount2, Mode=TwoWay}"
+                               BottomDiameter="{Binding RightBottomDiameter, Mode=TwoWay}"
+                               StirrupLegs="{Binding RightStirrupLegs, Mode=TwoWay}"
+                               StirrupDiameter="{Binding RightStirrupDiameter, Mode=TwoWay}"
+                               StirrupSpacing="{Binding RightStirrupSpacing, Mode=TwoWay}"
+                               SkinRebar="{Binding RightSkinRebar, Mode=TwoWay}"
+                               PreviewWidth="{Binding WidthValue}"
+                               PreviewHeight="{Binding HeightValue}"
+                               IsPreviewVisible="{Binding ShowRight}"/>
                 </Grid>
             </Grid>
-
-            <Border Grid.Column="1"
-                    Margin="10,20,20,20"
-                    BorderBrush="#9A9A9A"
-                    BorderThickness="1"
-                    Background="#EFEFEF">
-                <Grid Margin="10">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-
-                    <Grid Margin="0,0,0,8">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="55"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Text="보 일람표" VerticalAlignment="Center" FontSize="11"/>
-                        <TextBox Grid.Column="1" Height="22"/>
-                    </Grid>
-
-                    <Grid Grid.Row="1" Margin="0,0,0,8">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="55"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="24"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Text="층 목록" VerticalAlignment="Center" FontSize="11"/>
-                        <TextBox Grid.Column="1" Height="22"/>
-                        <Button Grid.Column="2" Margin="4,0,0,0" Content="+" FontSize="10"/>
-                    </Grid>
-
-                    <Grid Grid.Row="2" Margin="0,0,0,8">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="55"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="24"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Text="부재 목록" VerticalAlignment="Center" FontSize="11"/>
-                        <TextBox Grid.Column="1" Height="22"/>
-                        <Button Grid.Column="2" Margin="4,0,0,0" Content="⌕" FontSize="10"/>
-                    </Grid>
-
-                    <Border Grid.Row="3"
-                            Background="#FAFAFA"
-                            BorderBrush="#909090"
-                            BorderThickness="1"/>
-
-                    <StackPanel Grid.Row="4"
-                                Margin="0,10,0,0"
-                                Orientation="Horizontal"
-                                HorizontalAlignment="Right">
-                        <Button Width="62" Height="24" Margin="0,0,8,0" Content="저장"/>
-                        <Button Width="62" Height="24" Content="내보내기"/>
-                    </StackPanel>
-                </Grid>
-            </Border>
         </Grid>
     </Viewbox>
 </UserControl>

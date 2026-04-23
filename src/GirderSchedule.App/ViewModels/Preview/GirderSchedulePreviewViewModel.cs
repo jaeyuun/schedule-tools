@@ -44,6 +44,10 @@ namespace GirderSchedule.App.ViewModels.Preview
 			set { SetProperty(ref _zoom, value); }
 		}
 
+		public string LeftSkinRebar { get; set; } = string.Empty;
+		public string CenterSkinRebar { get; set; } = string.Empty;
+		public string RightSkinRebar { get; set; } = string.Empty;
+
 		public void Refresh()
 		{
 			var service = new BuildPreviewSceneService();
