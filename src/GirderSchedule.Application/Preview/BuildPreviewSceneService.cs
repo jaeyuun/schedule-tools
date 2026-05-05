@@ -55,7 +55,7 @@ namespace GirderSchedule.Application.Preview
 			AddText(scene, 8600, 480, string.Format("({0} × {1})", set.Width, set.Height), 120, "#00AA00");
 		}
 
-		private void DrawCell(PreviewScene scene, int cellIndex, GirderCellModel cell, int width, int height, bool showForce)
+		private void DrawCell(PreviewScene scene, int cellIndex, GirderCellModel cell, double width, double height, bool showForce)
 		{
 			if (cell == null || !cell.IsVisible)
 			{
@@ -78,7 +78,7 @@ namespace GirderSchedule.Application.Preview
 			DrawBottomTexts(scene, cellX, cellWidth, cell);
 		}
 
-		private void DrawSection(PreviewScene scene, double cellX, double cellWidth, int width, int height, GirderCellModel cell)
+		private void DrawSection(PreviewScene scene, double cellX, double cellWidth, double width, double height, GirderCellModel cell)
 		{
 			var scale = GetSectionScale(width, height);
 			var drawWidth = width * scale;
@@ -121,7 +121,7 @@ namespace GirderSchedule.Application.Preview
 
 		private void DrawRebarLayer(PreviewScene scene, double leftX, double rightX, double y, RebarLayerModel layer, bool isTop, double offset)
 		{
-			if (layer == null || layer.Count <= 0 || layer.Diameter <= 0)
+			if (layer == null || layer.FirstCount <= 0 || layer.Diameter <= 0)
 			{
 				return;
 			}
@@ -129,11 +129,17 @@ namespace GirderSchedule.Application.Preview
 			var radius = Math.Max(3.0, layer.Diameter * 0.35);
 			var minX = leftX + radius + 10.0;
 			var maxX = rightX - radius - 10.0;
-			var xs = RebarPlacementService.GetSymmetricPositions(minX, maxX, layer.Count);
+			var firstXs = RebarPlacementService.GetFirstLayerPositions(minX, maxX, layer.FirstCount);
+			var secondXs = RebarPlacementService.GetSecondLayerPositions(minX, maxX, layer.FirstCount, layer.SecondCount);
 
-			for (var i = 0; i < xs.Count; i++)
+			for (var i = 0; i < firstXs.Count; i++)
 			{
-				AddCircle(scene, xs[i], y, radius, "#00FF00", 1.5, "#00FF00");
+				AddCircle(scene, firstXs[i], y, radius, "#00FF00", 1.5, "#00FF00");
+			}
+
+			for (var i = 0; i < secondXs.Count; i++)
+			{
+				AddCircle(scene, secondXs[i], y, radius, "#00FF00", 1.5, "#00FF00");
 			}
 		}
 
@@ -192,7 +198,7 @@ namespace GirderSchedule.Application.Preview
 			AddLine(scene, cx - 20, cy + 20, cx + 20, cy - 20, "#00FF00", 2.0);
 		}
 
-		private double GetSectionScale(int width, int height)
+		private double GetSectionScale(double width, double height)
 		{
 			var sx = 600.0 / width;
 			var sy = 950.0 / height;
@@ -203,14 +209,14 @@ namespace GirderSchedule.Application.Preview
 		{
 			var parts = new List<string>();
 
-			if (layer1 != null && layer1.Count > 0 && layer1.Diameter > 0)
+			if (layer1 != null && layer1.TotalCount > 0 && layer1.Diameter > 0)
 			{
-				parts.Add(string.Format("{0}-HD{1}", layer1.Count, layer1.Diameter));
+				parts.Add(string.Format("{0}-HD{1}", layer1.TotalCount, layer1.Diameter));
 			}
 
-			if (layer2 != null && layer2.Count > 0 && layer2.Diameter > 0)
+			if (layer2 != null && layer2.TotalCount > 0 && layer2.Diameter > 0)
 			{
-				parts.Add(string.Format("{0}-HD{1}", layer2.Count, layer2.Diameter));
+				parts.Add(string.Format("{0}-HD{1}", layer2.TotalCount, layer2.Diameter));
 			}
 
 			if (parts.Count == 0)

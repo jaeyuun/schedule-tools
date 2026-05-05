@@ -9,15 +9,21 @@ namespace GirderSchedule.App.Views.Controls
 {
 	public partial class SectionColumnControl : UserControl
 	{
+		private const double BarRadius = 3.0;
+		private const double StirrupTouchOffset = BarRadius;
+
 		public SectionColumnControl()
 		{
 			InitializeComponent();
 			Loaded += SectionColumnControl_Loaded;
 			SizeChanged += SectionColumnControl_SizeChanged;
+
+			UpdateInputEnabled();
 		}
 
 		private void SectionColumnControl_Loaded(object sender, RoutedEventArgs e)
 		{
+			UpdateInputEnabled();
 			Redraw();
 		}
 
@@ -37,6 +43,28 @@ namespace GirderSchedule.App.Views.Controls
 			control.Redraw();
 		}
 
+		private static void OnStateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+		{
+			var control = d as SectionColumnControl;
+			if (control == null)
+			{
+				return;
+			}
+
+			control.UpdateInputEnabled();
+			control.Redraw();
+		}
+
+		private void UpdateInputEnabled()
+		{
+			IsInputEnabled = !ShowNoneCheckBox || !IsNone;
+		}
+
+		private bool ShouldDrawNone()
+		{
+			return ShowNoneCheckBox && IsNone;
+		}
+
 		private void Redraw()
 		{
 			if (PART_PreviewCanvas == null)
@@ -51,14 +79,43 @@ namespace GirderSchedule.App.Views.Controls
 				return;
 			}
 
+			if (ShouldDrawNone())
+			{
+				//DrawNoneSlash();
+				return;
+			}
+
+			var layout = CreatePreviewLayout();
+
+			DrawGirderOutline(layout);
+			DrawMainRebars(layout);
+			DrawStirrups(
+				layout.BarStartX,
+				layout.BarEndX,
+				layout.SectionTop,
+				layout.SectionBottom,
+				TopCount1,
+				BottomCount1,
+				StirrupLegs,
+				StirrupTouchOffset);
+
+			DrawPreviewDimensions(
+				layout.OuterLeft,
+				layout.OuterRight,
+				layout.OuterTop,
+				layout.OuterBottom,
+				layout.SideWing,
+				PreviewWidth,
+				PreviewHeight,
+				IsWidthOver,
+				IsHeightOver,
+				layout.DimensionScale);
+		}
+
+		private PreviewLayout CreatePreviewLayout()
+		{
 			var widthValue = PreviewWidth;
 			var heightValue = PreviewHeight;
-
-			var topCount1 = TopCount1;
-			var topCount2 = TopCount2;
-			var bottomCount1 = BottomCount1;
-			var bottomCount2 = BottomCount2;
-			var stirrupLegs = StirrupLegs;
 
 			var areaWidth = PART_PreviewCanvas.ActualWidth;
 			var areaHeight = PART_PreviewCanvas.ActualHeight;
@@ -69,66 +126,253 @@ namespace GirderSchedule.App.Views.Controls
 				areaHeight = 220;
 			}
 
-			var drawWidth = areaWidth * 0.38;
-			var drawHeight = areaHeight * 0.55;
+			var sectionUnitWidth = widthValue > 0 ? (double)widthValue : 600.0;
+			var sectionUnitHeight = heightValue > 0 ? (double)heightValue : 900.0;
 
-			if (widthValue > 0 && heightValue > 0)
+			const double topGapUnit = 30.0;
+			const double sideDropUnit = 150.0;
+			const double sideWingUnit = 175.0;
+			const double sideOffsetUnit = 25.0;
+			const double bottomOffsetUnit = 30.0;
+			const double rebarCoverUnit = 25.0;
+			const double secondLayerGapUnit = 40.0;
+
+			const double dimensionTopSpaceUnit = 95.0;
+			const double dimensionLeftSpaceUnit = 95.0;
+			const double dimensionRightSpaceUnit = 35.0;
+			const double dimensionBottomSpaceUnit = 25.0;
+
+			var outerUnitWidth = sectionUnitWidth + sideOffsetUnit * 2.0;
+			var outerUnitHeight = topGapUnit + sectionUnitHeight + bottomOffsetUnit;
+
+			var modelWidth =
+				dimensionLeftSpaceUnit +
+				sideWingUnit +
+				outerUnitWidth +
+				sideWingUnit +
+				dimensionRightSpaceUnit;
+
+			var modelHeight =
+				dimensionTopSpaceUnit +
+				outerUnitHeight +
+				dimensionBottomSpaceUnit;
+
+			var scaleX = areaWidth * 0.9 / modelWidth;
+			var scaleY = areaHeight * 0.9 / modelHeight;
+			var scale = Math.Min(scaleX, scaleY);
+
+			if (scale <= 0)
 			{
-				var ratio = (double)widthValue / heightValue;
-				if (ratio > 1.0)
-				{
-					drawHeight = drawWidth / ratio;
-				}
-				else
-				{
-					drawWidth = drawHeight * ratio;
-				}
+				scale = 1.0;
 			}
 
-			var left = (areaWidth - drawWidth) / 2.0;
-			var top = (areaHeight - drawHeight) / 2.0 + 8.0;
+			const double shapeScaleFactor = 0.82;
 
-			var outer = new Rectangle
+			var shapeScale = scale * shapeScaleFactor;
+			var dimensionScale = scale;
+
+			var originX = (areaWidth - modelWidth * scale) / 2.0;
+			var originY = (areaHeight - modelHeight * scale) / 2.0;
+
+			var topGap = topGapUnit * shapeScale;
+			var sideDrop = sideDropUnit * shapeScale;
+			var sideWing = sideWingUnit * shapeScale;
+			var sideOffset = sideOffsetUnit * shapeScale;
+			var bottomOffset = bottomOffsetUnit * shapeScale;
+			var rebarCover = Math.Max(4.0, rebarCoverUnit * shapeScale);
+			var secondLayerGap = Math.Max(7.0, secondLayerGapUnit * shapeScale);
+
+			var drawWidth = sectionUnitWidth * shapeScale;
+			var drawHeight = sectionUnitHeight * shapeScale;
+
+			var dimensionLeftSpace = dimensionLeftSpaceUnit * dimensionScale;
+			var dimensionRightSpace = dimensionRightSpaceUnit * dimensionScale;
+			var dimensionTopSpace = dimensionTopSpaceUnit * dimensionScale;
+			var dimensionBottomSpace = dimensionBottomSpaceUnit * dimensionScale;
+
+			var shapeModelWidth =
+				sideWingUnit * shapeScale +
+				sideOffsetUnit * shapeScale +
+				sectionUnitWidth * shapeScale +
+				sideOffsetUnit * shapeScale +
+				sideWingUnit * shapeScale;
+
+			var shapeModelHeight =
+				topGapUnit * shapeScale +
+				sectionUnitHeight * shapeScale +
+				bottomOffsetUnit * shapeScale;
+
+			var availableShapeWidth =
+				modelWidth * scale -
+				dimensionLeftSpace -
+				dimensionRightSpace;
+
+			var availableShapeHeight =
+				modelHeight * scale -
+				dimensionTopSpace -
+				dimensionBottomSpace;
+
+			var shapeStartX =
+				originX +
+				dimensionLeftSpace +
+				(availableShapeWidth - shapeModelWidth) / 2.0;
+
+			var shapeStartY =
+				originY +
+				dimensionTopSpace +
+				(availableShapeHeight - shapeModelHeight) / 2.0;
+
+			var outerLeft = shapeStartX + sideWing;
+			var outerTop = shapeStartY;
+
+			var outerRight = outerLeft + drawWidth + sideOffset * 2.0;
+			var outerShelfY = outerTop + sideDrop;
+			var outerBottom = outerTop + topGap + drawHeight + bottomOffset;
+
+			var sectionLeft = outerLeft + sideOffset;
+			var sectionTop = outerTop + topGap;
+			var sectionBottom = sectionTop + drawHeight;
+
+			var barStartX = sectionLeft + rebarCover;
+			var barEndX = sectionLeft + drawWidth - rebarCover;
+
+			var topBarY1 = sectionTop + rebarCover;
+			var topBarY2 = topBarY1 + secondLayerGap;
+
+			var bottomBarY1 = sectionTop + drawHeight - rebarCover;
+			var bottomBarY2 = bottomBarY1 - secondLayerGap;
+
+			return new PreviewLayout
 			{
-				Width = drawWidth,
-				Height = drawHeight,
-				Stroke = new SolidColorBrush(Color.FromRgb(70, 70, 70)),
-				StrokeThickness = 2
+				AreaWidth = areaWidth,
+				AreaHeight = areaHeight,
+				ShapeScale = shapeScale,
+				DimensionScale = dimensionScale,
+				OuterLeft = outerLeft,
+				OuterRight = outerRight,
+				OuterTop = outerTop,
+				OuterShelfY = outerShelfY,
+				OuterBottom = outerBottom,
+				SectionLeft = sectionLeft,
+				SectionTop = sectionTop,
+				SectionBottom = sectionBottom,
+				DrawWidth = drawWidth,
+				DrawHeight = drawHeight,
+				SideWing = sideWing,
+				RebarCover = rebarCover,
+				SecondLayerGap = secondLayerGap,
+				BarStartX = barStartX,
+				BarEndX = barEndX,
+				TopBarY1 = topBarY1,
+				TopBarY2 = topBarY2,
+				BottomBarY1 = bottomBarY1,
+				BottomBarY2 = bottomBarY2
 			};
-			Canvas.SetLeft(outer, left);
-			Canvas.SetTop(outer, top);
+		}
+
+		private void DrawGirderOutline(PreviewLayout layout)
+		{
+			var lineBrush = new SolidColorBrush(Color.FromRgb(25, 25, 25));
+
+			var outer = new Path
+			{
+				Stroke = lineBrush,
+				StrokeThickness = 1.5,
+				Fill = Brushes.Transparent,
+				Data = CreateGirderOuterGeometry(
+					layout.OuterLeft,
+					layout.OuterRight,
+					layout.OuterTop,
+					layout.OuterShelfY,
+					layout.OuterBottom,
+					layout.SideWing)
+			};
+
 			PART_PreviewCanvas.Children.Add(outer);
 
-			var stirrupInset = 10.0;
 			var stirrup = new Rectangle
 			{
-				Width = Math.Max(10, drawWidth - stirrupInset * 2),
-				Height = Math.Max(10, drawHeight - stirrupInset * 2),
-				Stroke = new SolidColorBrush(Color.FromRgb(90, 90, 90)),
+				Width = layout.DrawWidth,
+				Height = layout.DrawHeight,
+				Stroke = lineBrush,
+				StrokeThickness = 1.0,
+				Fill = Brushes.Transparent
+			};
+
+			Canvas.SetLeft(stirrup, layout.SectionLeft);
+			Canvas.SetTop(stirrup, layout.SectionTop);
+			PART_PreviewCanvas.Children.Add(stirrup);
+		}
+
+		private void DrawMainRebars(PreviewLayout layout)
+		{
+			DrawFirstLayerRebars(layout.BarStartX, layout.BarEndX, layout.TopBarY1, TopCount1);
+			DrawSecondLayerRebars(layout.BarStartX, layout.BarEndX, layout.TopBarY2, TopCount1, TopCount2);
+
+			DrawFirstLayerRebars(layout.BarStartX, layout.BarEndX, layout.BottomBarY1, BottomCount1);
+			DrawSecondLayerRebars(layout.BarStartX, layout.BarEndX, layout.BottomBarY2, BottomCount1, BottomCount2);
+		}
+
+		private void DrawNoneSlash()
+		{
+			var areaWidth = PART_PreviewCanvas.ActualWidth;
+			var areaHeight = PART_PreviewCanvas.ActualHeight;
+
+			if (areaWidth <= 0 || areaHeight <= 0)
+			{
+				areaWidth = 200;
+				areaHeight = 220;
+			}
+
+			var margin = 18.0;
+
+			var line = new Line
+			{
+				X1 = margin,
+				Y1 = areaHeight - margin,
+				X2 = areaWidth - margin,
+				Y2 = margin,
+				Stroke = new SolidColorBrush(Color.FromRgb(25, 25, 25)),
 				StrokeThickness = 1.5
 			};
-			Canvas.SetLeft(stirrup, left + stirrupInset);
-			Canvas.SetTop(stirrup, top + stirrupInset);
-			PART_PreviewCanvas.Children.Add(stirrup);
 
-			var barStartX = left + stirrupInset + 6;
-			var barEndX = left + drawWidth - stirrupInset - 6;
+			PART_PreviewCanvas.Children.Add(line);
+		}
 
-			var topBarY1 = top + 12;
-			var topBarY2 = top + 24;
-			var bottomBarY1 = top + drawHeight - 12;
-			var bottomBarY2 = top + drawHeight - 24;
+		private static Geometry CreateGirderOuterGeometry(
+			double outerLeft,
+			double outerRight,
+			double outerTop,
+			double outerShelfY,
+			double outerBottom,
+			double sideWing)
+		{
+			var geometry = new PathGeometry();
 
-			DrawFirstLayerRebars(barStartX, barEndX, topBarY1, topCount1);
-			DrawSecondLayerRebars(barStartX, barEndX, topBarY2, topCount1, topCount2);
+			var topLine = new PathFigure
+			{
+				StartPoint = new Point(outerLeft - sideWing, outerTop),
+				IsClosed = false
+			};
 
-			DrawFirstLayerRebars(barStartX, barEndX, bottomBarY1, bottomCount1);
-			DrawSecondLayerRebars(barStartX, barEndX, bottomBarY2, bottomCount1, bottomCount2);
+			topLine.Segments.Add(new LineSegment(new Point(outerRight + sideWing, outerTop), true));
 
-			DrawStirrups(barStartX, barEndX, top + stirrupInset, top + drawHeight - stirrupInset, stirrupLegs);
+			var lowerShape = new PathFigure
+			{
+				StartPoint = new Point(outerLeft - sideWing, outerShelfY),
+				IsClosed = false
+			};
 
-			DrawDimensionText(left + drawWidth / 2.0 - 12, top - 24, widthValue.ToString(CultureInfo.InvariantCulture));
-			DrawDimensionText(left - 28, top + drawHeight / 2.0 - 8, heightValue.ToString(CultureInfo.InvariantCulture));
+			lowerShape.Segments.Add(new LineSegment(new Point(outerLeft, outerShelfY), true));
+			lowerShape.Segments.Add(new LineSegment(new Point(outerLeft, outerBottom), true));
+			lowerShape.Segments.Add(new LineSegment(new Point(outerRight, outerBottom), true));
+			lowerShape.Segments.Add(new LineSegment(new Point(outerRight, outerShelfY), true));
+			lowerShape.Segments.Add(new LineSegment(new Point(outerRight + sideWing, outerShelfY), true));
+
+			geometry.Figures.Add(topLine);
+			geometry.Figures.Add(lowerShape);
+
+			return geometry;
 		}
 
 		private void DrawFirstLayerRebars(double startX, double endX, double y, int count)
@@ -192,115 +436,377 @@ namespace GirderSchedule.App.Views.Controls
 			}
 		}
 
-		private void DrawRebars(double startX, double endX, double y, int count)
-		{
-			if (count <= 0)
-			{
-				return;
-			}
-
-			if (count % 2 == 0)
-			{
-				DrawEvenRebars(startX, endX, y, count);
-				return;
-			}
-
-			var evenCount = count + 1;
-			var spacing = (endX - startX) / (evenCount - 1);
-			var removeIndex = evenCount - 2;
-
-			for (var i = 0; i < evenCount; i++)
-			{
-				if (i == removeIndex)
-				{
-					continue;
-				}
-
-				AddBar(startX + spacing * i, y);
-			}
-		}
-
-		private void DrawEvenRebars(double startX, double endX, double y, int count)
-		{
-			if (count <= 0)
-			{
-				return;
-			}
-
-			if (count == 1)
-			{
-				AddBar(startX, y);
-				return;
-			}
-
-			var spacing = (endX - startX) / (count - 1);
-			for (var i = 0; i < count; i++)
-			{
-				AddBar(startX + spacing * i, y);
-			}
-		}
-
 		private void AddBar(double x, double y)
 		{
 			var ellipse = new Ellipse
 			{
-				Width = 6,
-				Height = 6,
+				Width = BarRadius * 2.0,
+				Height = BarRadius * 2.0,
 				Fill = new SolidColorBrush(Color.FromRgb(70, 70, 70))
 			};
 
-			Canvas.SetLeft(ellipse, x - 3);
-			Canvas.SetTop(ellipse, y - 3);
+			Canvas.SetLeft(ellipse, x - BarRadius);
+			Canvas.SetTop(ellipse, y - BarRadius);
 			PART_PreviewCanvas.Children.Add(ellipse);
 		}
 
-		private void DrawStirrups(double startX, double endX, double topY, double bottomY, int count)
+		private void DrawStirrups(
+			double barStartX,
+			double barEndX,
+			double topY,
+			double bottomY,
+			int topFirstLayerCount,
+			int bottomFirstLayerCount,
+			int stirrupLegs,
+			double sideOffset)
+		{
+			if (stirrupLegs <= 2)
+			{
+				return;
+			}
+
+			if (topFirstLayerCount <= 2 || bottomFirstLayerCount <= 2)
+			{
+				return;
+			}
+
+			var availableLegs = Math.Min(stirrupLegs, bottomFirstLayerCount);
+			var innerCount = availableLegs - 2;
+
+			if (innerCount <= 0)
+			{
+				return;
+			}
+
+			var topXs = GetLayerRebarXs(barStartX, barEndX, topFirstLayerCount);
+			var bottomXs = GetLayerRebarXs(barStartX, barEndX, bottomFirstLayerCount);
+			var usedBottom = new bool[bottomFirstLayerCount];
+
+			for (var i = 1; i <= innerCount; i++)
+			{
+				var rawIndex = (topFirstLayerCount - 1) * i / (double)(availableLegs - 1);
+				var topIndex = (int)Math.Floor(rawIndex + 0.5 - 0.000001);
+
+				if (topIndex <= 0)
+				{
+					topIndex = 1;
+				}
+
+				if (topIndex >= topFirstLayerCount - 1)
+				{
+					topIndex = topFirstLayerCount - 2;
+				}
+
+				var topX = topXs[topIndex];
+				var direction = topIndex < topFirstLayerCount / 2.0 ? -1.0 : 1.0;
+
+				var bottomIndex = FindNearestIndex(bottomXs, topX, usedBottom);
+
+				if (bottomIndex < 0)
+				{
+					continue;
+				}
+
+				usedBottom[bottomIndex] = true;
+
+				var bottomX = bottomXs[bottomIndex];
+
+				var topLineX = topX + direction * sideOffset;
+				var bottomLineX = bottomX + direction * sideOffset;
+
+				topLineX = Clamp(topLineX, barStartX, barEndX);
+				bottomLineX = Clamp(bottomLineX, barStartX, barEndX);
+
+				AddStirrupLine(topLineX, bottomLineX, topY, bottomY);
+			}
+		}
+
+		private void AddStirrupLine(double topX, double bottomX, double topY, double bottomY)
+		{
+			var line = new Line
+			{
+				X1 = topX,
+				Y1 = topY,
+				X2 = bottomX,
+				Y2 = bottomY,
+				Stroke = new SolidColorBrush(Color.FromRgb(25, 25, 25)),
+				StrokeThickness = 1.0
+			};
+
+			PART_PreviewCanvas.Children.Add(line);
+		}
+
+		private double[] GetLayerRebarXs(double startX, double endX, int count)
 		{
 			if (count <= 0)
 			{
-				return;
+				return new double[0];
 			}
 
 			if (count == 1)
 			{
-				AddStirrupLine((startX + endX) / 2.0, topY, bottomY);
-				return;
+				return new[] { startX };
 			}
 
+			var values = new double[count];
 			var spacing = (endX - startX) / (count - 1);
+
 			for (var i = 0; i < count; i++)
 			{
-				AddStirrupLine(startX + spacing * i, topY, bottomY);
+				values[i] = startX + spacing * i;
 			}
+
+			return values;
 		}
 
-		private void AddStirrupLine(double x, double topY, double bottomY)
+		private static int FindNearestIndex(double[] values, double targetX, bool[] used)
+		{
+			var index = -1;
+			var distance = double.MaxValue;
+
+			for (var i = 0; i < values.Length; i++)
+			{
+				if (used != null && i < used.Length && used[i])
+				{
+					continue;
+				}
+
+				var currentDistance = Math.Abs(values[i] - targetX);
+
+				if (currentDistance >= distance)
+				{
+					continue;
+				}
+
+				index = i;
+				distance = currentDistance;
+			}
+
+			return index;
+		}
+
+		private static double Clamp(double value, double min, double max)
+		{
+			if (value < min)
+			{
+				return min;
+			}
+
+			if (value > max)
+			{
+				return max;
+			}
+
+			return value;
+		}
+
+		private void DrawPreviewDimensions(
+			double outerLeft,
+			double outerRight,
+			double outerTop,
+			double outerBottom,
+			double sideWing,
+			double widthValue,
+			double heightValue,
+			bool isWidthOver,
+			bool isHeightOver,
+			double scale)
+		{
+			var dimensionBrush = new SolidColorBrush(Color.FromRgb(25, 25, 25));
+
+			const double auxGap = 12.0;
+
+			var dimensionGap = Math.Max(24.0, 34.0 * scale);
+			var extensionOver = Math.Max(8.0, 12.0 * scale);
+			var tick = Math.Max(4.0, 8.0 * scale);
+			var circleRadius = Math.Max(2.0, 3.0 * scale);
+			var textFontSize = Math.Max(10.0, 16.0 * scale);
+
+			var widthText = FormatDimensionText(widthValue, isWidthOver);
+			var heightText = FormatDimensionText(heightValue, isHeightOver);
+
+			var outerVisualLeft = outerLeft - sideWing;
+
+			var topDimY = outerTop - dimensionGap;
+			var topExtTop = topDimY - extensionOver;
+			var topExtBottom = outerTop - auxGap;
+
+			DrawLine(outerLeft, topDimY, outerRight, topDimY, dimensionBrush, 1.0);
+			DrawLine(outerLeft, topExtTop, outerLeft, topExtBottom, dimensionBrush, 1.0);
+			DrawLine(outerRight, topExtTop, outerRight, topExtBottom, dimensionBrush, 1.0);
+
+			DrawDimensionMark(outerLeft, topDimY, circleRadius, tick, dimensionBrush);
+			DrawDimensionMark(outerRight, topDimY, circleRadius, tick, dimensionBrush);
+
+			DrawDimensionText(
+				outerLeft + (outerRight - outerLeft) / 2.0,
+				topDimY - textFontSize * 0.9,
+				widthText,
+				textFontSize,
+				0.0,
+				dimensionBrush);
+
+			var leftDimX = outerVisualLeft - dimensionGap;
+			var leftExtLeft = leftDimX - extensionOver;
+			var leftExtRight = outerVisualLeft - auxGap;
+
+			DrawLine(leftDimX, outerTop, leftDimX, outerBottom, dimensionBrush, 1.0);
+			DrawLine(leftExtLeft, outerTop, leftExtRight, outerTop, dimensionBrush, 1.0);
+			DrawLine(leftExtLeft, outerBottom, leftExtRight, outerBottom, dimensionBrush, 1.0);
+
+			DrawDimensionMark(leftDimX, outerTop, circleRadius, tick, dimensionBrush);
+			DrawDimensionMark(leftDimX, outerBottom, circleRadius, tick, dimensionBrush);
+
+			DrawDimensionText(
+				leftDimX - textFontSize * 0.9,
+				outerTop + (outerBottom - outerTop) / 2.0,
+				heightText,
+				textFontSize,
+				-90.0,
+				dimensionBrush);
+		}
+
+		private string FormatDimensionText(double value, bool isOver)
+		{
+			var text = value.ToString(CultureInfo.InvariantCulture);
+
+			if (!isOver)
+			{
+				return text;
+			}
+
+			return text + " 이상";
+		}
+
+		private void DrawLine(double x1, double y1, double x2, double y2, Brush stroke, double thickness)
 		{
 			var line = new Line
 			{
-				X1 = x,
-				Y1 = topY,
-				X2 = x,
-				Y2 = bottomY,
-				Stroke = new SolidColorBrush(Color.FromRgb(110, 110, 110)),
-				StrokeThickness = 1
+				X1 = x1,
+				Y1 = y1,
+				X2 = x2,
+				Y2 = y2,
+				Stroke = stroke,
+				StrokeThickness = thickness
 			};
+
 			PART_PreviewCanvas.Children.Add(line);
 		}
 
-		private void DrawDimensionText(double x, double y, string text)
+		private void DrawDimensionMark(
+			double x,
+			double y,
+			double radius,
+			double tick,
+			Brush stroke)
 		{
-			var tb = new TextBlock
+			var circle = new Ellipse
 			{
-				Text = text,
-				FontSize = 12,
-				Foreground = new SolidColorBrush(Color.FromRgb(60, 60, 60))
+				Width = radius * 2.0,
+				Height = radius * 2.0,
+				Stroke = stroke,
+				StrokeThickness = 1.0,
+				Fill = Brushes.Transparent
 			};
 
-			Canvas.SetLeft(tb, x);
-			Canvas.SetTop(tb, y);
-			PART_PreviewCanvas.Children.Add(tb);
+			Canvas.SetLeft(circle, x - radius);
+			Canvas.SetTop(circle, y - radius);
+			PART_PreviewCanvas.Children.Add(circle);
+
+			DrawLine(x - tick, y, x + tick, y, stroke, 1.0);
+			DrawLine(x, y - tick, x, y + tick, stroke, 1.0);
 		}
+
+		private void DrawDimensionText(
+			double centerX,
+			double centerY,
+			string text,
+			double fontSize,
+			double angle,
+			Brush foreground)
+		{
+			var textBlock = new TextBlock
+			{
+				Text = text,
+				FontSize = fontSize,
+				Foreground = foreground,
+				FontWeight = FontWeights.SemiBold,
+				RenderTransformOrigin = new Point(0.5, 0.5)
+			};
+
+			textBlock.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+
+			Canvas.SetLeft(textBlock, centerX - textBlock.DesiredSize.Width / 2.0);
+			Canvas.SetTop(textBlock, centerY - textBlock.DesiredSize.Height / 2.0);
+
+			if (Math.Abs(angle) > 0.001)
+			{
+				textBlock.RenderTransform = new RotateTransform(angle);
+			}
+
+			PART_PreviewCanvas.Children.Add(textBlock);
+		}
+
+		private class PreviewLayout
+		{
+			public double AreaWidth { get; set; }
+			public double AreaHeight { get; set; }
+
+			public double ShapeScale { get; set; }
+			public double DimensionScale { get; set; }
+
+			public double OuterLeft { get; set; }
+			public double OuterRight { get; set; }
+			public double OuterTop { get; set; }
+			public double OuterShelfY { get; set; }
+			public double OuterBottom { get; set; }
+
+			public double SectionLeft { get; set; }
+			public double SectionTop { get; set; }
+			public double SectionBottom { get; set; }
+
+			public double DrawWidth { get; set; }
+			public double DrawHeight { get; set; }
+
+			public double SideWing { get; set; }
+			public double RebarCover { get; set; }
+			public double SecondLayerGap { get; set; }
+
+			public double BarStartX { get; set; }
+			public double BarEndX { get; set; }
+
+			public double TopBarY1 { get; set; }
+			public double TopBarY2 { get; set; }
+			public double BottomBarY1 { get; set; }
+			public double BottomBarY2 { get; set; }
+		}
+
+		public bool IsNone
+		{
+			get { return (bool)GetValue(IsNoneProperty); }
+			set { SetValue(IsNoneProperty, value); }
+		}
+
+		public static readonly DependencyProperty IsNoneProperty =
+			DependencyProperty.Register(nameof(IsNone), typeof(bool), typeof(SectionColumnControl), new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnStateChanged));
+
+		public bool ShowNoneCheckBox
+		{
+			get { return (bool)GetValue(ShowNoneCheckBoxProperty); }
+			set { SetValue(ShowNoneCheckBoxProperty, value); }
+		}
+
+		public static readonly DependencyProperty ShowNoneCheckBoxProperty =
+			DependencyProperty.Register(nameof(ShowNoneCheckBox), typeof(bool), typeof(SectionColumnControl), new FrameworkPropertyMetadata(true, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnStateChanged));
+
+		public bool IsInputEnabled
+		{
+			get { return (bool)GetValue(IsInputEnabledProperty); }
+			private set { SetValue(IsInputEnabledProperty, value); }
+		}
+
+		public static readonly DependencyProperty IsInputEnabledProperty =
+			DependencyProperty.Register(nameof(IsInputEnabled), typeof(bool), typeof(SectionColumnControl), new PropertyMetadata(true));
 
 		public string Title
 		{
@@ -419,23 +925,41 @@ namespace GirderSchedule.App.Views.Controls
 		public static readonly DependencyProperty SkinRebarProperty =
 			DependencyProperty.Register(nameof(SkinRebar), typeof(string), typeof(SectionColumnControl), new FrameworkPropertyMetadata(string.Empty, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
 
-		public int PreviewWidth
+		public double PreviewWidth
 		{
-			get { return (int)GetValue(PreviewWidthProperty); }
+			get { return (double)GetValue(PreviewWidthProperty); }
 			set { SetValue(PreviewWidthProperty, value); }
 		}
 
 		public static readonly DependencyProperty PreviewWidthProperty =
-			DependencyProperty.Register(nameof(PreviewWidth), typeof(int), typeof(SectionColumnControl), new PropertyMetadata(0, OnPreviewPropertyChanged));
+			DependencyProperty.Register(nameof(PreviewWidth), typeof(double), typeof(SectionColumnControl), new PropertyMetadata(0.0, OnPreviewPropertyChanged));
 
-		public int PreviewHeight
+		public double PreviewHeight
 		{
-			get { return (int)GetValue(PreviewHeightProperty); }
+			get { return (double)GetValue(PreviewHeightProperty); }
 			set { SetValue(PreviewHeightProperty, value); }
 		}
 
 		public static readonly DependencyProperty PreviewHeightProperty =
-			DependencyProperty.Register(nameof(PreviewHeight), typeof(int), typeof(SectionColumnControl), new PropertyMetadata(0, OnPreviewPropertyChanged));
+			DependencyProperty.Register(nameof(PreviewHeight), typeof(double), typeof(SectionColumnControl), new PropertyMetadata(0.0, OnPreviewPropertyChanged));
+
+		public bool IsWidthOver
+		{
+			get { return (bool)GetValue(IsWidthOverProperty); }
+			set { SetValue(IsWidthOverProperty, value); }
+		}
+
+		public static readonly DependencyProperty IsWidthOverProperty =
+			DependencyProperty.Register(nameof(IsWidthOver), typeof(bool), typeof(SectionColumnControl), new PropertyMetadata(false, OnPreviewPropertyChanged));
+
+		public bool IsHeightOver
+		{
+			get { return (bool)GetValue(IsHeightOverProperty); }
+			set { SetValue(IsHeightOverProperty, value); }
+		}
+
+		public static readonly DependencyProperty IsHeightOverProperty =
+			DependencyProperty.Register(nameof(IsHeightOver), typeof(bool), typeof(SectionColumnControl), new PropertyMetadata(false, OnPreviewPropertyChanged));
 
 		public bool IsPreviewVisible
 		{

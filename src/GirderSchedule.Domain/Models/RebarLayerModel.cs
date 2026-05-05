@@ -2,7 +2,13 @@
 {
 	public class RebarLayerModel
 	{
-		public int Count { get; set; }
+		public int FirstCount { get; set; }
+		public int SecondCount { get; set; }
 		public int Diameter { get; set; }
+
+		public int TotalCount
+		{
+			get { return FirstCount + SecondCount; }
+		}
 	}
 }

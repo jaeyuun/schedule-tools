@@ -14,8 +14,10 @@ namespace GirderSchedule.App.ViewModels
 	public class MainViewModel : ViewModelBase
 	{
 		private string _memberName = "-1WG10";
-		private int _width = 600;
-		private int _height = 900;
+		private double _width = 600;
+		private bool _isWidthOver = false;
+		private double _height = 900;
+		private bool _isHeightOver = false;
 
 		private bool _showLeft = true;
 		private bool _showCenter = true;
@@ -25,25 +27,31 @@ namespace GirderSchedule.App.ViewModels
 		private string _centerTitle = "CENTER";
 		private string _rightTitle = "END (EXT.)";
 
-		private int _leftTopCount = 4;
+		private int _leftTopCount1 = 4;
+		private int _leftTopCount2 = 0;
 		private int _leftTopDiameter = 19;
-		private int _leftBottomCount = 4;
+		private int _leftBottomCount1 = 4;
+		private int _leftBottomCount2 = 0;
 		private int _leftBottomDiameter = 19;
 		private int _leftStirrupLegs = 2;
 		private int _leftStirrupDiameter = 10;
 		private int _leftStirrupSpacing = 250;
 
-		private int _centerTopCount = 6;
+		private int _centerTopCount1 = 6;
+		private int _centerTopCount2 = 0;
 		private int _centerTopDiameter = 19;
-		private int _centerBottomCount = 4;
+		private int _centerBottomCount1 = 4;
+		private int _centerBottomCount2 = 0;
 		private int _centerBottomDiameter = 19;
 		private int _centerStirrupLegs = 3;
 		private int _centerStirrupDiameter = 10;
 		private int _centerStirrupSpacing = 250;
 
-		private int _rightTopCount = 11;
+		private int _rightTopCount1 = 11;
+		private int _rightTopCount2 = 0;
 		private int _rightTopDiameter = 19;
-		private int _rightBottomCount = 7;
+		private int _rightBottomCount1 = 7;
+		private int _rightBottomCount2 = 0;
 		private int _rightBottomDiameter = 19;
 		private int _rightStirrupLegs = 4;
 		private int _rightStirrupDiameter = 10;
@@ -53,8 +61,8 @@ namespace GirderSchedule.App.ViewModels
 		private string _leftV = string.Empty;
 		private string _centerM = string.Empty;
 		private string _centerV = string.Empty;
-		private string _rightM = "1458";
-		private string _rightV = "1458";
+		private string _rightM = string.Empty;
+		private string _rightV = string.Empty;
 
 		private bool _showForce = true;
 
@@ -87,7 +95,7 @@ namespace GirderSchedule.App.ViewModels
 			}
 		}
 
-		public int WidthValue
+		public double WidthValue
 		{
 			get { return _width; }
 			set
@@ -97,12 +105,32 @@ namespace GirderSchedule.App.ViewModels
 			}
 		}
 
-		public int HeightValue
+		public bool IsWidthOver
+		{
+			get { return _isWidthOver; }
+			set
+			{
+				SetProperty(ref _isWidthOver, value);
+				RefreshPreview();
+			}
+		}
+
+		public double HeightValue
 		{
 			get { return _height; }
 			set
 			{
 				SetProperty(ref _height, value);
+				RefreshPreview();
+			}
+		}
+
+		public bool IsHeightOver
+		{
+			get { return _isHeightOver; }
+			set
+			{
+				SetProperty(ref _isHeightOver, value);
 				RefreshPreview();
 			}
 		}
@@ -167,12 +195,24 @@ namespace GirderSchedule.App.ViewModels
 			}
 		}
 
-		public int LeftTopCount
+		public int LeftTopCount1
+
 		{
-			get { return _leftTopCount; }
+			get { return _leftTopCount1; }
 			set
 			{
-				SetProperty(ref _leftTopCount, value);
+				SetProperty(ref _leftTopCount1, value);
+				RefreshPreview();
+			}
+		}
+
+		public int LeftTopCount2
+
+		{
+			get { return _leftTopCount2; }
+			set
+			{
+				SetProperty(ref _leftTopCount2, value);
 				RefreshPreview();
 			}
 		}
@@ -187,12 +227,22 @@ namespace GirderSchedule.App.ViewModels
 			}
 		}
 
-		public int LeftBottomCount
+		public int LeftBottomCount1
 		{
-			get { return _leftBottomCount; }
+			get { return _leftBottomCount1; }
 			set
 			{
-				SetProperty(ref _leftBottomCount, value);
+				SetProperty(ref _leftBottomCount1, value);
+				RefreshPreview();
+			}
+		}
+
+		public int LeftBottomCount2
+		{
+			get { return _leftBottomCount2; }
+			set
+			{
+				SetProperty(ref _leftBottomCount2, value);
 				RefreshPreview();
 			}
 		}
@@ -237,12 +287,22 @@ namespace GirderSchedule.App.ViewModels
 			}
 		}
 
-		public int CenterTopCount
+		public int CenterTopCount1
 		{
-			get { return _centerTopCount; }
+			get { return _centerTopCount1; }
 			set
 			{
-				SetProperty(ref _centerTopCount, value);
+				SetProperty(ref _centerTopCount1, value);
+				RefreshPreview();
+			}
+		}
+
+		public int CenterTopCount2
+		{
+			get { return _centerTopCount2; }
+			set
+			{
+				SetProperty(ref _centerTopCount2, value);
 				RefreshPreview();
 			}
 		}
@@ -257,12 +317,22 @@ namespace GirderSchedule.App.ViewModels
 			}
 		}
 
-		public int CenterBottomCount
+		public int CenterBottomCount1
 		{
-			get { return _centerBottomCount; }
+			get { return _centerBottomCount1; }
 			set
 			{
-				SetProperty(ref _centerBottomCount, value);
+				SetProperty(ref _centerBottomCount1, value);
+				RefreshPreview();
+			}
+		}
+
+		public int CenterBottomCount2
+		{
+			get { return _centerBottomCount2; }
+			set
+			{
+				SetProperty(ref _centerBottomCount2, value);
 				RefreshPreview();
 			}
 		}
@@ -307,12 +377,22 @@ namespace GirderSchedule.App.ViewModels
 			}
 		}
 
-		public int RightTopCount
+		public int RightTopCount1
 		{
-			get { return _rightTopCount; }
+			get { return _rightTopCount1; }
 			set
 			{
-				SetProperty(ref _rightTopCount, value);
+				SetProperty(ref _rightTopCount1, value);
+				RefreshPreview();
+			}
+		}
+
+		public int RightTopCount2
+		{
+			get { return _rightTopCount2; }
+			set
+			{
+				SetProperty(ref _rightTopCount2, value);
 				RefreshPreview();
 			}
 		}
@@ -327,12 +407,22 @@ namespace GirderSchedule.App.ViewModels
 			}
 		}
 
-		public int RightBottomCount
+		public int RightBottomCount1
 		{
-			get { return _rightBottomCount; }
+			get { return _rightBottomCount1; }
 			set
 			{
-				SetProperty(ref _rightBottomCount, value);
+				SetProperty(ref _rightBottomCount1, value);
+				RefreshPreview();
+			}
+		}
+
+		public int RightBottomCount2
+		{
+			get { return _rightBottomCount2; }
+			set
+			{
+				SetProperty(ref _rightBottomCount2, value);
 				RefreshPreview();
 			}
 		}
@@ -488,13 +578,17 @@ namespace GirderSchedule.App.ViewModels
 			var set = new GirderSetModel();
 			set.MemberName = MemberName;
 			set.Width = WidthValue;
+			set.IsWidthOver = _isWidthOver;
 			set.Height = HeightValue;
+			set.IsHeightOver = _isHeightOver;
 
 			set.Left.IsVisible = ShowLeft;
 			set.Left.Title = LeftTitle;
-			set.Left.Top1.Count = LeftTopCount;
+			set.Left.Top1.FirstCount = LeftTopCount1;
+			set.Left.Top1.SecondCount = LeftTopCount2;
 			set.Left.Top1.Diameter = LeftTopDiameter;
-			set.Left.Bottom1.Count = LeftBottomCount;
+			set.Left.Bottom1.FirstCount = LeftBottomCount1;
+			set.Left.Bottom1.SecondCount = LeftBottomCount2;
 			set.Left.Bottom1.Diameter = LeftBottomDiameter;
 			set.Left.Stirrup.Legs = LeftStirrupLegs;
 			set.Left.Stirrup.Diameter = LeftStirrupDiameter;
@@ -506,9 +600,11 @@ namespace GirderSchedule.App.ViewModels
 
 			set.Center.IsVisible = ShowCenter;
 			set.Center.Title = CenterTitle;
-			set.Center.Top1.Count = CenterTopCount;
+			set.Center.Top1.FirstCount = CenterTopCount1;
+			set.Center.Top1.SecondCount = CenterTopCount2;
 			set.Center.Top1.Diameter = CenterTopDiameter;
-			set.Center.Bottom1.Count = CenterBottomCount;
+			set.Center.Bottom1.FirstCount = CenterBottomCount1;
+			set.Center.Bottom1.SecondCount = CenterBottomCount2;
 			set.Center.Bottom1.Diameter = CenterBottomDiameter;
 			set.Center.Stirrup.Legs = CenterStirrupLegs;
 			set.Center.Stirrup.Diameter = CenterStirrupDiameter;
@@ -520,9 +616,11 @@ namespace GirderSchedule.App.ViewModels
 
 			set.Right.IsVisible = ShowRight;
 			set.Right.Title = RightTitle;
-			set.Right.Top1.Count = RightTopCount;
+			set.Right.Top1.FirstCount = RightTopCount1;
+			set.Right.Top1.SecondCount = RightTopCount2;
 			set.Right.Top1.Diameter = RightTopDiameter;
-			set.Right.Bottom1.Count = RightBottomCount;
+			set.Right.Bottom1.FirstCount = RightBottomCount1;
+			set.Right.Bottom1.SecondCount = RightBottomCount2;
 			set.Right.Bottom1.Diameter = RightBottomDiameter;
 			set.Right.Stirrup.Legs = RightStirrupLegs;
 			set.Right.Stirrup.Diameter = RightStirrupDiameter;

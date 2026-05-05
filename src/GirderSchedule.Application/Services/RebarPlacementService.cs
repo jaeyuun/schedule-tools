@@ -4,6 +4,56 @@ namespace GirderSchedule.Application.Services
 {
 	public static class RebarPlacementService
 	{
+		public static List<double> GetFirstLayerPositions(double minX, double maxX, int count)
+		{
+			return GetSymmetricPositions(minX, maxX, count);
+		}
+
+		public static List<double> GetSecondLayerPositions(double minX, double maxX, int firstLayerCount, int secondLayerCount)
+		{
+			var result = new List<double>();
+
+			if (firstLayerCount <= 0 || secondLayerCount <= 0)
+			{
+				return result;
+			}
+
+			if (firstLayerCount == 1)
+			{
+				result.Add(minX);
+				return result;
+			}
+
+			var spacing = (maxX - minX) / (firstLayerCount - 1);
+
+			var leftCount = (secondLayerCount + 1) / 2;
+			var rightCount = secondLayerCount / 2;
+
+			var drawn = new bool[firstLayerCount];
+
+			for (var i = 0; i < leftCount && i < firstLayerCount; i++)
+			{
+				drawn[i] = true;
+			}
+
+			for (var i = 0; i < rightCount && i < firstLayerCount; i++)
+			{
+				drawn[firstLayerCount - 1 - i] = true;
+			}
+
+			for (var i = 0; i < firstLayerCount; i++)
+			{
+				if (!drawn[i])
+				{
+					continue;
+				}
+
+				result.Add(minX + spacing * i);
+			}
+
+			return result;
+		}
+
 		public static List<double> GetSymmetricPositions(double minX, double maxX, int count)
 		{
 			var result = new List<double>();
@@ -62,7 +112,7 @@ namespace GirderSchedule.Application.Services
 			return diameter / 2.0;
 		}
 
-		public static bool NeedSkinMarkX(int height)
+		public static bool NeedSkinMarkX(double height)
 		{
 			return height > 900;
 		}

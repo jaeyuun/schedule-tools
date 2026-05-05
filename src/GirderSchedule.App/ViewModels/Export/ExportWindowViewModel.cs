@@ -32,9 +32,9 @@ namespace GirderSchedule.App.ViewModels.Export
 
 		public ObservableCollection<string> PageItems { get; } = new ObservableCollection<string>();
 
-		public ICommand BrowseFolderCommand { get; }
-		public ICommand ExportCommand { get; }
-		public ICommand CloseCommand { get; }
+		public ICommand BrowseFolderCommand { get; private set; }
+		public ICommand ExportCommand { get; private set; }
+		public ICommand CloseCommand { get; private set; }
 
 		public ExportWindowViewModel(
 			IDrawingExportService dxfExportService,
@@ -80,7 +80,11 @@ namespace GirderSchedule.App.ViewModels.Export
 			set
 			{
 				SetProperty(ref _selectedPageIndex, value);
-				Preview.SelectedPageIndex = value;
+
+				if (Preview != null)
+				{
+					Preview.SelectedPageIndex = value;
+				}
 			}
 		}
 
@@ -127,32 +131,50 @@ namespace GirderSchedule.App.ViewModels.Export
 		{
 			if (_document == null)
 			{
+				Forms.MessageBox.Show("내보낼 문서가 없습니다.", "내보내기", Forms.MessageBoxButtons.OK, Forms.MessageBoxIcon.Information);
 				return;
 			}
 
 			if (string.IsNullOrWhiteSpace(SaveFolder) || !Directory.Exists(SaveFolder))
 			{
 				BrowseFolder();
+
 				if (string.IsNullOrWhiteSpace(SaveFolder) || !Directory.Exists(SaveFolder))
 				{
 					return;
 				}
 			}
 
+			var fileName = string.IsNullOrWhiteSpace(FileName) ? "보일람표" : FileName.Trim();
 			var extension = GetExtension(SelectedFormat);
-			var path = Path.Combine(SaveFolder, FileName + extension);
+			var path = Path.Combine(SaveFolder, fileName + extension);
 
-			if (SelectedFormat == "DXF")
+			try
 			{
-				_dxfExportService.Export(path, _document);
+				if (SelectedFormat == "DXF")
+				{
+					_dxfExportService.Export(path, _document);
+				}
+				else if (SelectedFormat == "PDF")
+				{
+					_pdfExportService.Export(path, _document);
+				}
+				else if (SelectedFormat == "JPG")
+				{
+					_jpgExportService.Export(path, _document);
+				}
+				else
+				{
+					Forms.MessageBox.Show("지원하지 않는 파일 형식입니다.", "내보내기", Forms.MessageBoxButtons.OK, Forms.MessageBoxIcon.Information);
+					return;
+				}
+
+				Forms.MessageBox.Show("내보내기가 완료되었습니다.", "내보내기", Forms.MessageBoxButtons.OK, Forms.MessageBoxIcon.Information);
+				Close();
 			}
-			else if (SelectedFormat == "PDF")
+			catch (Exception ex)
 			{
-				_pdfExportService.Export(path, _document);
-			}
-			else if (SelectedFormat == "JPG")
-			{
-				_jpgExportService.Export(path, _document);
+				Forms.MessageBox.Show(ex.Message, "내보내기 실패", Forms.MessageBoxButtons.OK, Forms.MessageBoxIcon.Error);
 			}
 		}
 

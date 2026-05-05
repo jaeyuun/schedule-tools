@@ -4,7 +4,7 @@
              xmlns:controls="clr-namespace:GirderSchedule.App.Views.Controls">
     <Viewbox Stretch="Uniform">
         <Grid Width="870"
-              Height="642"
+              Height="656"
               Background="#F7F7F7">
 
             <Grid Margin="20">
@@ -15,7 +15,7 @@
                     <RowDefinition Height="56"/>
                     <RowDefinition Height="56"/>
                     <RowDefinition Height="28"/>
-                    <RowDefinition Height="28"/>
+                    <RowDefinition Height="56"/>
                 </Grid.RowDefinitions>
 
                 <Button Width="70"
@@ -39,7 +39,7 @@
                         <RowDefinition Height="56"/>
                         <RowDefinition Height="56"/>
                         <RowDefinition Height="28"/>
-                        <RowDefinition Height="28"/>
+                        <RowDefinition Height="56"/>
                     </Grid.RowDefinitions>
 
                     <Border Grid.Row="0" Grid.Column="0" BorderBrush="#B8B8B8" BorderThickness="1">
@@ -60,7 +60,7 @@
                             BorderBrush="#B8B8B8"
                             BorderThickness="0,1,1,1">
                         <StackPanel VerticalAlignment="Center">
-                            <TextBox Width="120"
+                            <TextBox Width="240"
                                      Height="24"
                                      HorizontalAlignment="Center"
                                      Text="{Binding MemberName, UpdateSourceTrigger=PropertyChanged}"/>
@@ -68,12 +68,20 @@
                                         HorizontalAlignment="Center"
                                         Margin="0,6,0,0">
                                 <TextBlock VerticalAlignment="Center" Text="(" FontSize="16"/>
-                                <TextBox Width="38"
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <CheckBox IsChecked="{Binding IsWidthOver, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center"/>
+                                    <TextBlock Text="이상" Margin="4,0,0,0" VerticalAlignment="Center"/>
+                                </StackPanel>
+                                <TextBox Width="60"
                                          Height="22"
                                          Margin="4,0"
                                          Text="{Binding WidthValue, UpdateSourceTrigger=PropertyChanged}"/>
                                 <TextBlock VerticalAlignment="Center" Text="×" FontSize="15"/>
-                                <TextBox Width="38"
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <CheckBox IsChecked="{Binding IsHeightOver, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center"/>
+                                    <TextBlock Text="이상" Margin="4,0,0,0" VerticalAlignment="Center"/>
+                                </StackPanel>
+                                <TextBox Width="60"
                                          Height="22"
                                          Margin="4,0"
                                          Text="{Binding HeightValue, UpdateSourceTrigger=PropertyChanged}"/>
@@ -117,65 +125,70 @@
                                    FontSize="14"/>
                     </Border>
 
-                    <controls:SectionColumnControl Grid.Row="1"
-                               Grid.RowSpan="5"
-                               Grid.Column="1"
-                               Title="{Binding LeftTitle, Mode=TwoWay}"
-                               MValue="{Binding LeftM, Mode=TwoWay}"
-                               VValue="{Binding LeftV, Mode=TwoWay}"
-                               TopCount1="{Binding LeftTopCount1, Mode=TwoWay}"
-                               TopCount2="{Binding LeftTopCount2, Mode=TwoWay}"
-                               TopDiameter="{Binding LeftTopDiameter, Mode=TwoWay}"
-                               BottomCount1="{Binding LeftBottomCount1, Mode=TwoWay}"
-                               BottomCount2="{Binding LeftBottomCount2, Mode=TwoWay}"
-                               BottomDiameter="{Binding LeftBottomDiameter, Mode=TwoWay}"
-                               StirrupLegs="{Binding LeftStirrupLegs, Mode=TwoWay}"
-                               StirrupDiameter="{Binding LeftStirrupDiameter, Mode=TwoWay}"
-                               StirrupSpacing="{Binding LeftStirrupSpacing, Mode=TwoWay}"
-                               SkinRebar="{Binding LeftSkinRebar, Mode=TwoWay}"
-                               PreviewWidth="{Binding WidthValue}"
-                               PreviewHeight="{Binding HeightValue}"
-                               IsPreviewVisible="{Binding ShowLeft}"/>
+                    <controls:SectionColumnControl Grid.Row="1" Grid.RowSpan="5" Grid.Column="1"
+                                                   ShowNoneCheckBox="True"
+                                                   IsNone="False"
+                                                   Title="{Binding LeftTitle, Mode=TwoWay}"
+                                                   MValue="{Binding LeftM, Mode=TwoWay}"
+                                                   VValue="{Binding LeftV, Mode=TwoWay}"
+                                                   TopCount1="{Binding LeftTopCount1, Mode=TwoWay}"
+                                                   TopCount2="{Binding LeftTopCount2, Mode=TwoWay}"
+                                                   TopDiameter="{Binding LeftTopDiameter, Mode=TwoWay}"
+                                                   BottomCount1="{Binding LeftBottomCount1, Mode=TwoWay}"
+                                                   BottomCount2="{Binding LeftBottomCount2, Mode=TwoWay}"
+                                                   BottomDiameter="{Binding LeftBottomDiameter, Mode=TwoWay}"
+                                                   StirrupLegs="{Binding LeftStirrupLegs, Mode=TwoWay}"
+                                                   StirrupDiameter="{Binding LeftStirrupDiameter, Mode=TwoWay}"
+                                                   StirrupSpacing="{Binding LeftStirrupSpacing, Mode=TwoWay}"
+                                                   SkinRebar="{Binding LeftSkinRebar, Mode=TwoWay}"
+                                                   PreviewWidth="{Binding WidthValue}"
+                                                   PreviewHeight="{Binding HeightValue}"
+                                                   IsWidthOver="{Binding IsWidthOver}"
+                                                   IsHeightOver="{Binding IsHeightOver}"
+                                                   IsPreviewVisible="{Binding ShowLeft}"/>
 
-                    <controls:SectionColumnControl Grid.Row="1"
-                               Grid.RowSpan="5"
-                               Grid.Column="2"
-                               Title="{Binding CenterTitle, Mode=TwoWay}"
-                               MValue="{Binding CenterM, Mode=TwoWay}"
-                               VValue="{Binding CenterV, Mode=TwoWay}"
-                               TopCount1="{Binding CenterTopCount1, Mode=TwoWay}"
-                               TopCount2="{Binding CenterTopCount2, Mode=TwoWay}"
-                               TopDiameter="{Binding CenterTopDiameter, Mode=TwoWay}"
-                               BottomCount1="{Binding CenterBottomCount1, Mode=TwoWay}"
-                               BottomCount2="{Binding CenterBottomCount2, Mode=TwoWay}"
-                               BottomDiameter="{Binding CenterBottomDiameter, Mode=TwoWay}"
-                               StirrupLegs="{Binding CenterStirrupLegs, Mode=TwoWay}"
-                               StirrupDiameter="{Binding CenterStirrupDiameter, Mode=TwoWay}"
-                               StirrupSpacing="{Binding CenterStirrupSpacing, Mode=TwoWay}"
-                               SkinRebar="{Binding CenterSkinRebar, Mode=TwoWay}"
-                               PreviewWidth="{Binding WidthValue}"
-                               PreviewHeight="{Binding HeightValue}"
-                               IsPreviewVisible="{Binding ShowCenter}"/>
+                    <controls:SectionColumnControl Grid.Row="1" Grid.RowSpan="5" Grid.Column="2"
+                                                   ShowNoneCheckBox="False"
+                                                   Title="{Binding CenterTitle, Mode=TwoWay}"
+                                                   MValue="{Binding CenterM, Mode=TwoWay}"
+                                                   VValue="{Binding CenterV, Mode=TwoWay}"
+                                                   TopCount1="{Binding CenterTopCount1, Mode=TwoWay}"
+                                                   TopCount2="{Binding CenterTopCount2, Mode=TwoWay}"
+                                                   TopDiameter="{Binding CenterTopDiameter, Mode=TwoWay}"
+                                                   BottomCount1="{Binding CenterBottomCount1, Mode=TwoWay}"
+                                                   BottomCount2="{Binding CenterBottomCount2, Mode=TwoWay}"
+                                                   BottomDiameter="{Binding CenterBottomDiameter, Mode=TwoWay}"
+                                                   StirrupLegs="{Binding CenterStirrupLegs, Mode=TwoWay}"
+                                                   StirrupDiameter="{Binding CenterStirrupDiameter, Mode=TwoWay}"
+                                                   StirrupSpacing="{Binding CenterStirrupSpacing, Mode=TwoWay}"
+                                                   SkinRebar="{Binding CenterSkinRebar, Mode=TwoWay}"
+                                                   PreviewWidth="{Binding WidthValue}"
+                                                   PreviewHeight="{Binding HeightValue}"
+                                                   IsWidthOver="{Binding IsWidthOver}"
+                                                   IsHeightOver="{Binding IsHeightOver}"
+                                                   IsPreviewVisible="{Binding ShowCenter}"/>
 
-                    <controls:SectionColumnControl Grid.Row="1"
-                               Grid.RowSpan="5"
-                               Grid.Column="3"
-                               Title="{Binding RightTitle, Mode=TwoWay}"
-                               MValue="{Binding RightM, Mode=TwoWay}"
-                               VValue="{Binding RightV, Mode=TwoWay}"
-                               TopCount1="{Binding RightTopCount1, Mode=TwoWay}"
-                               TopCount2="{Binding RightTopCount2, Mode=TwoWay}"
-                               TopDiameter="{Binding RightTopDiameter, Mode=TwoWay}"
-                               BottomCount1="{Binding RightBottomCount1, Mode=TwoWay}"
-                               BottomCount2="{Binding RightBottomCount2, Mode=TwoWay}"
-                               BottomDiameter="{Binding RightBottomDiameter, Mode=TwoWay}"
-                               StirrupLegs="{Binding RightStirrupLegs, Mode=TwoWay}"
-                               StirrupDiameter="{Binding RightStirrupDiameter, Mode=TwoWay}"
-                               StirrupSpacing="{Binding RightStirrupSpacing, Mode=TwoWay}"
-                               SkinRebar="{Binding RightSkinRebar, Mode=TwoWay}"
-                               PreviewWidth="{Binding WidthValue}"
-                               PreviewHeight="{Binding HeightValue}"
-                               IsPreviewVisible="{Binding ShowRight}"/>
+                    <controls:SectionColumnControl Grid.Row="1" Grid.RowSpan="5" Grid.Column="3"
+                                                   ShowNoneCheckBox="True"
+                                                   IsNone="False"
+                                                   Title="{Binding RightTitle, Mode=TwoWay}"
+                                                   MValue="{Binding RightM, Mode=TwoWay}"
+                                                   VValue="{Binding RightV, Mode=TwoWay}"
+                                                   TopCount1="{Binding RightTopCount1, Mode=TwoWay}"
+                                                   TopCount2="{Binding RightTopCount2, Mode=TwoWay}"
+                                                   TopDiameter="{Binding RightTopDiameter, Mode=TwoWay}"
+                                                   BottomCount1="{Binding RightBottomCount1, Mode=TwoWay}"
+                                                   BottomCount2="{Binding RightBottomCount2, Mode=TwoWay}"
+                                                   BottomDiameter="{Binding RightBottomDiameter, Mode=TwoWay}"
+                                                   StirrupLegs="{Binding RightStirrupLegs, Mode=TwoWay}"
+                                                   StirrupDiameter="{Binding RightStirrupDiameter, Mode=TwoWay}"
+                                                   StirrupSpacing="{Binding RightStirrupSpacing, Mode=TwoWay}"
+                                                   SkinRebar="{Binding RightSkinRebar, Mode=TwoWay}"
+                                                   PreviewWidth="{Binding WidthValue}"
+                                                   PreviewHeight="{Binding HeightValue}"
+                                                   IsWidthOver="{Binding IsWidthOver}"
+                                                   IsHeightOver="{Binding IsHeightOver}"
+                                                   IsPreviewVisible="{Binding ShowRight}"/>
                 </Grid>
             </Grid>
         </Grid>
