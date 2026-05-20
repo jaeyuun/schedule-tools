@@ -1,0 +1,247 @@
+﻿<UserControl x:Class="GirderSchedule.App.Views.Girder.SchedulePreview"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Loaded="UserControl_Loaded">
+
+    <UserControl.Resources>
+        <DataTemplate x:Key="RebarInputTemplate">
+            <Border BorderBrush="#B8B8B8" BorderThickness="0,1,1,0">
+                <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" Grid.Column="0" Margin="0,0,6,2" VerticalAlignment="Center" Text="1단"/>
+                    <TextBox Grid.Row="0" Grid.Column="1" Width="34" Height="20" Margin="0,0,4,2" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Text="{Binding TopCount1, UpdateSourceTrigger=PropertyChanged}"/>
+
+                    <TextBlock Grid.Row="1" Grid.Column="0" Margin="0,0,6,0" VerticalAlignment="Center" Text="2단"/>
+                    <TextBox Grid.Row="1" Grid.Column="1" Width="34" Height="20" Margin="0,0,4,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Text="{Binding TopCount2, UpdateSourceTrigger=PropertyChanged}"/>
+
+                    <StackPanel Grid.Row="0" Grid.RowSpan="2" Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock VerticalAlignment="Center" Text="-HD"/>
+                        <TextBox Width="34" Height="20" Margin="4,0,0,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Text="{Binding TopDiameter, UpdateSourceTrigger=PropertyChanged}"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </DataTemplate>
+
+        <DataTemplate x:Key="BottomRebarInputTemplate">
+            <Border BorderBrush="#B8B8B8" BorderThickness="0,1,1,0">
+                <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" Grid.Column="0" Margin="0,0,6,2" VerticalAlignment="Center" Text="1단"/>
+                    <TextBox Grid.Row="0" Grid.Column="1" Width="34" Height="20" Margin="0,0,4,2" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Text="{Binding BottomCount1, UpdateSourceTrigger=PropertyChanged}"/>
+
+                    <TextBlock Grid.Row="1" Grid.Column="0" Margin="0,0,6,0" VerticalAlignment="Center" Text="2단"/>
+                    <TextBox Grid.Row="1" Grid.Column="1" Width="34" Height="20" Margin="0,0,4,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Text="{Binding BottomCount2, UpdateSourceTrigger=PropertyChanged}"/>
+
+                    <StackPanel Grid.Row="0" Grid.RowSpan="2" Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock VerticalAlignment="Center" Text="-HD"/>
+                        <TextBox Width="34" Height="20" Margin="4,0,0,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Text="{Binding BottomDiameter, UpdateSourceTrigger=PropertyChanged}"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </DataTemplate>
+
+        <DataTemplate x:Key="StirrupInputTemplate">
+            <Border BorderBrush="#B8B8B8" BorderThickness="0,1,1,0">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <TextBox Width="34" Height="22" Margin="2,0" HorizontalContentAlignment="Center" Text="{Binding StirrupLegs, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBlock Text="-HD" VerticalAlignment="Center"/>
+                    <TextBox Width="34" Height="22" Margin="2,0" HorizontalContentAlignment="Center" Text="{Binding StirrupDiameter, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBlock Text="@" VerticalAlignment="Center"/>
+                    <TextBox Width="44" Height="22" Margin="2,0" HorizontalContentAlignment="Center" Text="{Binding StirrupSpacing, UpdateSourceTrigger=PropertyChanged}"/>
+                </StackPanel>
+            </Border>
+        </DataTemplate>
+    </UserControl.Resources>
+
+    <Viewbox Stretch="Uniform">
+        <Grid Width="1180" Height="720" Background="#F7F7F7">
+            <Grid Margin="20">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="42"/>
+                    <RowDefinition Height="44"/>
+                    <RowDefinition Height="320"/>
+                    <RowDefinition Height="32"/>
+                    <RowDefinition Height="32"/>
+                    <RowDefinition Height="32"/>
+                    <RowDefinition Height="32"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <Button Grid.Row="0"
+                        Width="70"
+                        Height="26"
+                        HorizontalAlignment="Left"
+                        Content="그리기"
+                        Command="{Binding RedrawCommand}"
+                        Click="RedrawButton_Click"/>
+
+                <Border Grid.Row="1" BorderBrush="#B8B8B8" BorderThickness="1,1,1,0">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="120"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Border Grid.Column="0" BorderBrush="#B8B8B8" BorderThickness="0,0,1,0" Background="#EFEFEF">
+                            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="부 재 명"/>
+                        </Border>
+
+                        <TextBox Grid.Column="1"
+                                 BorderThickness="0"
+                                 Background="White"
+                                 HorizontalContentAlignment="Center"
+                                 VerticalContentAlignment="Center"
+                                 Text="{Binding MemberName, UpdateSourceTrigger=PropertyChanged}"/>
+                    </Grid>
+                </Border>
+
+                <Grid Grid.Row="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="120"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="0" BorderBrush="#B8B8B8" BorderThickness="1,1,1,0" Background="#EFEFEF">
+                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="위 치"/>
+                    </Border>
+
+                    <Border Grid.Column="1" BorderBrush="#B8B8B8" BorderThickness="0,1,1,0">
+                        <TextBox BorderThickness="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Text="{Binding Left.Position, UpdateSourceTrigger=PropertyChanged}"/>
+                    </Border>
+
+                    <Border Grid.Column="2" BorderBrush="#B8B8B8" BorderThickness="0,1,1,0">
+                        <TextBox BorderThickness="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Text="{Binding Center.Position, UpdateSourceTrigger=PropertyChanged}"/>
+                    </Border>
+
+                    <Border Grid.Column="3" BorderBrush="#B8B8B8" BorderThickness="0,1,1,0">
+                        <TextBox BorderThickness="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Text="{Binding Right.Position, UpdateSourceTrigger=PropertyChanged}"/>
+                    </Border>
+                </Grid>
+
+                <Grid Grid.Row="3">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="120"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="0" BorderBrush="#B8B8B8" BorderThickness="1,1,1,0" Background="#EFEFEF">
+                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="단    면"/>
+                    </Border>
+
+                    <Border Grid.Column="1" BorderBrush="#B8B8B8" BorderThickness="0,1,1,0" Background="White">
+                        <Canvas x:Name="LeftCanvas" Width="300" Height="300"/>
+                    </Border>
+
+                    <Border Grid.Column="2" BorderBrush="#B8B8B8" BorderThickness="0,1,1,0" Background="White">
+                        <Canvas x:Name="CenterCanvas" Width="300" Height="300"/>
+                    </Border>
+
+                    <Border Grid.Column="3" BorderBrush="#B8B8B8" BorderThickness="0,1,1,0" Background="White">
+                        <Canvas x:Name="RightCanvas" Width="300" Height="300"/>
+                    </Border>
+                </Grid>
+
+                <Grid Grid.Row="4">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="120"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="0" BorderBrush="#B8B8B8" BorderThickness="1,1,1,0" Background="#EFEFEF">
+                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="상 부 근"/>
+                    </Border>
+
+                    <ContentControl Grid.Column="1" Content="{Binding Left}" ContentTemplate="{StaticResource RebarInputTemplate}"/>
+                    <ContentControl Grid.Column="2" Content="{Binding Center}" ContentTemplate="{StaticResource RebarInputTemplate}"/>
+                    <ContentControl Grid.Column="3" Content="{Binding Right}" ContentTemplate="{StaticResource RebarInputTemplate}"/>
+                </Grid>
+
+                <Grid Grid.Row="5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="120"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="0" BorderBrush="#B8B8B8" BorderThickness="1,1,1,0" Background="#EFEFEF">
+                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="하 부 근"/>
+                    </Border>
+
+                    <ContentControl Grid.Column="1" Content="{Binding Left}" ContentTemplate="{StaticResource BottomRebarInputTemplate}"/>
+                    <ContentControl Grid.Column="2" Content="{Binding Center}" ContentTemplate="{StaticResource BottomRebarInputTemplate}"/>
+                    <ContentControl Grid.Column="3" Content="{Binding Right}" ContentTemplate="{StaticResource BottomRebarInputTemplate}"/>
+                </Grid>
+
+                <Grid Grid.Row="6">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="120"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="0" BorderBrush="#B8B8B8" BorderThickness="1,1,1,0" Background="#EFEFEF">
+                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="스 터 럽"/>
+                    </Border>
+
+                    <ContentControl Grid.Column="1" Content="{Binding Left}" ContentTemplate="{StaticResource StirrupInputTemplate}"/>
+                    <ContentControl Grid.Column="2" Content="{Binding Center}" ContentTemplate="{StaticResource StirrupInputTemplate}"/>
+                    <ContentControl Grid.Column="3" Content="{Binding Right}" ContentTemplate="{StaticResource StirrupInputTemplate}"/>
+                </Grid>
+
+                <Grid Grid.Row="7">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="120"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="0" BorderBrush="#B8B8B8" BorderThickness="1,1,1,1" Background="#EFEFEF">
+                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="표피철근(X)"/>
+                    </Border>
+
+                    <Border Grid.Column="1" BorderBrush="#B8B8B8" BorderThickness="0,1,1,1">
+                        <TextBox BorderThickness="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Text="{Binding Left.SkinRebarText, UpdateSourceTrigger=PropertyChanged}"/>
+                    </Border>
+
+                    <Border Grid.Column="2" BorderBrush="#B8B8B8" BorderThickness="0,1,1,1">
+                        <TextBox BorderThickness="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Text="{Binding Center.SkinRebarText, UpdateSourceTrigger=PropertyChanged}"/>
+                    </Border>
+
+                    <Border Grid.Column="3" BorderBrush="#B8B8B8" BorderThickness="0,1,1,1">
+                        <TextBox BorderThickness="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Text="{Binding Right.SkinRebarText, UpdateSourceTrigger=PropertyChanged}"/>
+                    </Border>
+                </Grid>
+            </Grid>
+        </Grid>
+    </Viewbox>
+</UserControl>

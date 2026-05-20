@@ -1,115 +1,13 @@
 ﻿<Window x:Class="GirderSchedule.App.Views.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:controls="clr-namespace:GirderSchedule.App.Views.Controls"
-        mc:Ignorable="d"
-        Title="보 일람표 툴"
-        Width="1600"
-        Height="900"
+        xmlns:girder="clr-namespace:GirderSchedule.App.Views.Girder"
+        Title="GirderSchedule"
+        Width="1280"
+        Height="820"
         WindowStartupLocation="CenterScreen"
-        Background="#E6E6E6">
-
-    <Grid Margin="8">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="260" />
-        </Grid.ColumnDefinitions>
-
-        <Border Grid.Column="0"
-                Margin="0,0,10,0"
-                Background="#DCDCDC"
-                BorderBrush="#A9A9A9"
-                BorderThickness="1"
-                Padding="18">
-            <Grid>
-                <controls:GirderSchedulePreview DataContext="{Binding}" />
-            </Grid>
-        </Border>
-
-        <Border Grid.Column="1"
-                Background="#F3F3F3"
-                BorderBrush="#A9A9A9"
-                BorderThickness="1"
-                Padding="10">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
-
-                <Grid Margin="0,0,0,8">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="55"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Text="보 일람표"
-                               VerticalAlignment="Center"
-                               FontSize="11"/>
-                    <TextBox Grid.Column="1"
-                             Height="24"/>
-                </Grid>
-
-                <Grid Grid.Row="1" Margin="0,0,0,8">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="55"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="28"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Text="층 목록"
-                               VerticalAlignment="Center"
-                               FontSize="11"/>
-                    <TextBox Grid.Column="1"
-                             Height="24"/>
-                    <Button Grid.Column="2"
-                            Margin="4,0,0,0"
-                            Content="+"/>
-                </Grid>
-
-                <Grid Grid.Row="2" Margin="0,0,0,8">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="55"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="28"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Text="부재 목록"
-                               VerticalAlignment="Center"
-                               FontSize="11"/>
-                    <TextBox Grid.Column="1"
-                             Height="24"/>
-                    <Button Grid.Column="2"
-                            Margin="4,0,0,0"
-                            Content="⌕"/>
-                </Grid>
-
-                <Border Grid.Row="3"
-                        BorderBrush="#909090"
-                        BorderThickness="1"
-                        Background="#FBFBFB">
-                    <ScrollViewer VerticalScrollBarVisibility="Auto">
-                        <StackPanel Margin="6"/>
-                    </ScrollViewer>
-                </Border>
-
-                <StackPanel Grid.Row="4"
-                            Margin="0,10,0,0"
-                            Orientation="Horizontal"
-                            HorizontalAlignment="Right">
-                    <Button Width="62"
-                            Height="26"
-                            Margin="0,0,8,0"
-                            Content="저장"
-                            Command="{Binding RefreshCommand}"/>
-                    <Button Width="62"
-                            Height="26"
-                            Content="내보내기"
-                            Command="{Binding OpenExportCommand}"/>
-                </StackPanel>
-            </Grid>
-        </Border>
+        Background="#F0F0F0">
+    <Grid>
+        <girder:SchedulePreview/>
     </Grid>
 </Window>

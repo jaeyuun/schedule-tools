@@ -3,41 +3,47 @@ using System.Windows.Input;
 
 namespace GirderSchedule.App.ViewModels
 {
-	public class RelayCommand : ICommand
-	{
-		private readonly Action _execute;
-		private readonly Func<bool> _canExecute;
+    public sealed class RelayCommand : ICommand
+    {
+        private readonly Action<object> _execute;
+        private readonly Predicate<object> _canExecute;
 
-		public event EventHandler CanExecuteChanged;
+        public event EventHandler CanExecuteChanged;
 
-		public RelayCommand(Action execute, Func<bool> canExecute = null)
-		{
-			_execute = execute;
-			_canExecute = canExecute;
-		}
+        public RelayCommand(Action<object> execute)
+            : this(execute, null)
+        {
+        }
 
-		public bool CanExecute(object parameter)
-		{
-			if (_canExecute == null)
-			{
-				return true;
-			}
+        public RelayCommand(Action<object> execute, Predicate<object> canExecute)
+        {
+            _execute = execute;
+            _canExecute = canExecute;
+        }
 
-			return _canExecute();
-		}
+        public bool CanExecute(object parameter)
+        {
+            if (_canExecute == null)
+            {
+                return true;
+            }
 
-		public void Execute(object parameter)
-		{
-			_execute();
-		}
+            return _canExecute(parameter);
+        }
 
-		public void RaiseCanExecuteChanged()
-		{
-			var handler = CanExecuteChanged;
-			if (handler != null)
-			{
-				handler(this, EventArgs.Empty);
-			}
-		}
-	}
+        public void Execute(object parameter)
+        {
+            _execute(parameter);
+        }
+
+        public void RaiseCanExecuteChanged()
+        {
+            var handler = CanExecuteChanged;
+
+            if (handler != null)
+            {
+                handler(this, EventArgs.Empty);
+            }
+        }
+    }
 }

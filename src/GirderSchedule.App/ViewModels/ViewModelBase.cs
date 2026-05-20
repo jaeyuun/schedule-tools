@@ -3,28 +3,18 @@ using System.Runtime.CompilerServices;
 
 namespace GirderSchedule.App.ViewModels
 {
-	public class ViewModelBase : INotifyPropertyChanged
-	{
-		public event PropertyChangedEventHandler PropertyChanged;
+    public abstract class ViewModelBase : INotifyPropertyChanged
+    {
+        public event PropertyChangedEventHandler PropertyChanged;
 
-		protected void SetProperty<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
-		{
-			if (Equals(field, value))
-			{
-				return;
-			}
+        protected void OnPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            var handler = PropertyChanged;
 
-			field = value;
-			OnPropertyChanged(propertyName);
-		}
-
-		protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
-		{
-			var handler = PropertyChanged;
-			if (handler != null)
-			{
-				handler(this, new PropertyChangedEventArgs(propertyName));
-			}
-		}
-	}
+            if (handler != null)
+            {
+                handler(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
 }
