@@ -5,6 +5,7 @@ namespace GirderSchedule.App.ViewModels.Girder
     public sealed class SectionItemViewModel : ViewModelBase
     {
         private readonly ScheduleItem _model;
+        private bool _isSectionEnabled = true;
 
         public ScheduleItem Model
         {
@@ -250,6 +251,21 @@ namespace GirderSchedule.App.ViewModels.Girder
             get { return _model.Stirrup.Legs + "-HD" + _model.Stirrup.Diameter + "@" + _model.Stirrup.Spacing; }
         }
 
+        public bool IsSectionEnabled
+        {
+            get { return _isSectionEnabled; }
+            set
+            {
+                if (_isSectionEnabled == value)
+                {
+                    return;
+                }
+
+                _isSectionEnabled = value;
+                OnPropertyChanged(nameof(IsSectionEnabled));
+            }
+        }
+
         public SectionItemViewModel(ScheduleItem model)
         {
             _model = model;
@@ -280,6 +296,8 @@ namespace GirderSchedule.App.ViewModels.Girder
             OnPropertyChanged(nameof(BottomText1));
             OnPropertyChanged(nameof(BottomText2));
             OnPropertyChanged(nameof(StirrupText));
+
+            OnPropertyChanged(nameof(IsSectionEnabled));
         }
 
         private string FormatLayerText(int count, int diameter)

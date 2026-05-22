@@ -7,6 +7,8 @@ namespace GirderSchedule.App.ViewModels.Girder
     public sealed class ScheduleViewModel : ViewModelBase
     {
         private readonly ScheduleSheet _sheet;
+        private bool _isWidthOver;
+        private bool _isHeightOver;
 
         public SectionItemViewModel Left { get; private set; }
         public SectionItemViewModel Center { get; private set; }
@@ -62,6 +64,38 @@ namespace GirderSchedule.App.ViewModels.Girder
                 Right.HeightValue = value;
 
                 OnPropertyChanged(nameof(HeightValue));
+                RefreshItems();
+            }
+        }
+
+        public bool IsWidthOver
+        {
+            get { return _isWidthOver; }
+            set
+            {
+                if (_isWidthOver == value)
+                {
+                    return;
+                }
+
+                _isWidthOver = value;
+                OnPropertyChanged(nameof(IsWidthOver));
+                RefreshItems();
+            }
+        }
+
+        public bool IsHeightOver
+        {
+            get { return _isHeightOver; }
+            set
+            {
+                if (_isHeightOver == value)
+                {
+                    return;
+                }
+
+                _isHeightOver = value;
+                OnPropertyChanged(nameof(IsHeightOver));
                 RefreshItems();
             }
         }
