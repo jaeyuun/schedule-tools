@@ -5,26 +5,43 @@ namespace GirderSchedule.Dxf.Common
 {
     public sealed class DxfResourceValidator
     {
-        public void Validate(DxfDocument document)
+        public void Ensure(DxfDocument document)
         {
             RequireLayer(document, DxfLayers.FormLine);
             RequireLayer(document, DxfLayers.FormText);
             RequireLayer(document, DxfLayers.Text);
+            RequireLayer(document, DxfLayers.RcGir);
             RequireLayer(document, DxfLayers.Rebar);
-            RequireLayer(document, DxfLayers.RcGirder);
-            RequireLayer(document, DxfLayers.Dimension);
+            RequireLayer(document, DxfLayers.Dim);
 
-            RequireBlock(document, DxfBlocks.BaseForm);
-            RequireBlock(document, DxfBlocks.ExtendForm);
-            RequireBlock(document, DxfBlocks.RebarDot);
-            RequireBlock(document, DxfBlocks.TitleForm);
+            RequireTextStyle(document, DxfStyles.Text);
+            RequireDimensionStyle(document, DxfStyles.Dimension);
+
+            RequireBlock(document, DxfBlocks.RebarD19);
+            RequireBlock(document, DxfBlocks.DimensionDot);
         }
 
         private void RequireLayer(DxfDocument document, string name)
         {
             if (!document.Layers.Contains(name))
             {
-                throw new InvalidOperationException("DXF Layer가 없습니다: " + name);
+                throw new InvalidOperationException("템플릿 DXF에 레이어가 없습니다: " + name);
+            }
+        }
+
+        private void RequireTextStyle(DxfDocument document, string name)
+        {
+            if (!document.TextStyles.Contains(name))
+            {
+                throw new InvalidOperationException("템플릿 DXF에 문자 스타일이 없습니다: " + name);
+            }
+        }
+
+        private void RequireDimensionStyle(DxfDocument document, string name)
+        {
+            if (!document.DimensionStyles.Contains(name))
+            {
+                throw new InvalidOperationException("템플릿 DXF에 치수 스타일이 없습니다: " + name);
             }
         }
 
@@ -32,7 +49,7 @@ namespace GirderSchedule.Dxf.Common
         {
             if (!document.Blocks.Contains(name))
             {
-                throw new InvalidOperationException("DXF Block이 없습니다: " + name);
+                throw new InvalidOperationException("템플릿 DXF에 블록이 없습니다: " + name);
             }
         }
     }

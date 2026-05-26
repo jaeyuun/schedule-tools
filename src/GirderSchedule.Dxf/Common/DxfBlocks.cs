@@ -3,8 +3,9 @@
     public static class DxfBlocks
     {
         public const string BaseForm = "BASE1-1";
-        public const string ExtendForm = "FORM_2";
-        public const string RebarDot = "D19";
-        public const string TitleForm = "Xref_S_VForm";
+        public const string Form2 = "FORM_2";
+        public const string RebarD19 = "D19";
+        public const string DimensionDot = "Z_DOT";
+        public const string TitleBlock = "Xref_S_VForm";
     }
 }

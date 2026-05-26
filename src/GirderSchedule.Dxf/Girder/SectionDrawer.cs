@@ -1,10 +1,6 @@
-﻿using System.Collections.Generic;
-using GirderSchedule.Dxf.Common;
-using GirderSchedule.Domain.Girder.Layout;
-using GirderSchedule.Domain.Girder.Models;
-using netDxf;
+﻿using netDxf;
 using netDxf.Entities;
-using netDxf.Tables;
+using GirderSchedule.Dxf.Common;
 
 namespace GirderSchedule.Dxf.Girder
 {
@@ -19,77 +15,22 @@ namespace GirderSchedule.Dxf.Girder
             _pointConverter = pointConverter;
         }
 
-        public void Draw(CellBox box, ScheduleItem item)
+        public void Draw(SectionDxfLayout layout)
         {
-            var width = item.Section.Width <= 0 ? 400.0 : item.Section.Width;
-            var height = item.Section.Height <= 0 ? 600.0 : item.Section.Height;
+            AddLine(layout.OuterLeft - layout.SideWing, layout.OuterTop, layout.OuterRight + layout.SideWing, layout.OuterTop, DxfLayers.RcGir);
 
-            var maxWidth = 950.0;
-            var maxHeight = 900.0;
-            var scale = maxWidth / width;
-
-            if (height * scale > maxHeight)
-            {
-                scale = maxHeight / height;
-            }
-
-            var sectionWidth = width * scale;
-            var sectionHeight = height * scale;
-
-            var centerX = box.CenterX;
-            var baseY = box.Y + 1550.0;
-
-            var left = centerX - sectionWidth / 2.0;
-            var right = centerX + sectionWidth / 2.0;
-            var bottom = baseY;
-            var top = baseY + sectionHeight;
-
-            var slabOverhang = 175.0;
-            var slabThickness = 150.0;
-
-            DrawSlab(left - slabOverhang, top + slabThickness, left, top, right, right + slabOverhang);
-            DrawBeam(left, bottom, right, top);
+            AddLine(layout.OuterLeft - layout.SideWing, layout.OuterShelfY, layout.OuterLeft, layout.OuterShelfY, DxfLayers.RcGir);
+            AddLine(layout.OuterLeft, layout.OuterShelfY, layout.OuterLeft, layout.OuterBottom, DxfLayers.RcGir);
+            AddLine(layout.OuterLeft, layout.OuterBottom, layout.OuterRight, layout.OuterBottom, DxfLayers.RcGir);
+            AddLine(layout.OuterRight, layout.OuterBottom, layout.OuterRight, layout.OuterShelfY, DxfLayers.RcGir);
+            AddLine(layout.OuterRight, layout.OuterShelfY, layout.OuterRight + layout.SideWing, layout.OuterShelfY, DxfLayers.RcGir);
         }
 
-        private void DrawBeam(double left, double bottom, double right, double top)
+        private void AddLine(double x1, double y1, double x2, double y2, string layerName)
         {
-            var vertices = new List<Polyline2DVertex>();
-            vertices.Add(new Polyline2DVertex(_pointConverter.ToVector2(left, top)));
-            vertices.Add(new Polyline2DVertex(_pointConverter.ToVector2(left, bottom)));
-            vertices.Add(new Polyline2DVertex(_pointConverter.ToVector2(right, bottom)));
-            vertices.Add(new Polyline2DVertex(_pointConverter.ToVector2(right, top)));
-
-            var polyline = new Polyline2D(vertices, false);
-            ApplySectionStyle(polyline);
-
-            _document.Entities.Add(polyline);
-        }
-
-        private void DrawSlab(double leftEnd, double slabTop, double left, double beamTop, double right, double rightEnd)
-        {
-            var vertices = new List<Polyline2DVertex>();
-            vertices.Add(new Polyline2DVertex(_pointConverter.ToVector2(leftEnd, slabTop)));
-            vertices.Add(new Polyline2DVertex(_pointConverter.ToVector2(left, slabTop)));
-            vertices.Add(new Polyline2DVertex(_pointConverter.ToVector2(left, beamTop)));
-            vertices.Add(new Polyline2DVertex(_pointConverter.ToVector2(right, beamTop)));
-            vertices.Add(new Polyline2DVertex(_pointConverter.ToVector2(right, slabTop)));
-            vertices.Add(new Polyline2DVertex(_pointConverter.ToVector2(rightEnd, slabTop)));
-
-            var polyline = new Polyline2D(vertices, false);
-            ApplySectionStyle(polyline);
-
-            _document.Entities.Add(polyline);
-        }
-
-        private void ApplySectionStyle(EntityObject entity)
-        {
-            entity.Layer = _document.Layers[DxfLayers.RcGirder];
-            entity.Color = AciColor.ByLayer;
-
-            if (_document.Linetypes.Contains(DxfStyles.RcGirderLine))
-            {
-                entity.Linetype = _document.Linetypes[DxfStyles.RcGirderLine];
-            }
+            var line = new Line(_pointConverter.ToVector3(x1, y1), _pointConverter.ToVector3(x2, y2));
+            DxfEntityStyle.ApplyByLayer(line, _document.Layers[layerName]);
+            _document.Entities.Add(line);
         }
     }
 }

@@ -84,6 +84,7 @@ namespace GirderSchedule.App.ViewModels.Girder
 
                 _model.TopRebar.FirstLayer.Count = value;
                 OnPropertyChanged(nameof(TopCount1));
+                OnPropertyChanged(nameof(TopTotalCount));
             }
         }
 
@@ -116,7 +117,13 @@ namespace GirderSchedule.App.ViewModels.Girder
 
                 _model.TopRebar.SecondLayer.Count = value;
                 OnPropertyChanged(nameof(TopCount2));
+                OnPropertyChanged(nameof(TopTotalCount));
             }
+        }
+
+        public int TopTotalCount
+        {
+            get { return _model.TopRebar.FirstLayer.Count + _model.TopRebar.SecondLayer.Count; }
         }
 
         public int BottomCount1
@@ -131,6 +138,7 @@ namespace GirderSchedule.App.ViewModels.Girder
 
                 _model.BottomRebar.FirstLayer.Count = value;
                 OnPropertyChanged(nameof(BottomCount1));
+                OnPropertyChanged(nameof(BottomTotalCount));
             }
         }
 
@@ -163,7 +171,13 @@ namespace GirderSchedule.App.ViewModels.Girder
 
                 _model.BottomRebar.SecondLayer.Count = value;
                 OnPropertyChanged(nameof(BottomCount2));
+                OnPropertyChanged(nameof(BottomTotalCount));
             }
+        }
+
+        public int BottomTotalCount
+        {
+            get { return _model.BottomRebar.FirstLayer.Count + _model.BottomRebar.SecondLayer.Count; }
         }
 
         public int StirrupLegs

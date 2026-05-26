@@ -1,6 +1,10 @@
-﻿using System.Windows.Input;
+﻿using System;
+using System.IO;
+using System.Windows.Input;
 using GirderSchedule.Domain.Girder.Models;
 using GirderSchedule.Domain.Girder.Services;
+using GirderSchedule.Dxf.Girder;
+using Microsoft.Win32;
 
 namespace GirderSchedule.App.ViewModels.Girder
 {
@@ -15,6 +19,7 @@ namespace GirderSchedule.App.ViewModels.Girder
         public SectionItemViewModel Right { get; private set; }
 
         public ICommand RedrawCommand { get; private set; }
+        public ICommand ExportDxfCommand { get; private set; }
 
         public ScheduleSheet Sheet
         {
@@ -45,6 +50,11 @@ namespace GirderSchedule.App.ViewModels.Girder
             get { return Left.WidthValue; }
             set
             {
+                if (Left.WidthValue == value)
+                {
+                    return;
+                }
+
                 Left.WidthValue = value;
                 Center.WidthValue = value;
                 Right.WidthValue = value;
@@ -59,6 +69,11 @@ namespace GirderSchedule.App.ViewModels.Girder
             get { return Left.HeightValue; }
             set
             {
+                if (Left.HeightValue == value)
+                {
+                    return;
+                }
+
                 Left.HeightValue = value;
                 Center.HeightValue = value;
                 Right.HeightValue = value;
@@ -109,7 +124,10 @@ namespace GirderSchedule.App.ViewModels.Girder
             Center = new SectionItemViewModel(_sheet.Rows[0].Items[1]);
             Right = new SectionItemViewModel(_sheet.Rows[0].Items[2]);
 
+            Center.IsSectionEnabled = true;
+
             RedrawCommand = new RelayCommand(p => RefreshItems());
+            ExportDxfCommand = new RelayCommand(p => ExportDxf());
         }
 
         public void RefreshItems()
@@ -121,6 +139,38 @@ namespace GirderSchedule.App.ViewModels.Girder
             OnPropertyChanged(nameof(Left));
             OnPropertyChanged(nameof(Center));
             OnPropertyChanged(nameof(Right));
+        }
+
+        private void ExportDxf()
+        {
+            var dialog = new SaveFileDialog();
+            dialog.Title = "DXF 저장";
+            dialog.Filter = "DXF 파일 (*.dxf)|*.dxf";
+            dialog.FileName = string.IsNullOrWhiteSpace(MemberName) ? "BeamSchedule.dxf" : MemberName + ".dxf";
+            dialog.DefaultExt = ".dxf";
+            dialog.AddExtension = true;
+
+            if (dialog.ShowDialog() != true)
+            {
+                return;
+            }
+
+            ExportDxf(dialog.FileName);
+        }
+
+        private void ExportDxf(string filePath)
+        {
+            var exporter = new ScheduleDxfExporter();
+
+            var options = new ScheduleDxfExportOptions();
+            options.IncludeLeft = Left.IsSectionEnabled;
+            options.IncludeCenter = true;
+            options.IncludeRight = Right.IsSectionEnabled;
+            options.IsWidthOver = IsWidthOver;
+            options.IsHeightOver = IsHeightOver;
+            options.TemplatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "GirderTemplate.dxf");
+
+            exporter.Export(Sheet, filePath, options);
         }
     }
 }

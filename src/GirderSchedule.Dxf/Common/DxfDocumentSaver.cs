@@ -1,12 +1,20 @@
-﻿using netDxf;
+﻿using System.IO;
+using netDxf;
 
 namespace GirderSchedule.Dxf.Common
 {
     public sealed class DxfDocumentSaver
     {
-        public void Save(DxfDocument document, string path)
+        public void Save(DxfDocument document, string filePath)
         {
-            document.Save(path);
+            var directory = Path.GetDirectoryName(filePath);
+
+            if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+
+            document.Save(filePath);
         }
     }
 }

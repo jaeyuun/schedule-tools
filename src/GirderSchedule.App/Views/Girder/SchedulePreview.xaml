@@ -51,14 +51,7 @@
                 <TextBlock Grid.Row="1" Grid.Column="0" Margin="0,0,4,0" VerticalAlignment="Center" Text="2단"/>
                 <TextBox Grid.Row="1" Grid.Column="1" Style="{StaticResource SmallTextBoxStyle}" Text="{Binding TopCount2, UpdateSourceTrigger=PropertyChanged}"/>
 
-                <TextBlock Grid.Row="0" Grid.RowSpan="2" Grid.Column="2" Width="20" Margin="0,0,4,0" VerticalAlignment="Center" HorizontalAlignment="Right" TextAlignment="Right">
-                    <TextBlock.Text>
-                        <MultiBinding StringFormat="{}{0}">
-                            <Binding Path="TopCount1"/>
-                        </MultiBinding>
-                    </TextBlock.Text>
-                </TextBlock>
-
+                <TextBlock Grid.Row="0" Grid.RowSpan="2" Grid.Column="2" Width="20" Margin="0,0,4,0" VerticalAlignment="Center" HorizontalAlignment="Right" TextAlignment="Right" Text="{Binding TopTotalCount}"/>
                 <TextBlock Grid.Row="0" Grid.RowSpan="2" Grid.Column="3" Margin="0,0,4,0" VerticalAlignment="Center" Text="- HD"/>
                 <TextBox Grid.Row="0" Grid.RowSpan="2" Grid.Column="4" Style="{StaticResource SmallTextBoxStyle}" Text="{Binding TopDiameter, UpdateSourceTrigger=PropertyChanged}"/>
             </Grid>
@@ -85,14 +78,7 @@
                 <TextBlock Grid.Row="1" Grid.Column="0" Margin="0,0,4,0" VerticalAlignment="Center" Text="2단"/>
                 <TextBox Grid.Row="1" Grid.Column="1" Style="{StaticResource SmallTextBoxStyle}" Text="{Binding BottomCount2, UpdateSourceTrigger=PropertyChanged}"/>
 
-                <TextBlock Grid.Row="0" Grid.RowSpan="2" Grid.Column="2" Width="20" Margin="0,0,4,0" VerticalAlignment="Center" HorizontalAlignment="Right" TextAlignment="Right">
-                    <TextBlock.Text>
-                        <MultiBinding StringFormat="{}{0}">
-                            <Binding Path="BottomCount1"/>
-                        </MultiBinding>
-                    </TextBlock.Text>
-                </TextBlock>
-
+                <TextBlock Grid.Row="0" Grid.RowSpan="2" Grid.Column="2" Width="20" Margin="0,0,4,0" VerticalAlignment="Center" HorizontalAlignment="Right" TextAlignment="Right" Text="{Binding BottomTotalCount}"/>
                 <TextBlock Grid.Row="0" Grid.RowSpan="2" Grid.Column="3" Margin="0,0,4,0" VerticalAlignment="Center" Text="- HD"/>
                 <TextBox Grid.Row="0" Grid.RowSpan="2" Grid.Column="4" Style="{StaticResource SmallTextBoxStyle}" Text="{Binding BottomDiameter, UpdateSourceTrigger=PropertyChanged}"/>
             </Grid>
@@ -129,6 +115,10 @@
                     <RowDefinition Height="56"/>
                 </Grid.RowDefinitions>
 
+                <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                    <Button Width="100" Height="28" Margin="0,0,8,0" Content="DXF 저장" Command="{Binding ExportDxfCommand}"/>
+                </StackPanel>
+                
                 <Grid Grid.Row="1" Grid.RowSpan="6">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="110"/>
@@ -157,8 +147,6 @@
                         <StackPanel VerticalAlignment="Center">
                             <TextBox Width="240"
                                      Height="24"
-                                     HorizontalAlignment="Center"
-                                     Style="{StaticResource CellTextBoxStyle}"
                                      Text="{Binding MemberName, UpdateSourceTrigger=PropertyChanged}"/>
 
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,6,0,0">
@@ -172,8 +160,6 @@
                                 <TextBox Width="60"
                                          Height="22"
                                          Margin="4,0"
-                                         HorizontalContentAlignment="Center"
-                                         VerticalContentAlignment="Center"
                                          Text="{Binding WidthValue, UpdateSourceTrigger=PropertyChanged}"/>
 
                                 <TextBlock VerticalAlignment="Center" Text="×" FontSize="15"/>
@@ -186,8 +172,6 @@
                                 <TextBox Width="60"
                                          Height="22"
                                          Margin="4,0"
-                                         HorizontalContentAlignment="Center"
-                                         VerticalContentAlignment="Center"
                                          Text="{Binding HeightValue, UpdateSourceTrigger=PropertyChanged}"/>
 
                                 <TextBlock VerticalAlignment="Center" Text=")" FontSize="16"/>
@@ -262,7 +246,7 @@
                             <TextBox AcceptsReturn="True"
                                      HorizontalAlignment="Stretch"
                                      VerticalAlignment="Stretch"
-                                     Style="{StaticResource CellTextBoxStyle}"
+                                     Style="{StaticResource TransparentTextBoxStyle}"
                                      Text="{Binding Left.SkinRebarText, UpdateSourceTrigger=PropertyChanged}"/>
                         </Border>
                     </Grid>
@@ -315,7 +299,7 @@
                             <TextBox AcceptsReturn="True"
                                 HorizontalAlignment="Stretch"
                                 VerticalAlignment="Stretch"
-                                Style="{StaticResource CellTextBoxStyle}"
+                                Style="{StaticResource TransparentTextBoxStyle}"
                                 Text="{Binding Center.SkinRebarText, UpdateSourceTrigger=PropertyChanged}"/>
                         </Border>
                     </Grid>
@@ -367,7 +351,7 @@
                             <TextBox AcceptsReturn="True"
                                      HorizontalAlignment="Stretch"
                                      VerticalAlignment="Stretch"
-                                     Style="{StaticResource CellTextBoxStyle}"
+                                     Style="{StaticResource TransparentTextBoxStyle}"
                                      Text="{Binding Right.SkinRebarText, UpdateSourceTrigger=PropertyChanged}"/>
                         </Border>
                     </Grid>

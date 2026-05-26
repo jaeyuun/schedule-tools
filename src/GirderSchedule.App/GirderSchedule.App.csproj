@@ -11,8 +11,23 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\GirderTemplate.bak" />
+    <None Remove="Resources\GirderTemplate.dwg" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\GirderSchedule.Domain\GirderSchedule.Domain.csproj" />
     <ProjectReference Include="..\GirderSchedule.Dxf\GirderSchedule.Dxf.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Resources\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Resources\GirderTemplate.dxf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
