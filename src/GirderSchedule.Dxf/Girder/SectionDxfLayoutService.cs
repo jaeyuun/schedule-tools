@@ -10,18 +10,10 @@ namespace GirderSchedule.Dxf.Girder
         {
             var width = item.Section.Width <= 0 ? 400.0 : item.Section.Width;
             var height = item.Section.Height <= 0 ? 600.0 : item.Section.Height;
+            var scale = 1.0;
 
-            var maxWidth = 950.0;
-            var maxHeight = 1150.0;
-            var scale = Math.Min(maxWidth / width, maxHeight / height);
-
-            if (scale <= 0.0)
-            {
-                scale = 1.0;
-            }
-
-            var drawWidth = width * scale;
-            var drawHeight = height * scale;
+            var drawWidth = width;
+            var drawHeight = height;
 
             var centerX = box.CenterX;
             var centerY = box.CenterY - 120.0;
@@ -33,11 +25,14 @@ namespace GirderSchedule.Dxf.Girder
 
             var sideWing = Math.Max(175.0, drawWidth * 0.28);
             var slabUp = 150.0;
+
             var outerTop = sectionTop + slabUp;
             var outerShelfY = sectionTop;
             var outerBottom = sectionBottom;
 
-            var cover = Math.Max(40.0, 25.0 * scale);
+            var stirrupCover = 40.0;
+            var rebarRadius = 12.5;
+            var rebarInset = stirrupCover + rebarRadius;
             var layerGap = Math.Max(45.0, 40.0 * scale);
 
             return new SectionDxfLayout
@@ -60,13 +55,13 @@ namespace GirderSchedule.Dxf.Girder
 
                 SideWing = sideWing,
 
-                BarStartX = sectionLeft + cover,
-                BarEndX = sectionRight - cover,
+                BarStartX = sectionLeft + rebarInset,
+                BarEndX = sectionRight - rebarInset,
 
-                TopBarY1 = sectionTop - cover,
-                TopBarY2 = sectionTop - cover - layerGap,
-                BottomBarY1 = sectionBottom + cover,
-                BottomBarY2 = sectionBottom + cover + layerGap,
+                TopBarY1 = outerTop - rebarInset,
+                TopBarY2 = outerTop - rebarInset - layerGap,
+                BottomBarY1 = outerBottom + rebarInset,
+                BottomBarY2 = outerBottom + rebarInset + layerGap,
 
                 DrawWidth = drawWidth,
                 DrawHeight = drawHeight,

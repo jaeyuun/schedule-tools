@@ -16,6 +16,7 @@ namespace GirderSchedule.Dxf.Common
 
             RequireTextStyle(document, DxfStyles.Text);
             RequireDimensionStyle(document, DxfStyles.Dimension);
+            RequireLinetype(document, DxfStyles.RcGirderLine);
 
             RequireBlock(document, DxfBlocks.RebarD19);
             RequireBlock(document, DxfBlocks.DimensionDot);
@@ -42,6 +43,14 @@ namespace GirderSchedule.Dxf.Common
             if (!document.DimensionStyles.Contains(name))
             {
                 throw new InvalidOperationException("템플릿 DXF에 치수 스타일이 없습니다: " + name);
+            }
+        }
+
+        private void RequireLinetype(DxfDocument document, string name)
+        {
+            if (!document.Linetypes.Contains(name))
+            {
+                throw new InvalidOperationException("템플릿 DXF에 선종이 없습니다: " + name);
             }
         }
 

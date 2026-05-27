@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using netDxf;
+using netDxf.Blocks;
 using netDxf.Entities;
 using GirderSchedule.Domain.Girder.Models;
 using GirderSchedule.Dxf.Common;
@@ -9,6 +9,9 @@ namespace GirderSchedule.Dxf.Girder
 {
     public sealed class RebarDrawer
     {
+        private const double StirrupCover = 40.0;
+        private const double RebarRadius = 12.5;
+
         private readonly DxfDocument _document;
         private readonly DxfPointConverter _pointConverter;
 
@@ -27,17 +30,16 @@ namespace GirderSchedule.Dxf.Girder
 
         private void DrawOuterStirrup(SectionDxfLayout layout)
         {
-            var cover = 40.0;
+            var left = layout.SectionLeft + StirrupCover;
+            var right = layout.SectionRight - StirrupCover;
+            var top = layout.OuterTop - StirrupCover;
+            var bottom = layout.OuterBottom + StirrupCover;
 
-            var left = layout.SectionLeft + cover;
-            var right = layout.SectionRight - cover;
-            var top = layout.SectionTop - cover;
-            var bottom = layout.SectionBottom + cover;
-
-            AddLine(left, top, right, top);
-            AddLine(right, top, right, bottom);
-            AddLine(right, bottom, left, bottom);
-            AddLine(left, bottom, left, top);
+            AddClosedPolyline(
+                left, top,
+                right, top,
+                right, bottom,
+                left, bottom);
         }
 
         private void DrawInternalStirrups(SectionDxfLayout layout, ScheduleItem item)
@@ -68,6 +70,9 @@ namespace GirderSchedule.Dxf.Girder
             var bottomXs = GetLayerRebarXs(layout.BarStartX, layout.BarEndX, bottomCount);
             var usedBottom = new bool[bottomXs.Length];
 
+            var stirrupTop = layout.OuterTop - StirrupCover;
+            var stirrupBottom = layout.OuterBottom + StirrupCover;
+
             for (var i = 1; i <= innerCount; i++)
             {
                 var rawIndex = (topCount - 1) * i / (double)(innerCount + 1);
@@ -94,10 +99,22 @@ namespace GirderSchedule.Dxf.Girder
                 usedBottom[bottomIndex] = true;
 
                 var bottomX = bottomXs[bottomIndex];
-                var offset = topIndex < topCount / 2.0 ? -9.5 : 9.5;
+                var offset = GetInternalStirrupOffset(topIndex, topCount);
 
-                AddLine(topX + offset, layout.TopBarY1, bottomX + offset, layout.BottomBarY1);
+                AddOpenPolyline(
+                    topX + offset, stirrupTop,
+                    bottomX + offset, stirrupBottom);
             }
+        }
+
+        private double GetInternalStirrupOffset(int index, int count)
+        {
+            if (count <= 1)
+            {
+                return 0.0;
+            }
+
+            return index < count / 2.0 ? -RebarRadius : RebarRadius;
         }
 
         private void DrawMainRebars(SectionDxfLayout layout, ScheduleItem item)
@@ -183,22 +200,91 @@ namespace GirderSchedule.Dxf.Girder
         {
             if (_document.Blocks.Contains(DxfBlocks.RebarD19))
             {
-                var insert = new Insert(_document.Blocks[DxfBlocks.RebarD19], _pointConverter.ToVector3(x, y));
-                DxfEntityStyle.ApplyByLayer(insert, _document.Layers[DxfLayers.Rebar]);
+                var block = _document.Blocks[DxfBlocks.RebarD19];
+                var blockCircle = GetBlockCircleInfo(block);
+                var blockRadius = blockCircle.Radius <= 0.0 ? RebarRadius : blockCircle.Radius;
+                var insertScale = RebarRadius / blockRadius;
+
+                var insertX = x - blockCircle.Center.X * insertScale;
+                var insertY = y - blockCircle.Center.Y * insertScale;
+
+                var insert = new Insert(block, _pointConverter.ToVector3(insertX, insertY));
+                insert.Scale = new Vector3(insertScale, insertScale, insertScale);
+                insert.Rotation = 0.0;
+
+                DxfEntityStyle.ApplyRebar(insert, _document);
                 _document.Entities.Add(insert);
                 return;
             }
 
-            var circle = new Circle(_pointConverter.ToVector3(x, y), 9.5);
-            DxfEntityStyle.ApplyByLayer(circle, _document.Layers[DxfLayers.Rebar]);
+            AddFilledCircle(x, y, RebarRadius);
+        }
+
+        private BlockCircleInfo GetBlockCircleInfo(Block block)
+        {
+            foreach (var entity in block.Entities)
+            {
+                var circle = entity as Circle;
+
+                if (circle == null)
+                {
+                    continue;
+                }
+
+                return new BlockCircleInfo(new Vector2(circle.Center.X, circle.Center.Y), circle.Radius);
+            }
+
+            return new BlockCircleInfo(Vector2.Zero, RebarRadius);
+        }
+
+        private void AddFilledCircle(double x, double y, double radius)
+        {
+            var circle = new Circle(_pointConverter.ToVector3(x, y), radius);
+            DxfEntityStyle.ApplyRebar(circle, _document);
+
+            var hatch = new Hatch(HatchPattern.Solid, false);
+            DxfEntityStyle.ApplyRebar(hatch, _document);
+
+            var boundary = new HatchBoundaryPath(new EntityObject[] { circle });
+            hatch.BoundaryPaths.Add(boundary);
+
+            _document.Entities.Add(hatch);
             _document.Entities.Add(circle);
         }
 
-        private void AddLine(double x1, double y1, double x2, double y2)
+        private void AddOpenPolyline(params double[] values)
         {
-            var line = new Line(_pointConverter.ToVector3(x1, y1), _pointConverter.ToVector3(x2, y2));
-            DxfEntityStyle.ApplyByLayer(line, _document.Layers[DxfLayers.FormLine]);
-            _document.Entities.Add(line);
+            AddPolyline(false, values);
+        }
+
+        private void AddClosedPolyline(params double[] values)
+        {
+            AddPolyline(true, values);
+        }
+
+        private void AddPolyline(bool isClosed, params double[] values)
+        {
+            if (values == null || values.Length == 0)
+            {
+                return;
+            }
+
+            if (values.Length % 2 != 0)
+            {
+                return;
+            }
+
+            var polyline = new Polyline2D();
+
+            for (var i = 0; i < values.Length; i += 2)
+            {
+                polyline.Vertexes.Add(new Polyline2DVertex(_pointConverter.ToVector2(values[i], values[i + 1])));
+            }
+
+            polyline.IsClosed = isClosed;
+
+            DxfEntityStyle.ApplyRebar(polyline, _document);
+            _document.Entities.Add(polyline);
         }
 
         private int SafeCount(int count)
@@ -263,6 +349,18 @@ namespace GirderSchedule.Dxf.Girder
             }
 
             return index;
+        }
+
+        private sealed class BlockCircleInfo
+        {
+            public Vector2 Center { get; private set; }
+            public double Radius { get; private set; }
+
+            public BlockCircleInfo(Vector2 center, double radius)
+            {
+                Center = center;
+                Radius = radius;
+            }
         }
     }
 }

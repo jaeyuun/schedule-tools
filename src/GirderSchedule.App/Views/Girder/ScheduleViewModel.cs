@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Windows;
 using System.Windows.Input;
 using GirderSchedule.Domain.Girder.Models;
 using GirderSchedule.Domain.Girder.Services;
@@ -160,17 +161,63 @@ namespace GirderSchedule.App.ViewModels.Girder
 
         private void ExportDxf(string filePath)
         {
-            var exporter = new ScheduleDxfExporter();
+            try
+            {
+                var exporter = new ScheduleDxfExporter();
 
-            var options = new ScheduleDxfExportOptions();
-            options.IncludeLeft = Left.IsSectionEnabled;
-            options.IncludeCenter = true;
-            options.IncludeRight = Right.IsSectionEnabled;
-            options.IsWidthOver = IsWidthOver;
-            options.IsHeightOver = IsHeightOver;
-            options.TemplatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "GirderTemplate.dxf");
+                var options = new ScheduleDxfExportOptions();
+                options.IncludeLeft = Left.IsSectionEnabled;
+                options.IncludeCenter = true;
+                options.IncludeRight = Right.IsSectionEnabled;
+                options.IsWidthOver = IsWidthOver;
+                options.IsHeightOver = IsHeightOver;
+                options.TemplatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "GirderTemplate.dxf");
 
-            exporter.Export(Sheet, filePath, options);
+                exporter.Export(Sheet, filePath, options);
+
+                MessageBox.Show(
+                    "DXF 파일을 저장했습니다.",
+                    "DXF 저장 완료",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+            }
+            catch (InvalidOperationException ex)
+            {
+                MessageBox.Show(
+                    ex.Message,
+                    "DXF 저장 실패",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+            }
+            catch (IOException)
+            {
+                MessageBox.Show(
+                    "DXF 파일을 저장할 수 없습니다.\r\n\r\n" +
+                    "저장하려는 파일이 AutoCAD, GstarCAD, 뷰어 또는 다른 프로그램에서 열려 있을 수 있습니다.\r\n" +
+                    "파일을 닫은 뒤 다시 저장해 주세요.\r\n\r\n" +
+                    "파일 경로: " + filePath,
+                    "DXF 저장 실패",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                MessageBox.Show(
+                    "DXF 파일을 저장할 권한이 없습니다.\r\n\r\n" +
+                    "쓰기 권한이 있는 폴더인지 확인하거나 다른 위치에 저장해 주세요.\r\n\r\n" +
+                    "파일 경로: " + filePath,
+                    "DXF 저장 실패",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    "DXF 저장 중 오류가 발생했습니다.\r\n\r\n" + ex.Message,
+                    "DXF 저장 실패",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
         }
     }
 }

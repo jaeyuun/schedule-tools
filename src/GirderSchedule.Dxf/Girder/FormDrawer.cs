@@ -59,7 +59,7 @@ namespace GirderSchedule.Dxf.Girder
         private void AddLine(double x1, double y1, double x2, double y2)
         {
             var line = new Line(_pointConverter.ToVector3(x1, y1), _pointConverter.ToVector3(x2, y2));
-            DxfEntityStyle.ApplyByLayer(line, _document.Layers[DxfLayers.FormLine]);
+            DxfEntityStyle.ApplyFormLine(line, _document);
             _document.Entities.Add(line);
         }
     }

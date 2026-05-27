@@ -1,5 +1,6 @@
 ﻿using netDxf;
 using netDxf.Entities;
+using netDxf.Tables;
 using GirderSchedule.Domain.Girder.Models;
 using GirderSchedule.Dxf.Common;
 
@@ -18,20 +19,34 @@ namespace GirderSchedule.Dxf.Girder
 
         public void Draw(SectionDxfLayout layout, ScheduleItem item, bool isWidthOver, bool isHeightOver)
         {
-            AddAlignedDimension(
-                layout.SectionLeft,
-                layout.SectionTop,
-                layout.SectionRight,
-                layout.SectionTop,
-                220.0,
-                FormatDimensionText(item.Section.Width, isWidthOver));
+            DrawWidthDimension(layout, item, isWidthOver);
+            DrawHeightDimension(layout, item, isHeightOver);
+        }
+
+        private void DrawWidthDimension(SectionDxfLayout layout, ScheduleItem item, bool isWidthOver)
+        {
+            var outerLeftX = layout.OuterLeft - layout.SideWing;
+            var outerRightX = layout.OuterRight + layout.SideWing;
 
             AddAlignedDimension(
                 layout.SectionLeft,
-                layout.SectionTop,
-                layout.SectionLeft,
-                layout.SectionBottom,
-                -220.0,
+                layout.OuterTop,
+                layout.SectionRight,
+                layout.OuterTop,
+                220.0,
+                FormatDimensionText(item.Section.Width, isWidthOver));
+        }
+
+        private void DrawHeightDimension(SectionDxfLayout layout, ScheduleItem item, bool isHeightOver)
+        {
+            var outerLeftX = layout.OuterLeft - layout.SideWing;
+
+            AddAlignedDimension(
+                outerLeftX,
+                layout.OuterTop,
+                outerLeftX,
+                layout.OuterBottom,
+                -320.0,
                 FormatDimensionText(item.Section.Height, isHeightOver));
         }
 
@@ -54,11 +69,24 @@ namespace GirderSchedule.Dxf.Girder
                 _pointConverter.ToVector2(x2, y2),
                 offset);
 
-            DxfEntityStyle.ApplyByLayer(dimension, _document.Layers[DxfLayers.Dim]);
-            dimension.Style = _document.DimensionStyles[DxfStyles.Dimension];
-            dimension.UserText = text;
+            ApplyTemplateDimensionStyle(dimension);
+
+            //dimension.UserText = text;
 
             _document.Entities.Add(dimension);
+        }
+
+        private void ApplyTemplateDimensionStyle(AlignedDimension dimension)
+        {
+            dimension.Layer = _document.Layers[DxfLayers.Dim];
+            dimension.Color = AciColor.ByLayer;
+            dimension.Linetype = Linetype.ByLayer;
+            dimension.Lineweight = Lineweight.ByLayer;
+
+            if (_document.DimensionStyles.Contains(DxfStyles.Dimension))
+            {
+                dimension.Style = _document.DimensionStyles[DxfStyles.Dimension];
+            }
         }
     }
 }
