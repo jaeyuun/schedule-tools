@@ -40,16 +40,18 @@ namespace GirderSchedule.Dxf.Girder
                 options = new ScheduleDxfExportOptions();
             }
 
-            var document = _loader.LoadTemplateResourcesOnly(options.TemplatePath);
+            var template = _loader.LoadTemplateResourcesOnly(options.TemplatePath);
+            var document = template.Document;
+
             _validator.Ensure(document);
 
             var pointConverter = new DxfPointConverter();
-            var textDrawer = new TextDrawer(document, pointConverter);
-            var formDrawer = new FormDrawer(document, pointConverter, textDrawer);
+            var textDrawer = new TextDrawer(document, pointConverter, template.Overrides);
+            var formDrawer = new FormDrawer(document, pointConverter, textDrawer, template.Overrides);
             var sectionLayoutService = new SectionDxfLayoutService();
-            var sectionDrawer = new SectionDrawer(document, pointConverter);
-            var rebarDrawer = new RebarDrawer(document, pointConverter);
-            var dimensionDrawer = new DimensionDrawer(document, pointConverter);
+            var sectionDrawer = new SectionDrawer(document, pointConverter, template.Overrides);
+            var rebarDrawer = new RebarDrawer(document, pointConverter, template.Overrides);
+            var dimensionDrawer = new DimensionDrawer(document, pointConverter, template.Overrides);
 
             formDrawer.Draw();
 

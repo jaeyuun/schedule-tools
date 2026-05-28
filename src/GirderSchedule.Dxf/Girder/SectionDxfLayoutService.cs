@@ -18,17 +18,25 @@ namespace GirderSchedule.Dxf.Girder
             var centerX = box.CenterX;
             var centerY = box.CenterY - 120.0;
 
-            var sectionLeft = centerX - drawWidth / 2.0;
-            var sectionRight = centerX + drawWidth / 2.0;
-            var sectionTop = centerY + drawHeight / 2.0;
-            var sectionBottom = centerY - drawHeight / 2.0;
-
             var sideWing = Math.Max(175.0, drawWidth * 0.28);
             var slabUp = 150.0;
 
-            var outerTop = sectionTop + slabUp;
+            if (slabUp > drawHeight * 0.4)
+            {
+                slabUp = drawHeight * 0.4;
+            }
+
+            var outerLeft = centerX - drawWidth / 2.0;
+            var outerRight = centerX + drawWidth / 2.0;
+            var outerTop = centerY + drawHeight / 2.0;
+            var outerBottom = centerY - drawHeight / 2.0;
+
+            var sectionLeft = outerLeft;
+            var sectionRight = outerRight;
+            var sectionTop = outerTop - slabUp;
+            var sectionBottom = outerBottom;
+
             var outerShelfY = sectionTop;
-            var outerBottom = sectionBottom;
 
             var stirrupCover = 40.0;
             var rebarRadius = 12.5;
@@ -42,8 +50,8 @@ namespace GirderSchedule.Dxf.Girder
                 CellTop = box.Top,
                 CellBottom = box.Bottom,
 
-                OuterLeft = sectionLeft,
-                OuterRight = sectionRight,
+                OuterLeft = outerLeft,
+                OuterRight = outerRight,
                 OuterTop = outerTop,
                 OuterShelfY = outerShelfY,
                 OuterBottom = outerBottom,
