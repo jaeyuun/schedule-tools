@@ -2,12 +2,14 @@
 using System.IO;
 using System.Linq;
 using netDxf;
+using GirderSchedule.Dxf.Common.Overrides;
+using GirderSchedule.Dxf.Common.Templates;
 
 namespace GirderSchedule.Dxf.Common
 {
     public sealed class DxfDocumentLoader
     {
-        public DxfDocument LoadTemplateResourcesOnly(string templatePath)
+        public DxfTemplateDocument LoadTemplateResourcesOnly(string templatePath)
         {
             if (string.IsNullOrWhiteSpace(templatePath))
             {
@@ -26,9 +28,11 @@ namespace GirderSchedule.Dxf.Common
                 throw new InvalidOperationException("DXF 템플릿을 로드하지 못했습니다.");
             }
 
+            var overrides = DxfOverrideTemplateSet.Create(document);
+
             //ClearModelEntities(document);
 
-            return document;
+            return new DxfTemplateDocument(document, overrides);
         }
 
         private void ClearModelEntities(DxfDocument document)

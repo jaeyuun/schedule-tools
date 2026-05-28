@@ -1,6 +1,7 @@
 ﻿using netDxf;
 using netDxf.Entities;
 using GirderSchedule.Dxf.Common;
+using GirderSchedule.Dxf.Common.Overrides;
 
 namespace GirderSchedule.Dxf.Girder
 {
@@ -9,12 +10,14 @@ namespace GirderSchedule.Dxf.Girder
         private readonly DxfDocument _document;
         private readonly DxfPointConverter _pointConverter;
         private readonly TextDrawer _textDrawer;
+        private readonly DxfOverrideTemplateSet _overrides;
 
-        public FormDrawer(DxfDocument document, DxfPointConverter pointConverter, TextDrawer textDrawer)
+        public FormDrawer(DxfDocument document, DxfPointConverter pointConverter, TextDrawer textDrawer, DxfOverrideTemplateSet overrides)
         {
             _document = document;
             _pointConverter = pointConverter;
             _textDrawer = textDrawer;
+            _overrides = overrides;
         }
 
         public void Draw()
@@ -59,8 +62,19 @@ namespace GirderSchedule.Dxf.Girder
         private void AddLine(double x1, double y1, double x2, double y2)
         {
             var line = new Line(_pointConverter.ToVector3(x1, y1), _pointConverter.ToVector3(x2, y2));
+
             DxfEntityStyle.ApplyFormLine(line, _document);
+            ApplyOverrides(line);
+
             _document.Entities.Add(line);
+        }
+
+        private void ApplyOverrides(EntityObject entity)
+        {
+            if (_overrides != null)
+            {
+                _overrides.Apply(entity);
+            }
         }
     }
 }

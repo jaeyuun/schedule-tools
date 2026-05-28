@@ -4,6 +4,7 @@ using netDxf.Blocks;
 using netDxf.Entities;
 using GirderSchedule.Domain.Girder.Models;
 using GirderSchedule.Dxf.Common;
+using GirderSchedule.Dxf.Common.Overrides;
 
 namespace GirderSchedule.Dxf.Girder
 {
@@ -14,11 +15,13 @@ namespace GirderSchedule.Dxf.Girder
 
         private readonly DxfDocument _document;
         private readonly DxfPointConverter _pointConverter;
+        private readonly DxfOverrideTemplateSet _overrides;
 
-        public RebarDrawer(DxfDocument document, DxfPointConverter pointConverter)
+        public RebarDrawer(DxfDocument document, DxfPointConverter pointConverter, DxfOverrideTemplateSet overrides)
         {
             _document = document;
             _pointConverter = pointConverter;
+            _overrides = overrides;
         }
 
         public void Draw(SectionDxfLayout layout, ScheduleItem item)
@@ -213,6 +216,8 @@ namespace GirderSchedule.Dxf.Girder
                 insert.Rotation = 0.0;
 
                 DxfEntityStyle.ApplyRebar(insert, _document);
+                ApplyOverrides(insert);
+
                 _document.Entities.Add(insert);
                 return;
             }
@@ -241,9 +246,11 @@ namespace GirderSchedule.Dxf.Girder
         {
             var circle = new Circle(_pointConverter.ToVector3(x, y), radius);
             DxfEntityStyle.ApplyRebar(circle, _document);
+            ApplyOverrides(circle);
 
             var hatch = new Hatch(HatchPattern.Solid, false);
             DxfEntityStyle.ApplyRebar(hatch, _document);
+            ApplyOverrides(hatch);
 
             var boundary = new HatchBoundaryPath(new EntityObject[] { circle });
             hatch.BoundaryPaths.Add(boundary);
@@ -284,6 +291,8 @@ namespace GirderSchedule.Dxf.Girder
             polyline.IsClosed = isClosed;
 
             DxfEntityStyle.ApplyRebar(polyline, _document);
+            ApplyOverrides(polyline);
+
             _document.Entities.Add(polyline);
         }
 
@@ -349,6 +358,14 @@ namespace GirderSchedule.Dxf.Girder
             }
 
             return index;
+        }
+
+        private void ApplyOverrides(EntityObject entity)
+        {
+            if (_overrides != null)
+            {
+                _overrides.Apply(entity);
+            }
         }
 
         private sealed class BlockCircleInfo

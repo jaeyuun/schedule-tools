@@ -1,6 +1,7 @@
-﻿using netDxf;
+﻿using GirderSchedule.Dxf.Common;
+using GirderSchedule.Dxf.Common.Overrides;
+using netDxf;
 using netDxf.Entities;
-using GirderSchedule.Dxf.Common;
 
 namespace GirderSchedule.Dxf.Girder
 {
@@ -8,11 +9,13 @@ namespace GirderSchedule.Dxf.Girder
     {
         private readonly DxfDocument _document;
         private readonly DxfPointConverter _pointConverter;
+        private readonly DxfOverrideTemplateSet _overrides;
 
-        public SectionDrawer(DxfDocument document, DxfPointConverter pointConverter)
+        public SectionDrawer(DxfDocument document, DxfPointConverter pointConverter, DxfOverrideTemplateSet overrides)
         {
             _document = document;
             _pointConverter = pointConverter;
+            _overrides = overrides;
         }
 
         public void Draw(SectionDxfLayout layout)
