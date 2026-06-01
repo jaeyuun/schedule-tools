@@ -18,6 +18,9 @@
         public const double HeaderBottomY = -850.0;
 
         public const double SectionTopY = -850.0;
+        public const double MemberForceTopY = -1100.0;
+        public const double MemberForceBottomY = -1250.0;
+        public const double MemberForceCenterY = (MemberForceTopY + MemberForceBottomY) / 2.0;
         public const double SectionBottomY = -4050.0;
 
         public const double TopRebarTopY = -4050.0;

@@ -100,6 +100,37 @@
                          Text="{Binding StirrupSpacing, UpdateSourceTrigger=PropertyChanged}"/>
             </StackPanel>
         </DataTemplate>
+        <DataTemplate x:Key="MemberForceInputTemplate">
+            <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="54"/>
+                    <ColumnDefinition Width="16"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="54"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0" Text="M =" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                <TextBox Grid.Column="1"
+                 Width="54"
+                 Height="20"
+                 Padding="0"
+                 HorizontalContentAlignment="Center"
+                 VerticalContentAlignment="Center"
+                 FocusVisualStyle="{x:Null}"
+                 Text="{Binding MomentValue, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <TextBlock Grid.Column="3" Text="V =" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                <TextBox Grid.Column="4"
+                 Width="54"
+                 Height="20"
+                 Padding="0"
+                 HorizontalContentAlignment="Center"
+                 VerticalContentAlignment="Center"
+                 FocusVisualStyle="{x:Null}"
+                 Text="{Binding ShearValue, UpdateSourceTrigger=PropertyChanged}"/>
+            </Grid>
+        </DataTemplate>
     </UserControl.Resources>
 
     <Viewbox Stretch="Uniform">
@@ -226,6 +257,8 @@
                                              Text="{Binding Left.Position, UpdateSourceTrigger=PropertyChanged}"/>
                                 </StackPanel>
 
+                                <ContentControl Grid.Row="1" IsEnabled="{Binding Left.IsSectionEnabled}" Content="{Binding Left}" ContentTemplate="{StaticResource MemberForceInputTemplate}"/>
+
                                 <Canvas x:Name="LeftCanvas" Grid.Row="2" Width="200" Height="240" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Grid>
                         </Border>
@@ -274,12 +307,9 @@
                                         Text="{Binding Center.Position, UpdateSourceTrigger=PropertyChanged}"/>
                                 </StackPanel>
 
-                                <Canvas x:Name="CenterCanvas"
-                                    Grid.Row="2"
-                                    Width="200"
-                                    Height="240"
-                                    HorizontalAlignment="Center"
-                                    VerticalAlignment="Center"/>
+                                <ContentControl Grid.Row="1" Content="{Binding Center}" ContentTemplate="{StaticResource MemberForceInputTemplate}"/>
+                                
+                                <Canvas x:Name="CenterCanvas" Grid.Row="2" Width="200" Height="240" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Grid>
                         </Border>
 
@@ -331,6 +361,8 @@
                                              Text="{Binding Right.Position, UpdateSourceTrigger=PropertyChanged}"/>
                                 </StackPanel>
 
+                                <ContentControl Grid.Row="1" IsEnabled="{Binding Right.IsSectionEnabled}" Content="{Binding Right}" ContentTemplate="{StaticResource MemberForceInputTemplate}"/>
+                                
                                 <Canvas x:Name="RightCanvas" Grid.Row="2" Width="200" Height="240" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Grid>
                         </Border>

@@ -240,6 +240,84 @@ namespace GirderSchedule.App.ViewModels.Girder
             }
         }
 
+        public string MomentValue
+        {
+            get
+            {
+                if (!_model.MemberForce.Moment.HasValue)
+                {
+                    return string.Empty;
+                }
+
+                return _model.MemberForce.Moment.Value.ToString("0");
+            }
+            set
+            {
+                var number = ParseNullableDouble(value);
+
+                if (_model.MemberForce.Moment == number)
+                {
+                    return;
+                }
+
+                _model.MemberForce.Moment = number;
+                OnPropertyChanged(nameof(MomentValue));
+                OnPropertyChanged(nameof(MomentText));
+            }
+        }
+
+        public string ShearValue
+        {
+            get
+            {
+                if (!_model.MemberForce.Shear.HasValue)
+                {
+                    return string.Empty;
+                }
+
+                return _model.MemberForce.Shear.Value.ToString("0");
+            }
+            set
+            {
+                var number = ParseNullableDouble(value);
+
+                if (_model.MemberForce.Shear == number)
+                {
+                    return;
+                }
+
+                _model.MemberForce.Shear = number;
+                OnPropertyChanged(nameof(ShearValue));
+                OnPropertyChanged(nameof(ShearText));
+            }
+        }
+
+        public string MomentText
+        {
+            get
+            {
+                if (!_model.MemberForce.Moment.HasValue)
+                {
+                    return string.Empty;
+                }
+
+                return "M = " + _model.MemberForce.Moment.Value.ToString("0");
+            }
+        }
+
+        public string ShearText
+        {
+            get
+            {
+                if (!_model.MemberForce.Shear.HasValue)
+                {
+                    return string.Empty;
+                }
+
+                return "V = " + _model.MemberForce.Shear.Value.ToString("0");
+            }
+        }
+
         public string TopText1
         {
             get { return FormatLayerText(_model.TopRebar.FirstLayer.Count, _model.TopRebar.Diameter); }
@@ -305,6 +383,11 @@ namespace GirderSchedule.App.ViewModels.Girder
             OnPropertyChanged(nameof(StirrupSpacing));
             OnPropertyChanged(nameof(SkinRebarText));
 
+            OnPropertyChanged(nameof(MomentValue));
+            OnPropertyChanged(nameof(ShearValue));
+            OnPropertyChanged(nameof(MomentText));
+            OnPropertyChanged(nameof(ShearText));
+
             OnPropertyChanged(nameof(TopText1));
             OnPropertyChanged(nameof(TopText2));
             OnPropertyChanged(nameof(BottomText1));
@@ -312,6 +395,23 @@ namespace GirderSchedule.App.ViewModels.Girder
             OnPropertyChanged(nameof(StirrupText));
 
             OnPropertyChanged(nameof(IsSectionEnabled));
+        }
+
+        private double? ParseNullableDouble(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return null;
+            }
+
+            double result;
+
+            if (!double.TryParse(value, out result))
+            {
+                return null;
+            }
+
+            return result;
         }
 
         private string FormatLayerText(int count, int diameter)

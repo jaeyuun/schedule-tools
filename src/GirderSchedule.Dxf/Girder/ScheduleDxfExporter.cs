@@ -1,7 +1,8 @@
-﻿using System;
-using netDxf;
+﻿using GirderSchedule.Domain.Girder.Layout;
 using GirderSchedule.Domain.Girder.Models;
 using GirderSchedule.Dxf.Common;
+using netDxf;
+using System;
 
 namespace GirderSchedule.Dxf.Girder
 {
@@ -153,6 +154,7 @@ namespace GirderSchedule.Dxf.Girder
             }
 
             textDrawer.DrawValueText(item.Position, headerBox.CenterX, -760.0, 90.0);
+            DrawMemberForces(textDrawer, item, sectionBox);
 
             var layout = layoutService.Create(sectionBox, item);
 
@@ -161,6 +163,46 @@ namespace GirderSchedule.Dxf.Girder
             dimensionDrawer.Draw(layout, item, options.IsWidthOver, options.IsHeightOver);
 
             DrawRebarRows(textDrawer, item, topBox, bottomBox, stirrupBox, skinBox);
+        }
+
+        private void DrawMemberForces(TextDrawer textDrawer, ScheduleItem item, DxfBox sectionBox)
+        {
+            var moment = FormatMoment(item);
+            var shear = FormatShear(item);
+
+            var y = DxfLayout.MemberForceCenterY;
+
+            if (!string.IsNullOrWhiteSpace(moment))
+            {
+                var mX = sectionBox.Left + sectionBox.Width / 4.0;
+                textDrawer.DrawValueText(moment, mX, y, 90.0);
+            }
+
+            if (!string.IsNullOrWhiteSpace(shear))
+            {
+                var vX = sectionBox.Left + sectionBox.Width * 3.0 / 4.0;
+                textDrawer.DrawValueText(shear, vX, y, 90.0);
+            }
+        }
+
+        private string FormatMoment(ScheduleItem item)
+        {
+            if (item == null || item.MemberForce == null || !item.MemberForce.Moment.HasValue)
+            {
+                return string.Empty;
+            }
+
+            return "M = " + item.MemberForce.Moment.Value.ToString("0");
+        }
+
+        private string FormatShear(ScheduleItem item)
+        {
+            if (item == null || item.MemberForce == null || !item.MemberForce.Shear.HasValue)
+            {
+                return string.Empty;
+            }
+
+            return "V = " + item.MemberForce.Shear.Value.ToString("0");
         }
 
         private void DrawRebarRows(TextDrawer textDrawer, ScheduleItem item, DxfBox topBox, DxfBox bottomBox, DxfBox stirrupBox, DxfBox skinBox)
