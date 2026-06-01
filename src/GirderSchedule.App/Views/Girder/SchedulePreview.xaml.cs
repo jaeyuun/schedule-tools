@@ -13,6 +13,8 @@ namespace GirderSchedule.App.Views.Girder
     {
         private const double BarRadius = 3.0;
         private const double StirrupTouchOffset = BarRadius;
+        private const double SkinMarkSizeUnit = 25.0;
+        private const double SkinMarkWidthUnit = 5.0;
 
         private bool _isRedrawQueued;
 
@@ -104,6 +106,7 @@ namespace GirderSchedule.App.Views.Girder
             DrawGirderOutline(canvas, layout);
             DrawMainRebars(canvas, layout, item);
             DrawStirrups(canvas, layout.BarStartX, layout.BarEndX, layout.SectionTop, layout.SectionBottom, item.TopRebar.FirstLayer.Count, item.BottomRebar.FirstLayer.Count, item.Stirrup.Legs, StirrupTouchOffset);
+            DrawSkinRebarMarks(canvas, layout, item);
             DrawPreviewDimensions(canvas, layout.OuterLeft, layout.OuterRight, layout.OuterTop, layout.OuterBottom, layout.SideWing, item.Section.Width, item.Section.Height, isWidthOver, isHeightOver, layout.DimensionScale);
         }
 
@@ -438,6 +441,53 @@ namespace GirderSchedule.App.Views.Girder
 
                 AddStirrupLine(canvas, topLineX, bottomLineX, topY, bottomY);
             }
+        }
+
+        private void DrawSkinRebarMarks(Canvas canvas, PreviewLayout layout, ScheduleItem item)
+        {
+            if (item.Section.Height < 900.0)
+            {
+                return;
+            }
+
+            var size = SkinMarkSizeUnit * layout.ShapeScale;
+            var width = SkinMarkWidthUnit * layout.ShapeScale;
+
+            if (size < 4.0)
+            {
+                size = 4.0;
+            }
+
+            if (width < 1.0)
+            {
+                width = 1.0;
+            }
+
+            var halfSize = size / 2.0;
+            var halfWidth = width / 2.0;
+            var clearance = halfWidth / Math.Sqrt(2.0);
+            var inset = halfSize + clearance;
+
+            var stirrupLeft = layout.SectionLeft;
+            var stirrupRight = layout.SectionLeft + layout.DrawWidth;
+            var centerY = (layout.OuterTop + layout.OuterBottom) / 2.0;
+
+            if (stirrupRight - stirrupLeft <= inset * 2.0)
+            {
+                return;
+            }
+
+            AddXMark(canvas, stirrupLeft + inset, centerY, size, width);
+            AddXMark(canvas, stirrupRight - inset, centerY, size, width);
+        }
+
+        private void AddXMark(Canvas canvas, double x, double y, double size, double thickness)
+        {
+            var half = size / 2.0;
+            var brush = new SolidColorBrush(Color.FromRgb(25, 25, 25));
+
+            DrawLine(canvas, x - half, y - half, x + half, y + half, brush, thickness);
+            DrawLine(canvas, x - half, y + half, x + half, y - half, brush, thickness);
         }
 
         private void AddStirrupLine(Canvas canvas, double topX, double bottomX, double topY, double bottomY)

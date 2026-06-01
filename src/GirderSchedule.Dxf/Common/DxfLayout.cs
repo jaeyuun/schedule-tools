@@ -9,7 +9,10 @@
         public const double SheetHeight = 5250.0;
 
         public const double LabelWidth = 1200.0;
-        public const double SectionGroupWidth = 7170.0;
+        public const double SlotWidth = 2390.0;
+        public const double GroupSlotCount = 3.0;
+        public const double GroupWidth = SlotWidth * GroupSlotCount;
+        public const int SlotCount = 9;
 
         public const double HeaderTopY = 0.0;
         public const double HeaderBottomY = -850.0;
@@ -29,51 +32,62 @@
         public const double SkinTopY = -4950.0;
         public const double SkinBottomY = -5250.0;
 
-        public static DxfBox GetGroupBox(int index)
+        public static DxfBox GetSlotBox(int index)
         {
-            var left = LabelWidth + SectionGroupWidth * index;
+            var left = LabelWidth + SlotWidth * index;
 
             return new DxfBox(
                 left,
                 HeaderTopY,
-                left + SectionGroupWidth,
+                left + SlotWidth,
                 SkinBottomY);
         }
 
         public static DxfBox GetHeaderBox(int index)
         {
-            var group = GetGroupBox(index);
-            return new DxfBox(group.Left, HeaderTopY, group.Right, HeaderBottomY);
+            var slot = GetSlotBox(index);
+            return new DxfBox(slot.Left, HeaderTopY, slot.Right, HeaderBottomY);
         }
 
         public static DxfBox GetSectionBox(int index)
         {
-            var group = GetGroupBox(index);
-            return new DxfBox(group.Left, SectionTopY, group.Right, SectionBottomY);
+            var slot = GetSlotBox(index);
+            return new DxfBox(slot.Left, SectionTopY, slot.Right, SectionBottomY);
         }
 
         public static DxfBox GetTopRebarBox(int index)
         {
-            var group = GetGroupBox(index);
-            return new DxfBox(group.Left, TopRebarTopY, group.Right, TopRebarBottomY);
+            var slot = GetSlotBox(index);
+            return new DxfBox(slot.Left, TopRebarTopY, slot.Right, TopRebarBottomY);
         }
 
         public static DxfBox GetBottomRebarBox(int index)
         {
-            var group = GetGroupBox(index);
-            return new DxfBox(group.Left, BottomRebarTopY, group.Right, BottomRebarBottomY);
+            var slot = GetSlotBox(index);
+            return new DxfBox(slot.Left, BottomRebarTopY, slot.Right, BottomRebarBottomY);
         }
 
         public static DxfBox GetStirrupBox(int index)
         {
-            var group = GetGroupBox(index);
-            return new DxfBox(group.Left, StirrupTopY, group.Right, StirrupBottomY);
+            var slot = GetSlotBox(index);
+            return new DxfBox(slot.Left, StirrupTopY, slot.Right, StirrupBottomY);
         }
 
         public static DxfBox GetSkinBox(int index)
         {
-            var group = GetGroupBox(index);
-            return new DxfBox(group.Left, SkinTopY, group.Right, SkinBottomY);
+            var slot = GetSlotBox(index);
+            return new DxfBox(slot.Left, SkinTopY, slot.Right, SkinBottomY);
+        }
+
+        public static DxfBox GetGroupHeaderBox(int groupIndex)
+        {
+            var left = LabelWidth + GroupWidth * groupIndex;
+
+            return new DxfBox(
+                left,
+                HeaderTopY,
+                left + GroupWidth,
+                HeaderBottomY);
         }
     }
 }

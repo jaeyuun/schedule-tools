@@ -12,6 +12,8 @@ namespace GirderSchedule.Dxf.Girder
     {
         private const double StirrupCover = 40.0;
         private const double RebarRadius = 12.5;
+        private const double SkinMarkSize = 25.0;
+        private const double SkinMarkWidth = 5.0;
 
         private readonly DxfDocument _document;
         private readonly DxfPointConverter _pointConverter;
@@ -29,6 +31,7 @@ namespace GirderSchedule.Dxf.Girder
             DrawOuterStirrup(layout);
             DrawInternalStirrups(layout, item);
             DrawMainRebars(layout, item);
+            DrawSkinRebarMarks(layout, item);
         }
 
         private void DrawOuterStirrup(SectionDxfLayout layout)
@@ -197,6 +200,80 @@ namespace GirderSchedule.Dxf.Girder
 
                 AddBar(startX + spacing * i, y);
             }
+        }
+
+        private void DrawSkinRebarMarks(SectionDxfLayout layout, ScheduleItem item)
+        {
+            if (item.Section.Height < 900.0)
+            {
+                return;
+            }
+
+            var halfSize = SkinMarkSize / 2.0;
+            var halfWidth = SkinMarkWidth / 2.0;
+            var clearance = halfWidth / Math.Sqrt(2.0);
+            var inset = halfSize + clearance;
+
+            var stirrupLeft = layout.SectionLeft + StirrupCover;
+            var stirrupRight = layout.SectionRight - StirrupCover;
+
+            var left = stirrupLeft + inset;
+            var right = stirrupRight - inset;
+            var centerY = (layout.OuterTop + layout.OuterBottom) / 2.0;
+
+            AddXMark(left, centerY, SkinMarkSize, SkinMarkWidth);
+            AddXMark(right, centerY, SkinMarkSize, SkinMarkWidth);
+        }
+
+        private void AddXMark(double x, double y, double size, double width)
+        {
+            var half = size / 2.0;
+
+            AddRebarPolylineWithWidth(
+                width,
+                x - half, y + half,
+                x + half, y - half);
+
+            AddRebarPolylineWithWidth(
+                width,
+                x - half, y - half,
+                x + half, y + half);
+        }
+
+        private void AddRebarPolylineWithWidth(double width, params double[] values)
+        {
+            if (values == null || values.Length == 0)
+            {
+                return;
+            }
+
+            if (values.Length % 2 != 0)
+            {
+                return;
+            }
+
+            var polyline = new Polyline2D();
+
+            for (var i = 0; i < values.Length; i += 2)
+            {
+                var vertex = new Polyline2DVertex(_pointConverter.ToVector2(values[i], values[i + 1]));
+                vertex.StartWidth = width;
+                vertex.EndWidth = width;
+                polyline.Vertexes.Add(vertex);
+            }
+
+            polyline.IsClosed = false;
+
+            DxfEntityStyle.ApplyRebar(polyline, _document);
+            ApplyOverrides(polyline);
+
+            for (var i = 0; i < polyline.Vertexes.Count; i++)
+            {
+                polyline.Vertexes[i].StartWidth = width;
+                polyline.Vertexes[i].EndWidth = width;
+            }
+
+            _document.Entities.Add(polyline);
         }
 
         private void AddBar(double x, double y)

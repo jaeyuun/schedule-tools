@@ -41,7 +41,7 @@ namespace GirderSchedule.Dxf.Girder
             var stirrupCover = 40.0;
             var rebarRadius = 12.5;
             var rebarInset = stirrupCover + rebarRadius;
-            var layerGap = Math.Max(45.0, 40.0 * scale);
+            var layerGap = 80.0/*Math.Max(45.0, 40.0 * scale)*/;
 
             return new SectionDxfLayout
             {

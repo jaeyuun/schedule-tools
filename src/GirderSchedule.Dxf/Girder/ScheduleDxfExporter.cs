@@ -59,7 +59,7 @@ namespace GirderSchedule.Dxf.Girder
 
             if (row != null)
             {
-                DrawHeaderTexts(textDrawer, row, options);
+                //DrawHeaderTexts(textDrawer, row, options);
                 DrawItems(row, options, sectionLayoutService, sectionDrawer, rebarDrawer, dimensionDrawer, textDrawer);
             }
 
@@ -68,13 +68,13 @@ namespace GirderSchedule.Dxf.Girder
 
         private void DrawHeaderTexts(TextDrawer textDrawer, ScheduleRow row, ScheduleDxfExportOptions options)
         {
-            var firstItem = row.Items.Count > 0 ? row.Items[0] : null;
-
-            if (firstItem != null)
-            {
-                textDrawer.DrawValueText(firstItem.Name, DxfLayout.LabelWidth + DxfLayout.SectionGroupWidth * 1.5, -300.0, 120.0);
-                textDrawer.DrawValueText(FormatSectionText(firstItem.Section.Width, firstItem.Section.Height, options), DxfLayout.LabelWidth + DxfLayout.SectionGroupWidth * 1.5, -600.0, 120.0);
-            }
+            //var firstItem = row.Items.Count > 0 ? row.Items[0] : null;
+            //
+            //if (firstItem != null)
+            //{
+            //    textDrawer.DrawValueText(firstItem.Name, DxfLayout.LabelWidth + DxfLayout.SectionGroupWidth * 1.5, -300.0, 120.0);
+            //    textDrawer.DrawValueText(FormatSectionText(firstItem.Section.Width, firstItem.Section.Height, options), DxfLayout.LabelWidth + DxfLayout.SectionGroupWidth * 1.5, -600.0, 120.0);
+            //}
         }
 
         private string FormatSectionText(double width, double height, ScheduleDxfExportOptions options)
@@ -104,9 +104,17 @@ namespace GirderSchedule.Dxf.Girder
             DimensionDrawer dimensionDrawer,
             TextDrawer textDrawer)
         {
-            DrawItem(row, 0, options.IncludeLeft, options, layoutService, sectionDrawer, rebarDrawer, dimensionDrawer, textDrawer);
-            DrawItem(row, 1, options.IncludeCenter, options, layoutService, sectionDrawer, rebarDrawer, dimensionDrawer, textDrawer);
-            DrawItem(row, 2, options.IncludeRight, options, layoutService, sectionDrawer, rebarDrawer, dimensionDrawer, textDrawer);
+            var count = row.Items.Count;
+
+            if (count > DxfLayout.SlotCount)
+            {
+                count = DxfLayout.SlotCount;
+            }
+
+            for (var i = 0; i < count; i++)
+            {
+                DrawItem(row, i, true, options, layoutService, sectionDrawer, rebarDrawer, dimensionDrawer, textDrawer);
+            }
         }
 
         private void DrawItem(
@@ -121,6 +129,11 @@ namespace GirderSchedule.Dxf.Girder
             TextDrawer textDrawer)
         {
             if (index < 0 || index >= row.Items.Count)
+            {
+                return;
+            }
+
+            if (index < 0 || index >= DxfLayout.SlotCount)
             {
                 return;
             }

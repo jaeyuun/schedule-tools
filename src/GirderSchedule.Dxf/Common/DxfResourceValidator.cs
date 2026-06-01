@@ -18,6 +18,8 @@ namespace GirderSchedule.Dxf.Common
             RequireDimensionStyle(document, DxfStyles.Dimension);
             RequireLinetype(document, DxfStyles.RcGirderLine);
 
+            RequireBlock(document, DxfBlocks.Form2);
+            RequireBlock(document, DxfBlocks.BaseForm);
             RequireBlock(document, DxfBlocks.RebarD19);
             RequireBlock(document, DxfBlocks.DimensionDot);
         }
