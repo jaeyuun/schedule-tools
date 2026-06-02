@@ -175,13 +175,13 @@ namespace GirderSchedule.Dxf.Girder
             if (!string.IsNullOrWhiteSpace(moment))
             {
                 var mX = sectionBox.Left + sectionBox.Width / 4.0;
-                textDrawer.DrawValueText(moment, mX, y, 90.0);
+                textDrawer.DrawDefPointText(moment, mX, y, 90.0);
             }
 
             if (!string.IsNullOrWhiteSpace(shear))
             {
                 var vX = sectionBox.Left + sectionBox.Width * 3.0 / 4.0;
-                textDrawer.DrawValueText(shear, vX, y, 90.0);
+                textDrawer.DrawDefPointText(shear, vX, y, 90.0);
             }
         }
 

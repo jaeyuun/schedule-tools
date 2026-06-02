@@ -8,5 +8,6 @@
         public const string RcGir = "(S)_RC_Gir";
         public const string Rebar = "(S)_Rebar";
         public const string Dim = "(S)_DIM";
+        public const string Defpoint = "(S)_DEFPOINT";
     }
 }

@@ -33,6 +33,11 @@ namespace GirderSchedule.Dxf.Girder
             Draw(value, x, y, height, DxfLayers.Text);
         }
 
+        public void DrawDefPointText(string value, double x, double y, double height)
+        {
+            Draw(value, x, y, height, DxfLayers.Defpoint);
+        }
+
         public void DrawDimText(string value, double x, double y, double height, double rotation)
         {
             var text = CreateText(value, x, y, height, DxfLayers.Dim);
