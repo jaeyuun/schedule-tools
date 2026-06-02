@@ -105,22 +105,73 @@ namespace GirderSchedule.Dxf.Girder
             DimensionDrawer dimensionDrawer,
             TextDrawer textDrawer)
         {
-            var count = row.Items.Count;
-
-            if (count > DxfLayout.SlotCount)
+            for (var setIndex = 0; setIndex < row.Sets.Count; setIndex++)
             {
-                count = DxfLayout.SlotCount;
-            }
-
-            for (var i = 0; i < count; i++)
-            {
-                DrawItem(row, i, true, options, layoutService, sectionDrawer, rebarDrawer, dimensionDrawer, textDrawer);
+                DrawSet(row.Sets[setIndex], setIndex, options, layoutService, sectionDrawer, rebarDrawer, dimensionDrawer, textDrawer);
             }
         }
 
-        private void DrawItem(
-            ScheduleRow row,
-            int index,
+        private void DrawSet(
+            ScheduleSet set,
+            int setIndex,
+            ScheduleDxfExportOptions options,
+            SectionDxfLayoutService layoutService,
+            SectionDrawer sectionDrawer,
+            RebarDrawer rebarDrawer,
+            DimensionDrawer dimensionDrawer,
+            TextDrawer textDrawer)
+        {
+            DrawMemberName(set, setIndex, textDrawer);
+
+            DrawSlot(set, setIndex, ScheduleSlotType.Left, options.IncludeLeft, options, layoutService, sectionDrawer, rebarDrawer, dimensionDrawer, textDrawer);
+            DrawSlot(set, setIndex, ScheduleSlotType.Center, options.IncludeCenter, options, layoutService, sectionDrawer, rebarDrawer, dimensionDrawer, textDrawer);
+            DrawSlot(set, setIndex, ScheduleSlotType.Right, options.IncludeRight, options, layoutService, sectionDrawer, rebarDrawer, dimensionDrawer, textDrawer);
+        }
+
+        private void DrawMemberName(ScheduleSet set, int setIndex, TextDrawer textDrawer)
+        {
+            var box = DxfLayout.GetMemberNameBox(setIndex);
+            var item = GetHeaderItem(set);
+
+            textDrawer.DrawValueText(set.MemberName, box.CenterX, DxfLayout.HeaderMemberNameTextY, DxfLayout.HeaderTextHeight);
+
+            if (item == null)
+            {
+                return;
+            }
+
+            textDrawer.DrawValueText(FormatSectionSize(item), box.CenterX, DxfLayout.HeaderSectionSizeTextY, DxfLayout.HeaderTextHeight);
+        }
+
+        private ScheduleItem GetHeaderItem(ScheduleSet set)
+        {
+            if (set.Center != null)
+            {
+                return set.Center;
+            }
+
+            if (set.Left != null)
+            {
+                return set.Left;
+            }
+
+            return set.Right;
+        }
+
+        private string FormatSectionSize(ScheduleItem item)
+        {
+            if (item == null || item.Section == null)
+            {
+                return string.Empty;
+            }
+
+            return "( " + item.Section.Width.ToString("0") + " × " + item.Section.Height.ToString("0") + " )";
+        }
+
+        private void DrawSlot(
+            ScheduleSet set,
+            int setIndex,
+            ScheduleSlotType type,
             bool enabled,
             ScheduleDxfExportOptions options,
             SectionDxfLayoutService layoutService,
@@ -129,31 +180,28 @@ namespace GirderSchedule.Dxf.Girder
             DimensionDrawer dimensionDrawer,
             TextDrawer textDrawer)
         {
-            if (index < 0 || index >= row.Items.Count)
-            {
-                return;
-            }
-
-            if (index < 0 || index >= DxfLayout.SlotCount)
-            {
-                return;
-            }
-
-            var item = row.Items[index];
-            var headerBox = DxfLayout.GetHeaderBox(index);
-            var sectionBox = DxfLayout.GetSectionBox(index);
-            var topBox = DxfLayout.GetTopRebarBox(index);
-            var bottomBox = DxfLayout.GetBottomRebarBox(index);
-            var stirrupBox = DxfLayout.GetStirrupBox(index);
-            var skinBox = DxfLayout.GetSkinBox(index);
+            var sectionBox = DxfLayout.GetSectionBox(setIndex, type);
 
             if (!enabled)
             {
-                DrawDisabledCell(textDrawer, sectionBox);
+                sectionDrawer.DrawDisabled(sectionBox);
                 return;
             }
 
-            textDrawer.DrawValueText(item.Position, headerBox.CenterX, -760.0, 90.0);
+            var item = set.GetItem(type);
+
+            if (item == null)
+            {
+                return;
+            }
+
+            var positionBox = DxfLayout.GetPositionBox(setIndex, type);
+            var topBox = DxfLayout.GetTopRebarBox(setIndex, type);
+            var bottomBox = DxfLayout.GetBottomRebarBox(setIndex, type);
+            var stirrupBox = DxfLayout.GetStirrupBox(setIndex, type);
+            var skinBox = DxfLayout.GetSkinBox(setIndex, type);
+
+            DrawPositionText(textDrawer, item, positionBox);
             DrawMemberForces(textDrawer, item, sectionBox);
 
             var layout = layoutService.Create(sectionBox, item);
@@ -163,6 +211,16 @@ namespace GirderSchedule.Dxf.Girder
             dimensionDrawer.Draw(layout, item, options.IsWidthOver, options.IsHeightOver);
 
             DrawRebarRows(textDrawer, item, topBox, bottomBox, stirrupBox, skinBox);
+        }
+
+        private void DrawPositionText(TextDrawer textDrawer, ScheduleItem item, DxfBox positionBox)
+        {
+            if (item == null || string.IsNullOrWhiteSpace(item.Position))
+            {
+                return;
+            }
+
+            textDrawer.DrawValueText(item.Position, positionBox.CenterX, positionBox.CenterY, 90.0);
         }
 
         private void DrawMemberForces(TextDrawer textDrawer, ScheduleItem item, DxfBox sectionBox)
@@ -245,11 +303,6 @@ namespace GirderSchedule.Dxf.Girder
             }
 
             return stirrup.Legs + "-HD" + stirrup.Diameter + "@" + stirrup.Spacing;
-        }
-
-        private void DrawDisabledCell(TextDrawer textDrawer, DxfBox sectionBox)
-        {
-            textDrawer.DrawValueText("-", sectionBox.CenterX, sectionBox.CenterY, 120.0);
         }
     }
 }

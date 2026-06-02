@@ -35,10 +35,22 @@ namespace GirderSchedule.Dxf.Girder
                 layout.OuterRight + layout.SideWing, layout.OuterShelfY);
         }
 
+        public void DrawDisabled(DxfBox box)
+        {
+            AddDisabledLine(box.Left, box.Top, box.Right, box.Bottom);
+        }
+
         private void AddLine(double x1, double y1, double x2, double y2)
         {
             var line = new Line(_pointConverter.ToVector3(x1, y1), _pointConverter.ToVector3(x2, y2));
             DxfEntityStyle.ApplyRcGir(line, _document);
+            _document.Entities.Add(line);
+        }
+
+        private void AddDisabledLine(double x1, double y1, double x2, double y2)
+        {
+            var line = new Line(_pointConverter.ToVector3(x1, y1), _pointConverter.ToVector3(x2, y2));
+            DxfEntityStyle.ApplyRebar(line, _document);
             _document.Entities.Add(line);
         }
 

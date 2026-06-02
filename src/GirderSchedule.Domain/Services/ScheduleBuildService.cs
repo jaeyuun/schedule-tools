@@ -9,10 +9,13 @@ namespace GirderSchedule.Domain.Girder.Services
             var sheet = new ScheduleSheet();
             var row = new ScheduleRow();
 
-            row.Items.Add(CreateItem("CENTER"));
-            row.Items.Add(CreateItem("BOTH"));
-            row.Items.Add(CreateItem("END (EXT.)"));
+            var set = new ScheduleSet();
+            set.MemberName = "1G1";
+            set.Left = CreateItem("LEFT");
+            set.Center = CreateItem("CENTER");
+            set.Right = CreateItem("RIGHT");
 
+            row.Sets.Add(set);
             sheet.Rows.Add(row);
 
             return sheet;

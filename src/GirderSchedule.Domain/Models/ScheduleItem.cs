@@ -1,6 +1,4 @@
-﻿using GirderSchedule.Domain.Models;
-
-namespace GirderSchedule.Domain.Girder.Models
+﻿namespace GirderSchedule.Domain.Girder.Models
 {
     public sealed class ScheduleItem
     {

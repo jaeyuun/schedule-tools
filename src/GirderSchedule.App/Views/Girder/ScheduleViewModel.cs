@@ -12,6 +12,7 @@ namespace GirderSchedule.App.ViewModels.Girder
     public sealed class ScheduleViewModel : ViewModelBase
     {
         private readonly ScheduleSheet _sheet;
+        private readonly ScheduleSet _set;
         private bool _isWidthOver;
         private bool _isHeightOver;
 
@@ -29,13 +30,15 @@ namespace GirderSchedule.App.ViewModels.Girder
 
         public string MemberName
         {
-            get { return Left.Name; }
+            get { return _set.MemberName; }
             set
             {
-                if (Left.Name == value)
+                if (_set.MemberName == value)
                 {
                     return;
                 }
+
+                _set.MemberName = value;
 
                 Left.Name = value;
                 Center.Name = value;
@@ -121,11 +124,15 @@ namespace GirderSchedule.App.ViewModels.Girder
             var service = new ScheduleBuildService();
             _sheet = service.CreateSample();
 
-            Left = new SectionItemViewModel(_sheet.Rows[0].Items[0]);
-            Center = new SectionItemViewModel(_sheet.Rows[0].Items[1]);
-            Right = new SectionItemViewModel(_sheet.Rows[0].Items[2]);
+            _set = _sheet.Rows[0].Sets[0];
 
+            Left = new SectionItemViewModel(_set.Left);
+            Center = new SectionItemViewModel(_set.Center);
+            Right = new SectionItemViewModel(_set.Right);
+
+            Left.IsSectionEnabled = true;
             Center.IsSectionEnabled = true;
+            Right.IsSectionEnabled = true;
 
             RedrawCommand = new RelayCommand(p => RefreshItems());
             ExportDxfCommand = new RelayCommand(p => ExportDxf());
