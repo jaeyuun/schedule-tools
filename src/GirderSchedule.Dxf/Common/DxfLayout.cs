@@ -4,8 +4,8 @@ namespace GirderSchedule.Dxf.Common
 {
     public static class DxfLayout
     {
-        public const double OriginX = 310378.9119;
-        public const double OriginY = 34880.5467;
+        public const double OriginX = 0.0;
+        public const double OriginY = 5250.0;
 
         public const double SheetWidth = 22710.0;
         public const double SheetHeight = 5250.0;
@@ -38,12 +38,42 @@ namespace GirderSchedule.Dxf.Common
         public const double SkinBottomY = -5250.0;
 
         public const double HeaderMemberNameTextY = -325.0;
-        public const double HeaderSectionSizeTextY = -565.0;
+        public const double HeaderSectionSizeTextY = -560.0;
         public const double HeaderTextHeight = 120.0;
+
+        public const double HeaderWidthValueOffsetX = -250.0;
+        public const double HeaderHeightValueOffsetX = 250.0;
+
+        public const double RebarTextHeight = 90.0;
+        public const double ValueTextGap = 45.0;
+        public const double NumberTextWidthFactor = 0.6;
+
+        public const double RebarDashHdCenterOffsetX = 0.0;
+        public const double RebarDashHdTextWidth = 315.0;
+        public const double RebarCountAdjustX = 20.0; // 상부근/하부근 개수 위치
+        public const double RebarDiameterAdjustX = 20.0; // 상부근/하부근 규격 위치
+
+        public const double StirrupDashHdCenterOffsetX = -135.0;
+        public const double StirrupDashHdTextWidth = 315.0;
+
+        public const double StirrupAtCenterOffsetX = 245.0;
+        public const double StirrupAtTextWidth = 60.0;
+
+        public const double StirrupLegAdjustX = -60.0; // 스터럽 개수 위치
+        public const double StirrupDiameterAdjustX = -100.0; // 스터럽 규격 위치
+        public const double StirrupSpacingAdjustX = 20.0; // 스터럽 간격 위치
+
+        public const double RebarValueOffsetY = -10.0;
+        public const double StirrupValueOffsetY = -10.0;
 
         public static int GetItemIndex(int setIndex, ScheduleSlotType type)
         {
             return setIndex * SlotCountPerSet + GetSlotOffset(type);
+        }
+
+        public static int GetSlotIndex(int setIndex, ScheduleSlotType type)
+        {
+            return GetItemIndex(setIndex, type);
         }
 
         public static int GetSlotOffset(ScheduleSlotType type)
@@ -87,78 +117,6 @@ namespace GirderSchedule.Dxf.Common
             return GetSectionBox(GetItemIndex(setIndex, type));
         }
 
-        public static DxfBox GetTopRebarBox(int setIndex, ScheduleSlotType type)
-        {
-            return GetTopRebarBox(GetItemIndex(setIndex, type));
-        }
-
-        public static DxfBox GetBottomRebarBox(int setIndex, ScheduleSlotType type)
-        {
-            return GetBottomRebarBox(GetItemIndex(setIndex, type));
-        }
-
-        public static DxfBox GetStirrupBox(int setIndex, ScheduleSlotType type)
-        {
-            return GetStirrupBox(GetItemIndex(setIndex, type));
-        }
-
-        public static DxfBox GetSkinBox(int setIndex, ScheduleSlotType type)
-        {
-            return GetSkinBox(GetItemIndex(setIndex, type));
-        }
-
-        public static DxfBox GetSlotBox(int index)
-        {
-            var left = LabelWidth + SlotWidth * index;
-
-            return new DxfBox(
-                left,
-                HeaderTopY,
-                left + SlotWidth,
-                SkinBottomY);
-        }
-
-        public static DxfBox GetHeaderBox(int index)
-        {
-            var slot = GetSlotBox(index);
-            return new DxfBox(slot.Left, HeaderTopY, slot.Right, HeaderBottomY);
-        }
-
-        public static DxfBox GetSectionBox(int index)
-        {
-            var slot = GetSlotBox(index);
-            return new DxfBox(slot.Left, SectionTopY, slot.Right, SectionBottomY);
-        }
-
-        public static DxfBox GetTopRebarBox(int index)
-        {
-            var slot = GetSlotBox(index);
-            return new DxfBox(slot.Left, TopRebarTopY, slot.Right, TopRebarBottomY);
-        }
-
-        public static DxfBox GetBottomRebarBox(int index)
-        {
-            var slot = GetSlotBox(index);
-            return new DxfBox(slot.Left, BottomRebarTopY, slot.Right, BottomRebarBottomY);
-        }
-
-        public static DxfBox GetStirrupBox(int index)
-        {
-            var slot = GetSlotBox(index);
-            return new DxfBox(slot.Left, StirrupTopY, slot.Right, StirrupBottomY);
-        }
-
-        public static DxfBox GetSkinBox(int index)
-        {
-            var slot = GetSlotBox(index);
-            return new DxfBox(slot.Left, SkinTopY, slot.Right, SkinBottomY);
-        }
-
-        public static int GetSlotIndex(int setIndex, ScheduleSlotType type)
-        {
-            return setIndex * 3 + GetSlotOffset(type);
-        }
-
         public static DxfBox GetPositionBox(int setIndex, ScheduleSlotType type)
         {
             var section = GetSectionBox(setIndex, type);
@@ -179,6 +137,109 @@ namespace GirderSchedule.Dxf.Common
                 MemberForceTopY,
                 section.Right,
                 MemberForceBottomY);
+        }
+
+        public static DxfBox GetTopRebarBox(int setIndex, ScheduleSlotType type)
+        {
+            return GetTopRebarBox(GetItemIndex(setIndex, type));
+        }
+
+        public static DxfBox GetBottomRebarBox(int setIndex, ScheduleSlotType type)
+        {
+            return GetBottomRebarBox(GetItemIndex(setIndex, type));
+        }
+
+        public static DxfBox GetStirrupBox(int setIndex, ScheduleSlotType type)
+        {
+            return GetStirrupBox(GetItemIndex(setIndex, type));
+        }
+
+        public static DxfBox GetSkinBox(int setIndex, ScheduleSlotType type)
+        {
+            return GetSkinBox(GetItemIndex(setIndex, type));
+        }
+
+        public static double GetSlotCenterX(int setIndex, ScheduleSlotType type)
+        {
+            var box = GetSectionBox(setIndex, type);
+            return box.CenterX;
+        }
+
+        public static DxfBox GetSlotBox(int index)
+        {
+            var left = LabelWidth + SlotWidth * index;
+
+            return new DxfBox(
+                left,
+                HeaderTopY,
+                left + SlotWidth,
+                SkinBottomY);
+        }
+
+        public static DxfBox GetHeaderBox(int index)
+        {
+            var slot = GetSlotBox(index);
+
+            return new DxfBox(
+                slot.Left,
+                HeaderTopY,
+                slot.Right,
+                HeaderBottomY);
+        }
+
+        public static DxfBox GetSectionBox(int index)
+        {
+            var slot = GetSlotBox(index);
+
+            return new DxfBox(
+                slot.Left,
+                SectionTopY,
+                slot.Right,
+                SectionBottomY);
+        }
+
+        public static DxfBox GetTopRebarBox(int index)
+        {
+            var slot = GetSlotBox(index);
+
+            return new DxfBox(
+                slot.Left,
+                TopRebarTopY,
+                slot.Right,
+                TopRebarBottomY);
+        }
+
+        public static DxfBox GetBottomRebarBox(int index)
+        {
+            var slot = GetSlotBox(index);
+
+            return new DxfBox(
+                slot.Left,
+                BottomRebarTopY,
+                slot.Right,
+                BottomRebarBottomY);
+        }
+
+        public static DxfBox GetStirrupBox(int index)
+        {
+            var slot = GetSlotBox(index);
+
+            return new DxfBox(
+                slot.Left,
+                StirrupTopY,
+                slot.Right,
+                StirrupBottomY);
+        }
+
+        public static DxfBox GetSkinBox(int index)
+        {
+            var slot = GetSlotBox(index);
+
+            return new DxfBox(
+                slot.Left,
+                SkinTopY,
+                slot.Right,
+                SkinBottomY);
         }
     }
 }

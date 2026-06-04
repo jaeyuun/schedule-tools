@@ -60,40 +60,10 @@ namespace GirderSchedule.Dxf.Girder
 
             if (row != null)
             {
-                //DrawHeaderTexts(textDrawer, row, options);
                 DrawItems(row, options, sectionLayoutService, sectionDrawer, rebarDrawer, dimensionDrawer, textDrawer);
             }
 
             _saver.Save(document, filePath);
-        }
-
-        private void DrawHeaderTexts(TextDrawer textDrawer, ScheduleRow row, ScheduleDxfExportOptions options)
-        {
-            //var firstItem = row.Items.Count > 0 ? row.Items[0] : null;
-            //
-            //if (firstItem != null)
-            //{
-            //    textDrawer.DrawValueText(firstItem.Name, DxfLayout.LabelWidth + DxfLayout.SectionGroupWidth * 1.5, -300.0, 120.0);
-            //    textDrawer.DrawValueText(FormatSectionText(firstItem.Section.Width, firstItem.Section.Height, options), DxfLayout.LabelWidth + DxfLayout.SectionGroupWidth * 1.5, -600.0, 120.0);
-            //}
-        }
-
-        private string FormatSectionText(double width, double height, ScheduleDxfExportOptions options)
-        {
-            var widthText = width.ToString("0");
-            var heightText = height.ToString("0");
-
-            if (options.IsWidthOver)
-            {
-                widthText += " 이상";
-            }
-
-            if (options.IsHeightOver)
-            {
-                heightText += " 이상";
-            }
-
-            return "( " + widthText + " × " + heightText + " )";
         }
 
         private void DrawItems(
@@ -124,7 +94,7 @@ namespace GirderSchedule.Dxf.Girder
             DrawMemberName(set, setIndex, textDrawer);
 
             DrawSlot(set, setIndex, ScheduleSlotType.Left, options.IncludeLeft, options, layoutService, sectionDrawer, rebarDrawer, dimensionDrawer, textDrawer);
-            DrawSlot(set, setIndex, ScheduleSlotType.Center, options.IncludeCenter, options, layoutService, sectionDrawer, rebarDrawer, dimensionDrawer, textDrawer);
+            DrawSlot(set, setIndex, ScheduleSlotType.Center, true, options, layoutService, sectionDrawer, rebarDrawer, dimensionDrawer, textDrawer);
             DrawSlot(set, setIndex, ScheduleSlotType.Right, options.IncludeRight, options, layoutService, sectionDrawer, rebarDrawer, dimensionDrawer, textDrawer);
         }
 
@@ -135,12 +105,27 @@ namespace GirderSchedule.Dxf.Girder
 
             textDrawer.DrawValueText(set.MemberName, box.CenterX, DxfLayout.HeaderMemberNameTextY, DxfLayout.HeaderTextHeight);
 
-            if (item == null)
+            if (item == null || item.Section == null)
             {
                 return;
             }
 
-            textDrawer.DrawValueText(FormatSectionSize(item), box.CenterX, DxfLayout.HeaderSectionSizeTextY, DxfLayout.HeaderTextHeight);
+            DrawSectionSizeValues(textDrawer, item, box.CenterX);
+        }
+
+        private void DrawSectionSizeValues(TextDrawer textDrawer, ScheduleItem item, double centerX)
+        {
+            textDrawer.DrawValueText(
+                item.Section.Width.ToString("0"),
+                centerX + DxfLayout.HeaderWidthValueOffsetX,
+                DxfLayout.HeaderSectionSizeTextY,
+                DxfLayout.HeaderTextHeight);
+
+            textDrawer.DrawValueText(
+                item.Section.Height.ToString("0"),
+                centerX + DxfLayout.HeaderHeightValueOffsetX,
+                DxfLayout.HeaderSectionSizeTextY,
+                DxfLayout.HeaderTextHeight);
         }
 
         private ScheduleItem GetHeaderItem(ScheduleSet set)
@@ -156,16 +141,6 @@ namespace GirderSchedule.Dxf.Girder
             }
 
             return set.Right;
-        }
-
-        private string FormatSectionSize(ScheduleItem item)
-        {
-            if (item == null || item.Section == null)
-            {
-                return string.Empty;
-            }
-
-            return "( " + item.Section.Width.ToString("0") + " × " + item.Section.Height.ToString("0") + " )";
         }
 
         private void DrawSlot(
@@ -220,7 +195,7 @@ namespace GirderSchedule.Dxf.Girder
                 return;
             }
 
-            textDrawer.DrawValueText(item.Position, positionBox.CenterX, positionBox.CenterY, 90.0);
+            textDrawer.DrawValueText(item.Position, positionBox.CenterX, positionBox.CenterY, DxfLayout.RebarTextHeight);
         }
 
         private void DrawMemberForces(TextDrawer textDrawer, ScheduleItem item, DxfBox sectionBox)
@@ -233,13 +208,13 @@ namespace GirderSchedule.Dxf.Girder
             if (!string.IsNullOrWhiteSpace(moment))
             {
                 var mX = sectionBox.Left + sectionBox.Width / 4.0;
-                textDrawer.DrawDefPointText(moment, mX, y, 90.0);
+                textDrawer.DrawDefPointText(moment, mX, y, DxfLayout.RebarTextHeight);
             }
 
             if (!string.IsNullOrWhiteSpace(shear))
             {
                 var vX = sectionBox.Left + sectionBox.Width * 3.0 / 4.0;
-                textDrawer.DrawDefPointText(shear, vX, y, 90.0);
+                textDrawer.DrawDefPointText(shear, vX, y, DxfLayout.RebarTextHeight);
             }
         }
 
@@ -263,46 +238,120 @@ namespace GirderSchedule.Dxf.Girder
             return "V = " + item.MemberForce.Shear.Value.ToString("0");
         }
 
-        private void DrawRebarRows(TextDrawer textDrawer, ScheduleItem item, DxfBox topBox, DxfBox bottomBox, DxfBox stirrupBox, DxfBox skinBox)
+        private void DrawRebarRows(
+            TextDrawer textDrawer,
+            ScheduleItem item,
+            DxfBox topBox,
+            DxfBox bottomBox,
+            DxfBox stirrupBox,
+            DxfBox skinBox)
         {
-            DrawRebarSet(textDrawer, item.TopRebar, topBox.CenterX, topBox.CenterY);
-            DrawRebarSet(textDrawer, item.BottomRebar, bottomBox.CenterX, bottomBox.CenterY);
-
-            textDrawer.DrawRebarValueText(FormatStirrup(item.Stirrup), stirrupBox.CenterX, stirrupBox.CenterY, 90.0);
-
-            if (!string.IsNullOrEmpty(item.SkinRebarText))
+            if (item == null)
             {
-                textDrawer.DrawRebarValueText(item.SkinRebarText, skinBox.CenterX, skinBox.CenterY, 90.0);
-            }
-            else
-            {
-                textDrawer.DrawRebarValueText("-", skinBox.CenterX, skinBox.CenterY, 90.0);
-            }
-        }
-
-        private void DrawRebarSet(TextDrawer textDrawer, RebarSet rebar, double centerX, double centerY)
-        {
-            var total = rebar.FirstLayer.Count + rebar.SecondLayer.Count;
-
-            if (total <= 0 || rebar.Diameter <= 0)
-            {
-                textDrawer.DrawRebarValueText("-", centerX, centerY, 90.0);
                 return;
             }
 
-            textDrawer.DrawRebarValueText(total.ToString("0"), centerX - 360.0, centerY, 90.0);
-            textDrawer.DrawRebarValueText("- HD", centerX - 40.0, centerY, 90.0);
-            textDrawer.DrawRebarValueText(rebar.Diameter.ToString("0"), centerX + 300.0, centerY, 90.0);
+            DrawRebarSetValues(textDrawer, item.TopRebar, topBox);
+            DrawRebarSetValues(textDrawer, item.BottomRebar, bottomBox);
+            DrawStirrupValues(textDrawer, item.Stirrup, stirrupBox);
+            DrawSkinRebarValue(textDrawer, item, skinBox);
         }
 
-        private string FormatStirrup(StirrupData stirrup)
+        private void DrawRebarSetValues(TextDrawer textDrawer, RebarSet rebar, DxfBox box)
         {
-            if (stirrup == null || stirrup.Legs <= 0 || stirrup.Diameter <= 0 || stirrup.Spacing <= 0)
+            if (rebar == null)
             {
-                return "-";
+                return;
             }
 
-            return stirrup.Legs + "-HD" + stirrup.Diameter + "@" + stirrup.Spacing;
+            var totalCount = GetTotalRebarCount(rebar);
+
+            if (totalCount <= 0)
+            {
+                return;
+            }
+
+            var countText = totalCount.ToString("0");
+            var diameterText = rebar.Diameter.ToString("0");
+
+            var dashHdCenterX = box.CenterX + DxfLayout.RebarDashHdCenterOffsetX;
+            var countX = GetLeftValueCenterX(dashHdCenterX, DxfLayout.RebarDashHdTextWidth, countText) + DxfLayout.RebarCountAdjustX;
+            var diameterX = GetRightValueCenterX(dashHdCenterX, DxfLayout.RebarDashHdTextWidth, diameterText) + DxfLayout.RebarDiameterAdjustX;
+            var y = box.CenterY + DxfLayout.RebarValueOffsetY;
+
+            textDrawer.DrawValueText(countText, countX, y, DxfLayout.RebarTextHeight);
+            textDrawer.DrawValueText(diameterText, diameterX, y, DxfLayout.RebarTextHeight);
+        }
+
+        private int GetTotalRebarCount(RebarSet rebar)
+        {
+            var count = 0;
+
+            if (rebar.FirstLayer != null)
+            {
+                count += rebar.FirstLayer.Count;
+            }
+
+            if (rebar.SecondLayer != null)
+            {
+                count += rebar.SecondLayer.Count;
+            }
+
+            return count;
+        }
+
+        private void DrawStirrupValues(TextDrawer textDrawer, StirrupData stirrup, DxfBox box)
+        {
+            if (stirrup == null)
+            {
+                return;
+            }
+
+            var legText = stirrup.Legs.ToString("0");
+            var diameterText = stirrup.Diameter.ToString("0");
+            var spacingText = stirrup.Spacing.ToString("0");
+
+            var dashHdCenterX = box.CenterX + DxfLayout.StirrupDashHdCenterOffsetX;
+            var atCenterX = box.CenterX + DxfLayout.StirrupAtCenterOffsetX;
+
+            var legX = GetLeftValueCenterX(dashHdCenterX, DxfLayout.StirrupDashHdTextWidth, legText) + DxfLayout.StirrupLegAdjustX;
+            var diameterX = GetRightValueCenterX(dashHdCenterX, DxfLayout.StirrupDashHdTextWidth, diameterText) + DxfLayout.StirrupDiameterAdjustX;
+            var spacingX = GetRightValueCenterX(atCenterX, DxfLayout.StirrupAtTextWidth, spacingText) + DxfLayout.StirrupSpacingAdjustX;
+            var y = box.CenterY + DxfLayout.StirrupValueOffsetY;
+
+            textDrawer.DrawValueText(legText, legX, y, DxfLayout.RebarTextHeight);
+            textDrawer.DrawValueText(diameterText, diameterX, y, DxfLayout.RebarTextHeight);
+            textDrawer.DrawValueText(spacingText, spacingX, y, DxfLayout.RebarTextHeight);
+        }
+
+        private double EstimateNumberTextWidth(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return 0.0;
+            }
+
+            return value.Length * DxfLayout.RebarTextHeight * DxfLayout.NumberTextWidthFactor;
+        }
+
+        private double GetLeftValueCenterX(double fixedCenterX, double fixedTextWidth, string value)
+        {
+            return fixedCenterX - fixedTextWidth / 2.0 - DxfLayout.ValueTextGap - EstimateNumberTextWidth(value) / 2.0;
+        }
+
+        private double GetRightValueCenterX(double fixedCenterX, double fixedTextWidth, string value)
+        {
+            return fixedCenterX + fixedTextWidth / 2.0 + DxfLayout.ValueTextGap + EstimateNumberTextWidth(value) / 2.0;
+        }
+
+        private void DrawSkinRebarValue(TextDrawer textDrawer, ScheduleItem item, DxfBox skinBox)
+        {
+            if (string.IsNullOrWhiteSpace(item.SkinRebarText))
+            {
+                return;
+            }
+
+            textDrawer.DrawValueText(item.SkinRebarText, skinBox.CenterX, skinBox.CenterY, DxfLayout.RebarTextHeight);
         }
     }
 }
