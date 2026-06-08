@@ -4,7 +4,7 @@ using netDxf;
 using netDxf.Entities;
 using netDxf.Tables;
 
-namespace GirderSchedule.Dxf.Girder
+namespace GirderSchedule.Dxf.Drawers
 {
     public sealed class FormDrawer
     {

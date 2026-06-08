@@ -1,6 +1,6 @@
 ﻿using GirderSchedule.Domain.Girder.Models;
 
-namespace GirderSchedule.Domain.Girder.Services
+namespace GirderSchedule.Domain.Services
 {
     public sealed class ScheduleBuildService
     {

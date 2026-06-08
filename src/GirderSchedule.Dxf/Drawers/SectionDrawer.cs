@@ -1,9 +1,10 @@
 ﻿using GirderSchedule.Dxf.Common;
 using GirderSchedule.Dxf.Common.Overrides;
+using GirderSchedule.Dxf.Layout;
 using netDxf;
 using netDxf.Entities;
 
-namespace GirderSchedule.Dxf.Girder
+namespace GirderSchedule.Dxf.Drawers
 {
     public sealed class SectionDrawer
     {

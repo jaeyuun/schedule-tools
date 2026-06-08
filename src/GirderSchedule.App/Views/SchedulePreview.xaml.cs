@@ -4,10 +4,10 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using GirderSchedule.App.ViewModels.Girder;
+using GirderSchedule.App.ViewModels;
 using GirderSchedule.Domain.Girder.Models;
 
-namespace GirderSchedule.App.Views.Girder
+namespace GirderSchedule.App.Views
 {
     public partial class SchedulePreview : UserControl
     {

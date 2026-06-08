@@ -1,18 +1,20 @@
-﻿using System;
+﻿using GirderSchedule.App.Commands;
+using GirderSchedule.Domain.Girder.Models;
+using GirderSchedule.Domain.Services;
+using GirderSchedule.Domain.Models;
+using GirderSchedule.Dxf.Export;
+using Microsoft.Win32;
+using System;
 using System.IO;
 using System.Windows;
 using System.Windows.Input;
-using GirderSchedule.Domain.Girder.Models;
-using GirderSchedule.Domain.Girder.Services;
-using GirderSchedule.Dxf.Girder;
-using Microsoft.Win32;
 
-namespace GirderSchedule.App.ViewModels.Girder
+namespace GirderSchedule.App.ViewModels
 {
     public sealed class ScheduleViewModel : ViewModelBase
     {
-        private readonly ScheduleSheet _sheet;
-        private readonly ScheduleSet _set;
+        private ScheduleSheet _sheet;
+        private ScheduleSet _set;
         private bool _isWidthOver;
         private bool _isHeightOver;
 
@@ -28,12 +30,25 @@ namespace GirderSchedule.App.ViewModels.Girder
             get { return _sheet; }
         }
 
+        public ScheduleSet CurrentSet
+        {
+            get { return _set; }
+        }
+
         public string MemberName
         {
-            get { return _set.MemberName; }
+            get
+            {
+                if (_set == null)
+                {
+                    return string.Empty;
+                }
+
+                return _set.MemberName;
+            }
             set
             {
-                if (_set.MemberName == value)
+                if (_set == null || _set.MemberName == value)
                 {
                     return;
                 }
@@ -51,10 +66,10 @@ namespace GirderSchedule.App.ViewModels.Girder
 
         public double WidthValue
         {
-            get { return Left.WidthValue; }
+            get { return Left == null ? 0.0 : Left.WidthValue; }
             set
             {
-                if (Left.WidthValue == value)
+                if (Left == null || Left.WidthValue == value)
                 {
                     return;
                 }
@@ -70,10 +85,10 @@ namespace GirderSchedule.App.ViewModels.Girder
 
         public double HeightValue
         {
-            get { return Left.HeightValue; }
+            get { return Left == null ? 0.0 : Left.HeightValue; }
             set
             {
-                if (Left.HeightValue == value)
+                if (Left == null || Left.HeightValue == value)
                 {
                     return;
                 }
@@ -124,7 +139,20 @@ namespace GirderSchedule.App.ViewModels.Girder
             var service = new ScheduleBuildService();
             _sheet = service.CreateSample();
 
-            _set = _sheet.Rows[0].Sets[0];
+            RedrawCommand = new RelayCommand(p => RefreshItems());
+            ExportDxfCommand = new RelayCommand(p => ExportDxf());
+
+            LoadSet(_sheet.Rows[0].Sets[0]);
+        }
+
+        public void LoadSet(ScheduleSet set)
+        {
+            if (set == null)
+            {
+                return;
+            }
+
+            _set = set;
 
             Left = new SectionItemViewModel(_set.Left);
             Center = new SectionItemViewModel(_set.Center);
@@ -134,12 +162,41 @@ namespace GirderSchedule.App.ViewModels.Girder
             Center.IsSectionEnabled = true;
             Right.IsSectionEnabled = true;
 
-            RedrawCommand = new RelayCommand(p => RefreshItems());
-            ExportDxfCommand = new RelayCommand(p => ExportDxf());
+            EnsureSheetForCurrentSet();
+
+            OnPropertyChanged(nameof(CurrentSet));
+            OnPropertyChanged(nameof(Sheet));
+            OnPropertyChanged(nameof(MemberName));
+            OnPropertyChanged(nameof(WidthValue));
+            OnPropertyChanged(nameof(HeightValue));
+            OnPropertyChanged(nameof(Left));
+            OnPropertyChanged(nameof(Center));
+            OnPropertyChanged(nameof(Right));
+
+            RefreshItems();
+        }
+
+        public void ApplyFloorSetting(FloorSetting setting)
+        {
+            if (setting == null || Left == null || Center == null || Right == null)
+            {
+                return;
+            }
+
+            ApplyFloorSettingToItem(Left, setting);
+            ApplyFloorSettingToItem(Center, setting);
+            ApplyFloorSettingToItem(Right, setting);
+
+            RefreshItems();
         }
 
         public void RefreshItems()
         {
+            if (Left == null || Center == null || Right == null)
+            {
+                return;
+            }
+
             Left.RefreshAll();
             Center.RefreshAll();
             Right.RefreshAll();
@@ -147,6 +204,38 @@ namespace GirderSchedule.App.ViewModels.Girder
             OnPropertyChanged(nameof(Left));
             OnPropertyChanged(nameof(Center));
             OnPropertyChanged(nameof(Right));
+        }
+
+        private void ApplyFloorSettingToItem(SectionItemViewModel item, FloorSetting setting)
+        {
+            if (setting.MainRebarDiameter > 0)
+            {
+                item.TopDiameter = setting.MainRebarDiameter;
+                item.BottomDiameter = setting.MainRebarDiameter;
+            }
+
+            if (setting.StirrupDiameter > 0)
+            {
+                item.StirrupDiameter = setting.StirrupDiameter;
+            }
+
+            if (setting.SkinRebarDiameter > 0)
+            {
+                item.SkinRebarDiameter = setting.SkinRebarDiameter;
+            }
+        }
+
+        private void EnsureSheetForCurrentSet()
+        {
+            var service = new ScheduleBuildService();
+            _sheet = service.CreateSample();
+
+            if (_sheet.Rows.Count == 0 || _sheet.Rows[0].Sets.Count == 0)
+            {
+                return;
+            }
+
+            _sheet.Rows[0].Sets[0] = _set;
         }
 
         private void ExportDxf()
@@ -170,6 +259,8 @@ namespace GirderSchedule.App.ViewModels.Girder
         {
             try
             {
+                EnsureSheetForCurrentSet();
+
                 var exporter = new ScheduleDxfExporter();
 
                 var options = new ScheduleDxfExportOptions();
@@ -182,19 +273,11 @@ namespace GirderSchedule.App.ViewModels.Girder
 
                 exporter.Export(Sheet, filePath, options);
 
-                MessageBox.Show(
-                    "DXF 파일을 저장했습니다.",
-                    "DXF 저장 완료",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Information);
+                MessageBox.Show("DXF 파일을 저장했습니다.", "DXF 저장 완료", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (InvalidOperationException ex)
             {
-                MessageBox.Show(
-                    ex.Message,
-                    "DXF 저장 실패",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
+                MessageBox.Show(ex.Message, "DXF 저장 실패", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
             catch (IOException)
             {
@@ -219,11 +302,7 @@ namespace GirderSchedule.App.ViewModels.Girder
             }
             catch (Exception ex)
             {
-                MessageBox.Show(
-                    "DXF 저장 중 오류가 발생했습니다.\r\n\r\n" + ex.Message,
-                    "DXF 저장 실패",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
+                MessageBox.Show("DXF 저장 중 오류가 발생했습니다.\r\n\r\n" + ex.Message, "DXF 저장 실패", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }

@@ -3,7 +3,7 @@ using netDxf.Entities;
 using GirderSchedule.Dxf.Common;
 using GirderSchedule.Dxf.Common.Overrides;
 
-namespace GirderSchedule.Dxf.Girder
+namespace GirderSchedule.Dxf.Drawers
 {
     public sealed class TextDrawer
     {

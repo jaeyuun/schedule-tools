@@ -4,8 +4,9 @@ using netDxf.Tables;
 using GirderSchedule.Domain.Girder.Models;
 using GirderSchedule.Dxf.Common;
 using GirderSchedule.Dxf.Common.Overrides;
+using GirderSchedule.Dxf.Layout;
 
-namespace GirderSchedule.Dxf.Girder
+namespace GirderSchedule.Dxf.Drawers
 {
     public sealed class DimensionDrawer
     {

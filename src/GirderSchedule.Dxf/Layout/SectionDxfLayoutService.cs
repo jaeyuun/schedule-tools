@@ -2,7 +2,7 @@
 using GirderSchedule.Domain.Girder.Models;
 using GirderSchedule.Dxf.Common;
 
-namespace GirderSchedule.Dxf.Girder
+namespace GirderSchedule.Dxf.Layout
 {
     public sealed class SectionDxfLayoutService
     {

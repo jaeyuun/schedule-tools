@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Input;
 
-namespace GirderSchedule.App.ViewModels
+namespace GirderSchedule.App.Commands
 {
     public sealed class RelayCommand : ICommand
     {

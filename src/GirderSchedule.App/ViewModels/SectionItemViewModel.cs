@@ -1,11 +1,15 @@
 ﻿using GirderSchedule.Domain.Girder.Models;
+using GirderSchedule.Domain.Models;
+using System;
 
-namespace GirderSchedule.App.ViewModels.Girder
+namespace GirderSchedule.App.ViewModels
 {
     public sealed class SectionItemViewModel : ViewModelBase
     {
         private readonly ScheduleItem _model;
         private bool _isSectionEnabled = true;
+        private int _skinRebarDiameter;
+        private int _skinRebarSpacing;
 
         public ScheduleItem Model
         {
@@ -85,6 +89,7 @@ namespace GirderSchedule.App.ViewModels.Girder
                 _model.TopRebar.FirstLayer.Count = value;
                 OnPropertyChanged(nameof(TopCount1));
                 OnPropertyChanged(nameof(TopTotalCount));
+                OnPropertyChanged(nameof(TopText1));
             }
         }
 
@@ -118,6 +123,7 @@ namespace GirderSchedule.App.ViewModels.Girder
                 _model.TopRebar.SecondLayer.Count = value;
                 OnPropertyChanged(nameof(TopCount2));
                 OnPropertyChanged(nameof(TopTotalCount));
+                OnPropertyChanged(nameof(TopText2));
             }
         }
 
@@ -139,6 +145,7 @@ namespace GirderSchedule.App.ViewModels.Girder
                 _model.BottomRebar.FirstLayer.Count = value;
                 OnPropertyChanged(nameof(BottomCount1));
                 OnPropertyChanged(nameof(BottomTotalCount));
+                OnPropertyChanged(nameof(BottomText1));
             }
         }
 
@@ -172,6 +179,7 @@ namespace GirderSchedule.App.ViewModels.Girder
                 _model.BottomRebar.SecondLayer.Count = value;
                 OnPropertyChanged(nameof(BottomCount2));
                 OnPropertyChanged(nameof(BottomTotalCount));
+                OnPropertyChanged(nameof(BottomText2));
             }
         }
 
@@ -192,6 +200,7 @@ namespace GirderSchedule.App.ViewModels.Girder
 
                 _model.Stirrup.Legs = value;
                 OnPropertyChanged(nameof(StirrupLegs));
+                OnPropertyChanged(nameof(StirrupText));
             }
         }
 
@@ -207,6 +216,7 @@ namespace GirderSchedule.App.ViewModels.Girder
 
                 _model.Stirrup.Diameter = value;
                 OnPropertyChanged(nameof(StirrupDiameter));
+                OnPropertyChanged(nameof(StirrupText));
             }
         }
 
@@ -222,20 +232,53 @@ namespace GirderSchedule.App.ViewModels.Girder
 
                 _model.Stirrup.Spacing = value;
                 OnPropertyChanged(nameof(StirrupSpacing));
+                OnPropertyChanged(nameof(StirrupText));
+            }
+        }
+
+        public int SkinRebarDiameter
+        {
+            get { return _skinRebarDiameter; }
+            set
+            {
+                if (_skinRebarDiameter == value)
+                {
+                    return;
+                }
+
+                _skinRebarDiameter = value;
+                UpdateSkinRebarText();
+                OnPropertyChanged(nameof(SkinRebarDiameter));
+                OnPropertyChanged(nameof(SkinRebarText));
+            }
+        }
+
+        public int SkinRebarSpacing
+        {
+            get { return _skinRebarSpacing; }
+            set
+            {
+                if (_skinRebarSpacing == value)
+                {
+                    return;
+                }
+
+                _skinRebarSpacing = value;
+                UpdateSkinRebarText();
+                OnPropertyChanged(nameof(SkinRebarSpacing));
+                OnPropertyChanged(nameof(SkinRebarText));
             }
         }
 
         public string SkinRebarText
         {
-            get { return _model.SkinRebarText; }
+            get { return BuildSkinRebarText(); }
             set
             {
-                if (_model.SkinRebarText == value)
-                {
-                    return;
-                }
-
-                _model.SkinRebarText = value;
+                ApplySkinRebarText(value);
+                UpdateSkinRebarText();
+                OnPropertyChanged(nameof(SkinRebarDiameter));
+                OnPropertyChanged(nameof(SkinRebarSpacing));
                 OnPropertyChanged(nameof(SkinRebarText));
             }
         }
@@ -340,7 +383,7 @@ namespace GirderSchedule.App.ViewModels.Girder
 
         public string StirrupText
         {
-            get { return _model.Stirrup.Legs + "-HD" + _model.Stirrup.Diameter + "@" + _model.Stirrup.Spacing; }
+            get { return FormatStirrupText(); }
         }
 
         public bool IsSectionEnabled
@@ -361,6 +404,8 @@ namespace GirderSchedule.App.ViewModels.Girder
         public SectionItemViewModel(ScheduleItem model)
         {
             _model = model;
+            ApplySkinRebarText(_model.SkinRebarText);
+            UpdateSkinRebarText();
         }
 
         public void RefreshAll()
@@ -369,31 +414,29 @@ namespace GirderSchedule.App.ViewModels.Girder
             OnPropertyChanged(nameof(Position));
             OnPropertyChanged(nameof(WidthValue));
             OnPropertyChanged(nameof(HeightValue));
-
             OnPropertyChanged(nameof(TopCount1));
             OnPropertyChanged(nameof(TopCount2));
             OnPropertyChanged(nameof(TopDiameter));
-
+            OnPropertyChanged(nameof(TopTotalCount));
             OnPropertyChanged(nameof(BottomCount1));
             OnPropertyChanged(nameof(BottomCount2));
             OnPropertyChanged(nameof(BottomDiameter));
-
+            OnPropertyChanged(nameof(BottomTotalCount));
             OnPropertyChanged(nameof(StirrupLegs));
             OnPropertyChanged(nameof(StirrupDiameter));
             OnPropertyChanged(nameof(StirrupSpacing));
+            OnPropertyChanged(nameof(StirrupText));
+            OnPropertyChanged(nameof(SkinRebarDiameter));
+            OnPropertyChanged(nameof(SkinRebarSpacing));
             OnPropertyChanged(nameof(SkinRebarText));
-
             OnPropertyChanged(nameof(MomentValue));
             OnPropertyChanged(nameof(ShearValue));
             OnPropertyChanged(nameof(MomentText));
             OnPropertyChanged(nameof(ShearText));
-
             OnPropertyChanged(nameof(TopText1));
             OnPropertyChanged(nameof(TopText2));
             OnPropertyChanged(nameof(BottomText1));
             OnPropertyChanged(nameof(BottomText2));
-            OnPropertyChanged(nameof(StirrupText));
-
             OnPropertyChanged(nameof(IsSectionEnabled));
         }
 
@@ -422,6 +465,80 @@ namespace GirderSchedule.App.ViewModels.Girder
             }
 
             return count + "-HD" + diameter;
+        }
+
+        private string FormatStirrupText()
+        {
+            if (_model.Stirrup.Legs <= 0 || _model.Stirrup.Diameter <= 0 || _model.Stirrup.Spacing <= 0)
+            {
+                return "-";
+            }
+
+            return _model.Stirrup.Legs + "-HD" + _model.Stirrup.Diameter + "@" + _model.Stirrup.Spacing;
+        }
+
+        private void UpdateSkinRebarText()
+        {
+            _model.SkinRebarText = BuildSkinRebarText();
+        }
+
+        private string BuildSkinRebarText()
+        {
+            if (_skinRebarDiameter <= 0 || _skinRebarSpacing <= 0)
+            {
+                return "-";
+            }
+
+            return "HD" + _skinRebarDiameter + "@" + _skinRebarSpacing;
+        }
+
+        private void ApplySkinRebarText(string value)
+        {
+            _skinRebarDiameter = 0;
+            _skinRebarSpacing = 0;
+
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return;
+            }
+
+            var text = value.Trim();
+
+            if (text == "-")
+            {
+                return;
+            }
+
+            if (text.StartsWith("HD", StringComparison.OrdinalIgnoreCase))
+            {
+                text = text.Substring(2);
+            }
+
+            var parts = text.Split('@');
+
+            if (parts.Length != 2)
+            {
+                int diameter;
+                if (int.TryParse(text, out diameter))
+                {
+                    _skinRebarDiameter = diameter;
+                }
+
+                return;
+            }
+
+            int parsedDiameter;
+            int parsedSpacing;
+
+            if (int.TryParse(parts[0].Trim(), out parsedDiameter))
+            {
+                _skinRebarDiameter = parsedDiameter;
+            }
+
+            if (int.TryParse(parts[1].Trim(), out parsedSpacing))
+            {
+                _skinRebarSpacing = parsedSpacing;
+            }
         }
     }
 }

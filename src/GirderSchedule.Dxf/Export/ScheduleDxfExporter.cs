@@ -1,10 +1,12 @@
 ﻿using GirderSchedule.Domain.Girder.Layout;
 using GirderSchedule.Domain.Girder.Models;
 using GirderSchedule.Dxf.Common;
+using GirderSchedule.Dxf.Drawers;
+using GirderSchedule.Dxf.Layout;
 using netDxf;
 using System;
 
-namespace GirderSchedule.Dxf.Girder
+namespace GirderSchedule.Dxf.Export
 {
     public sealed class ScheduleDxfExporter
     {

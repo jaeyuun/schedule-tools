@@ -1,4 +1,4 @@
-﻿namespace GirderSchedule.Dxf.Girder
+﻿namespace GirderSchedule.Dxf.Export
 {
     public sealed class ScheduleDxfExportOptions
     {
