@@ -1,6 +1,8 @@
 ﻿using System.Collections.ObjectModel;
+using System.Windows;
 using System.Windows.Input;
 using GirderSchedule.App.Commands;
+using GirderSchedule.Domain.Models;
 
 namespace GirderSchedule.App.ViewModels
 {
@@ -90,14 +92,37 @@ namespace GirderSchedule.App.ViewModels
             }
         }
 
+        public ICommand AddCommand { get; private set; }
         public ICommand UpdateCommand { get; private set; }
-        public ICommand ClearCommand { get; private set; }
+        public ICommand RemoveCommand { get; private set; }
 
         public FloorSettingWindowViewModel(ObservableCollection<FloorNodeViewModel> floors)
         {
             Floors = floors;
+
+            AddCommand = new RelayCommand(p => Add());
             UpdateCommand = new RelayCommand(p => Update(), p => SelectedFloor != null);
-            ClearCommand = new RelayCommand(p => ClearInput());
+            RemoveCommand = new RelayCommand(p => Remove(), p => SelectedFloor != null);
+        }
+
+        private void Add()
+        {
+            if (string.IsNullOrWhiteSpace(InputFloorName))
+            {
+                MessageBox.Show("층 이름을 입력해 주세요.", "층 추가", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            var floor = new ScheduleFloor();
+            floor.Name = InputFloorName.Trim();
+            floor.Setting.FloorName = floor.Name;
+            floor.Setting.MainRebarDiameter = ParseInt(InputMainRebarDiameter);
+            floor.Setting.StirrupDiameter = ParseInt(InputStirrupDiameter);
+            floor.Setting.SkinRebarDiameter = ParseInt(InputSkinRebarDiameter);
+
+            var node = new FloorNodeViewModel(floor);
+            Floors.Add(node);
+            SelectedFloor = node;
         }
 
         private void Update()
@@ -107,15 +132,53 @@ namespace GirderSchedule.App.ViewModels
                 return;
             }
 
-            if (!string.IsNullOrWhiteSpace(InputFloorName))
+            if (string.IsNullOrWhiteSpace(InputFloorName))
             {
-                SelectedFloor.Name = InputFloorName.Trim();
+                MessageBox.Show("층 이름을 입력해 주세요.", "층 수정", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
             }
 
+            SelectedFloor.Name = InputFloorName.Trim();
             SelectedFloor.MainRebarDiameter = ParseInt(InputMainRebarDiameter);
             SelectedFloor.StirrupDiameter = ParseInt(InputStirrupDiameter);
             SelectedFloor.SkinRebarDiameter = ParseInt(InputSkinRebarDiameter);
             SelectedFloor.RefreshAll();
+        }
+
+        private void Remove()
+        {
+            if (SelectedFloor == null)
+            {
+                return;
+            }
+
+            var result = MessageBox.Show(
+                "선택한 층과 하위 부재가 모두 삭제됩니다.\r\n삭제하시겠습니까?",
+                "층 삭제",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning);
+
+            if (result != MessageBoxResult.Yes)
+            {
+                return;
+            }
+
+            var index = Floors.IndexOf(SelectedFloor);
+            Floors.Remove(SelectedFloor);
+
+            if (Floors.Count == 0)
+            {
+                SelectedFloor = null;
+                ClearInput();
+                return;
+            }
+
+            if (index >= Floors.Count)
+            {
+                index = Floors.Count - 1;
+            }
+
+            SelectedFloor = Floors[index];
         }
 
         private void LoadSelectedFloor()

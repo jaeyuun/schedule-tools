@@ -411,12 +411,49 @@ namespace GirderSchedule.App.ViewModels
             window.DataContext = viewModel;
             window.ShowDialog();
 
+            SyncProjectFloors();
+
             for (var i = 0; i < Floors.Count; i++)
             {
                 Floors[i].RefreshAll();
             }
 
+            if (Floors.Count == 0)
+            {
+                SelectedFloor = null;
+                SelectedSet = null;
+                IsDirty = true;
+                return;
+            }
+
+            if (SelectedFloor == null || !Floors.Contains(SelectedFloor))
+            {
+                SelectedFloor = Floors[0];
+            }
+
+            if (SelectedFloor != null && SelectedFloor.Sets.Count > 0)
+            {
+                if (SelectedSet == null || !SelectedFloor.Sets.Contains(SelectedSet))
+                {
+                    SelectedSet = SelectedFloor.Sets[0];
+                }
+            }
+            else
+            {
+                SelectedSet = null;
+            }
+
             IsDirty = true;
+        }
+
+        private void SyncProjectFloors()
+        {
+            _project.Floors.Clear();
+
+            for (var i = 0; i < Floors.Count; i++)
+            {
+                _project.Floors.Add(Floors[i].Model);
+            }
         }
 
         private void RemoveFloor()

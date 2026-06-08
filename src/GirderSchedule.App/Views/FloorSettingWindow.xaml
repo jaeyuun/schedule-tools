@@ -23,9 +23,9 @@
 
         <Grid Grid.Row="0" Grid.Column="0">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="160"/>
-                <ColumnDefinition Width="160"/>
-                <ColumnDefinition Width="160"/>
+                <ColumnDefinition Width="107"/>
+                <ColumnDefinition Width="133"/>
+                <ColumnDefinition/>
                 <ColumnDefinition Width="160"/>
             </Grid.ColumnDefinitions>
 
@@ -34,23 +34,24 @@
                 <RowDefinition Height="32"/>
             </Grid.RowDefinitions>
 
-            <TextBlock Grid.Row="0" Grid.Column="0" Text="층" FontSize="20" VerticalAlignment="Center"/>
-            <TextBlock Grid.Row="0" Grid.Column="1" Text="주근 직경" FontSize="20" VerticalAlignment="Center"/>
-            <TextBlock Grid.Row="0" Grid.Column="2" Text="스터럽 직경" FontSize="20" VerticalAlignment="Center"/>
-            <TextBlock Grid.Row="0" Grid.Column="3" Text="표피철근 직경" FontSize="20" VerticalAlignment="Center"/>
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="층" VerticalAlignment="Center"/>
+            <TextBlock Grid.Row="0" Grid.Column="1" Text="주근 직경" VerticalAlignment="Center"/>
+            <TextBlock Grid.Row="0" Grid.Column="2" Text="스터럽 직경" VerticalAlignment="Center"/>
+            <TextBlock Grid.Row="0" Grid.Column="3" Text="표피철근 직경" VerticalAlignment="Center"/>
 
-            <TextBox Grid.Row="1" Grid.Column="0" Height="26" Margin="0,0,12,0" Text="{Binding InputFloorName, UpdateSourceTrigger=PropertyChanged}"/>
-            <TextBox Grid.Row="1" Grid.Column="1" Height="26" Margin="0,0,12,0" Text="{Binding InputMainRebarDiameter, UpdateSourceTrigger=PropertyChanged}"/>
-            <TextBox Grid.Row="1" Grid.Column="2" Height="26" Margin="0,0,12,0" Text="{Binding InputStirrupDiameter, UpdateSourceTrigger=PropertyChanged}"/>
-            <TextBox Grid.Row="1" Grid.Column="3" Height="26" Margin="0,0,12,0" Text="{Binding InputSkinRebarDiameter, UpdateSourceTrigger=PropertyChanged}"/>
+            <TextBox Grid.Row="1" Grid.Column="0" Margin="0,3,12,3" Text="{Binding InputFloorName, UpdateSourceTrigger=PropertyChanged}"/>
+            <TextBox Grid.Row="1" Grid.Column="1" Margin="0,3,12,3" Text="{Binding InputMainRebarDiameter, UpdateSourceTrigger=PropertyChanged}"/>
+            <TextBox Grid.Row="1" Grid.Column="2" Margin="0,3,12,3" Text="{Binding InputStirrupDiameter, UpdateSourceTrigger=PropertyChanged}"/>
+            <TextBox Grid.Row="1" Grid.Column="3" Margin="0,3,12,3" Text="{Binding InputSkinRebarDiameter, UpdateSourceTrigger=PropertyChanged}"/>
         </Grid>
 
         <StackPanel Grid.Row="0" Grid.Column="1" VerticalAlignment="Bottom">
-            <Button Content="수정" Height="30" Margin="0,0,0,8" Command="{Binding UpdateCommand}"/>
-            <Button Content="비우기" Height="30" Command="{Binding ClearCommand}"/>
+            <Button Content="추가" Height="28" Margin="0,0,0,6" Command="{Binding AddCommand}"/>
+            <Button Content="수정" Height="28" Margin="0,0,0,6" Command="{Binding UpdateCommand}"/>
+            <Button Content="삭제" Height="28" Command="{Binding RemoveCommand}"/>
         </StackPanel>
 
-        <TextBlock Grid.Row="2" Grid.Column="0" Text="목록" FontSize="20" Margin="0,0,0,8"/>
+        <TextBlock Grid.Row="2" Grid.Column="0" Text="목록" Margin="0,0,0,8"/>
 
         <DataGrid Grid.Row="3"
                   Grid.Column="0"
