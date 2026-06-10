@@ -1,5 +1,5 @@
-﻿using System.Windows;
-using System.Windows.Controls;
+﻿using System.ComponentModel;
+using System.Windows;
 using GirderSchedule.App.ViewModels;
 
 namespace GirderSchedule.App.Views
@@ -12,15 +12,8 @@ namespace GirderSchedule.App.Views
             DataContext = new MainWindowViewModel();
         }
 
-        private void TreeViewItem_Selected(object sender, RoutedEventArgs e)
+        private void Window_Closing(object sender, CancelEventArgs e)
         {
-            var item = e.OriginalSource as TreeViewItem;
-
-            if (item == null)
-            {
-                return;
-            }
-
             var viewModel = DataContext as MainWindowViewModel;
 
             if (viewModel == null)
@@ -28,19 +21,9 @@ namespace GirderSchedule.App.Views
                 return;
             }
 
-            var floor = item.DataContext as FloorNodeViewModel;
-            if (floor != null)
+            if (!viewModel.ConfirmSaveIfDirty())
             {
-                viewModel.SelectedFloor = floor;
-                e.Handled = true;
-                return;
-            }
-
-            var set = item.DataContext as ScheduleSetNodeViewModel;
-            if (set != null)
-            {
-                viewModel.SelectedSet = set;
-                e.Handled = true;
+                e.Cancel = true;
             }
         }
     }

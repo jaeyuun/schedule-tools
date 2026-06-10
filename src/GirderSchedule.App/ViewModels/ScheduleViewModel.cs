@@ -25,6 +25,8 @@ namespace GirderSchedule.App.ViewModels
         public ICommand RedrawCommand { get; private set; }
         public ICommand ExportDxfCommand { get; private set; }
 
+        public event EventHandler CurrentSetChanged;
+
         public ScheduleSheet Sheet
         {
             get { return _sheet; }
@@ -55,12 +57,24 @@ namespace GirderSchedule.App.ViewModels
 
                 _set.MemberName = value;
 
-                Left.Name = value;
-                Center.Name = value;
-                Right.Name = value;
+                if (Left != null)
+                {
+                    Left.Name = value;
+                }
+
+                if (Center != null)
+                {
+                    Center.Name = value;
+                }
+
+                if (Right != null)
+                {
+                    Right.Name = value;
+                }
 
                 OnPropertyChanged(nameof(MemberName));
                 RefreshItems();
+                RaiseCurrentSetChanged();
             }
         }
 
@@ -204,6 +218,16 @@ namespace GirderSchedule.App.ViewModels
             OnPropertyChanged(nameof(Left));
             OnPropertyChanged(nameof(Center));
             OnPropertyChanged(nameof(Right));
+        }
+
+        private void RaiseCurrentSetChanged()
+        {
+            var handler = CurrentSetChanged;
+
+            if (handler != null)
+            {
+                handler(this, EventArgs.Empty);
+            }
         }
 
         private void ApplyFloorSettingToItem(SectionItemViewModel item, FloorSetting setting)

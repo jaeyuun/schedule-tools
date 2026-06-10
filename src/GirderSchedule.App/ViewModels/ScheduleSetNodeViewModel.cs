@@ -7,6 +7,7 @@ namespace GirderSchedule.App.ViewModels
     {
         private readonly ScheduleSet _model;
         private bool _isChecked = true;
+        private bool _isSelected;
 
         public ScheduleSet Model
         {
@@ -57,6 +58,21 @@ namespace GirderSchedule.App.ViewModels
             }
         }
 
+        public bool IsSelected
+        {
+            get { return _isSelected; }
+            set
+            {
+                if (_isSelected == value)
+                {
+                    return;
+                }
+
+                _isSelected = value;
+                OnPropertyChanged(nameof(IsSelected));
+            }
+        }
+
         public ScheduleSetNodeViewModel(ScheduleSet model)
         {
             _model = model;
@@ -67,6 +83,7 @@ namespace GirderSchedule.App.ViewModels
             OnPropertyChanged(nameof(MemberName));
             OnPropertyChanged(nameof(DisplayName));
             OnPropertyChanged(nameof(IsChecked));
+            OnPropertyChanged(nameof(IsSelected));
         }
     }
 }

@@ -1,8 +1,10 @@
-﻿using System.Collections.ObjectModel;
+﻿using GirderSchedule.App.Commands;
+using GirderSchedule.Domain.Girder.Models;
+using GirderSchedule.Domain.Models;
+using GirderSchedule.Domain.Services;
+using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Input;
-using GirderSchedule.App.Commands;
-using GirderSchedule.Domain.Models;
 
 namespace GirderSchedule.App.ViewModels
 {
@@ -120,6 +122,9 @@ namespace GirderSchedule.App.ViewModels
             floor.Setting.StirrupDiameter = ParseInt(InputStirrupDiameter);
             floor.Setting.SkinRebarDiameter = ParseInt(InputSkinRebarDiameter);
 
+            var set = CreateScheduleSet("G1", floor.Setting);
+            floor.Sets.Add(set);
+
             var node = new FloorNodeViewModel(floor);
             Floors.Add(node);
             SelectedFloor = node;
@@ -202,6 +207,57 @@ namespace GirderSchedule.App.ViewModels
             InputSkinRebarDiameter = string.Empty;
         }
 
+        private ScheduleSet CreateScheduleSet(string memberName, FloorSetting setting)
+        {
+            var service = new ScheduleBuildService();
+            var sheet = service.CreateSample();
+            var set = sheet.Rows[0].Sets[0];
+
+            set.MemberName = memberName;
+
+            set.Left.Name = memberName;
+            set.Center.Name = memberName;
+            set.Right.Name = memberName;
+
+            ApplySetting(set.Left, setting);
+            ApplySetting(set.Center, setting);
+            ApplySetting(set.Right, setting);
+
+            return set;
+        }
+
+        private void ApplySetting(ScheduleItem item, FloorSetting setting)
+        {
+            if (setting == null)
+            {
+                return;
+            }
+
+            if (setting.MainRebarDiameter > 0)
+            {
+                item.TopRebar.Diameter = setting.MainRebarDiameter;
+                item.BottomRebar.Diameter = setting.MainRebarDiameter;
+            }
+
+            if (setting.StirrupDiameter > 0)
+            {
+                item.Stirrup.Diameter = setting.StirrupDiameter;
+            }
+
+            if (setting.SkinRebarDiameter > 0)
+            {
+                var spacing = string.Empty;
+
+                if (!string.IsNullOrWhiteSpace(item.SkinRebarText) && item.SkinRebarText.Contains("@"))
+                {
+                    spacing = item.SkinRebarText.Substring(item.SkinRebarText.IndexOf("@") + 1).Trim();
+                }
+
+                item.SkinRebarText = string.IsNullOrWhiteSpace(spacing)
+                    ? "HD" + setting.SkinRebarDiameter
+                    : "HD" + setting.SkinRebarDiameter + "@" + spacing;
+            }
+        }
         private int ParseInt(string value)
         {
             int result;

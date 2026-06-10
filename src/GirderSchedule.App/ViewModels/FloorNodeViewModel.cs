@@ -8,6 +8,8 @@ namespace GirderSchedule.App.ViewModels
     {
         private readonly ScheduleFloor _model;
         private bool _isChecked = true;
+        private bool _isSelected;
+        private bool _isChildSelected;
 
         public ScheduleFloor Model
         {
@@ -139,6 +141,36 @@ namespace GirderSchedule.App.ViewModels
             }
         }
 
+        public bool IsSelected
+        {
+            get { return _isSelected; }
+            set
+            {
+                if (_isSelected == value)
+                {
+                    return;
+                }
+
+                _isSelected = value;
+                OnPropertyChanged(nameof(IsSelected));
+            }
+        }
+
+        public bool IsChildSelected
+        {
+            get { return _isChildSelected; }
+            set
+            {
+                if (_isChildSelected == value)
+                {
+                    return;
+                }
+
+                _isChildSelected = value;
+                OnPropertyChanged(nameof(IsChildSelected));
+            }
+        }
+
         public FloorNodeViewModel(ScheduleFloor model)
         {
             _model = model;
@@ -197,6 +229,8 @@ namespace GirderSchedule.App.ViewModels
             OnPropertyChanged(nameof(StirrupText));
             OnPropertyChanged(nameof(SkinRebarText));
             OnPropertyChanged(nameof(IsChecked));
+            OnPropertyChanged(nameof(IsSelected));
+            OnPropertyChanged(nameof(IsChildSelected));
 
             for (var i = 0; i < Sets.Count; i++)
             {

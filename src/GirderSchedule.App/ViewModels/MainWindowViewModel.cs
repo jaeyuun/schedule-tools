@@ -118,10 +118,21 @@ namespace GirderSchedule.App.ViewModels
                 _selectedFloor = value;
                 OnPropertyChanged(nameof(SelectedFloor));
 
-                if (_selectedFloor != null && SelectedSet != null)
+                if (_selectedFloor == null)
                 {
-                    Editor.ApplyFloorSetting(_selectedFloor.Setting);
-                    IsDirty = true;
+                    SelectedSet = null;
+                    return;
+                }
+
+                if (_selectedFloor.Sets.Count > 0)
+                {
+                    SelectedSet = _selectedFloor.Sets[0];
+                }
+                else
+                {
+                    ClearTreeSelection();
+                    _selectedFloor.IsSelected = true;
+                    SelectedSet = null;
                 }
             }
         }
@@ -136,13 +147,28 @@ namespace GirderSchedule.App.ViewModels
                     return;
                 }
 
+                ClearTreeSelection();
+
                 _selectedSet = value;
                 OnPropertyChanged(nameof(SelectedSet));
 
-                if (_selectedSet != null)
+                if (_selectedSet == null)
                 {
-                    Editor.LoadSet(_selectedSet.Model);
+                    return;
                 }
+
+                var parentFloor = FindFloorBySet(_selectedSet);
+
+                if (parentFloor != null)
+                {
+                    _selectedFloor = parentFloor;
+                    OnPropertyChanged(nameof(SelectedFloor));
+
+                    parentFloor.IsChildSelected = true;
+                }
+
+                _selectedSet.IsSelected = true;
+                Editor.LoadSet(_selectedSet.Model);
             }
         }
 
@@ -150,9 +176,7 @@ namespace GirderSchedule.App.ViewModels
         public ICommand OpenProjectCommand { get; private set; }
         public ICommand SaveProjectCommand { get; private set; }
         public ICommand SaveAsProjectCommand { get; private set; }
-        public ICommand AddFloorCommand { get; private set; }
         public ICommand EditFloorSettingCommand { get; private set; }
-        public ICommand RemoveFloorCommand { get; private set; }
         public ICommand AddSetCommand { get; private set; }
         public ICommand RemoveSetCommand { get; private set; }
         public ICommand ExportCurrentSetCommand { get; private set; }
@@ -161,15 +185,14 @@ namespace GirderSchedule.App.ViewModels
         public MainWindowViewModel()
         {
             Editor = new ScheduleViewModel();
+            Editor.CurrentSetChanged += Editor_CurrentSetChanged;
             Floors = new ObservableCollection<FloorNodeViewModel>();
 
             NewProjectCommand = new RelayCommand(p => NewProject());
             OpenProjectCommand = new RelayCommand(p => OpenProject());
             SaveProjectCommand = new RelayCommand(p => SaveProject());
             SaveAsProjectCommand = new RelayCommand(p => SaveAsProject());
-            AddFloorCommand = new RelayCommand(p => AddFloor());
             EditFloorSettingCommand = new RelayCommand(p => EditFloorSetting());
-            RemoveFloorCommand = new RelayCommand(p => RemoveFloor(), p => SelectedFloor != null);
             AddSetCommand = new RelayCommand(p => AddSet(), p => SelectedFloor != null);
             RemoveSetCommand = new RelayCommand(p => RemoveSet(), p => SelectedFloor != null && SelectedSet != null);
             ExportCurrentSetCommand = new RelayCommand(p => Editor.ExportDxfCommand.Execute(null));
@@ -354,7 +377,7 @@ namespace GirderSchedule.App.ViewModels
             SaveProject();
         }
 
-        private bool ConfirmSaveIfDirty()
+        public bool ConfirmSaveIfDirty()
         {
             if (!IsDirty)
             {
@@ -362,8 +385,8 @@ namespace GirderSchedule.App.ViewModels
             }
 
             var result = MessageBox.Show(
-                "저장되지 않은 변경사항이 있습니다.\r\n저장하시겠습니까?",
-                "저장 확인",
+                "저장하지 않은 변경 내용이 있습니다.\r\n저장하시겠습니까?",
+                "프로젝트 저장",
                 MessageBoxButton.YesNoCancel,
                 MessageBoxImage.Question);
 
@@ -375,30 +398,10 @@ namespace GirderSchedule.App.ViewModels
             if (result == MessageBoxResult.Yes)
             {
                 SaveProject();
+                return !IsDirty;
             }
 
             return true;
-        }
-
-        private void AddFloor()
-        {
-            var index = Floors.Count + 1;
-
-            var floor = new ScheduleFloor();
-            floor.Name = "층 " + index;
-            floor.Setting.FloorName = floor.Name;
-            floor.Setting.MainRebarDiameter = 19;
-            floor.Setting.StirrupDiameter = 10;
-            floor.Setting.SkinRebarDiameter = 10;
-
-            _project.Floors.Add(floor);
-
-            var node = new FloorNodeViewModel(floor);
-            Floors.Add(node);
-            SelectedFloor = node;
-
-            EditFloorSetting();
-            IsDirty = true;
         }
 
         private void EditFloorSetting()
@@ -411,6 +414,8 @@ namespace GirderSchedule.App.ViewModels
             window.DataContext = viewModel;
             window.ShowDialog();
 
+            SyncProjectFloors();
+            EnsureEachFloorHasSet();
             SyncProjectFloors();
 
             for (var i = 0; i < Floors.Count; i++)
@@ -446,6 +451,22 @@ namespace GirderSchedule.App.ViewModels
             IsDirty = true;
         }
 
+        private void EnsureEachFloorHasSet()
+        {
+            for (var i = 0; i < Floors.Count; i++)
+            {
+                var floor = Floors[i];
+
+                if (floor.Sets.Count > 0)
+                {
+                    continue;
+                }
+
+                var set = CreateScheduleSet("G1", floor.Setting);
+                floor.AddSet(set);
+            }
+        }
+
         private void SyncProjectFloors()
         {
             _project.Floors.Clear();
@@ -456,52 +477,6 @@ namespace GirderSchedule.App.ViewModels
             }
         }
 
-        private void RemoveFloor()
-        {
-            if (SelectedFloor == null)
-            {
-                return;
-            }
-
-            var result = MessageBox.Show(
-                "선택한 층과 하위 부재가 모두 삭제됩니다.\r\n삭제하시겠습니까?",
-                "층 삭제",
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Warning);
-
-            if (result != MessageBoxResult.Yes)
-            {
-                return;
-            }
-
-            var index = Floors.IndexOf(SelectedFloor);
-
-            _project.Floors.Remove(SelectedFloor.Model);
-            Floors.Remove(SelectedFloor);
-
-            if (Floors.Count == 0)
-            {
-                SelectedFloor = null;
-                SelectedSet = null;
-                IsDirty = true;
-                return;
-            }
-
-            if (index >= Floors.Count)
-            {
-                index = Floors.Count - 1;
-            }
-
-            SelectedFloor = Floors[index];
-
-            if (SelectedFloor.Sets.Count > 0)
-            {
-                SelectedSet = SelectedFloor.Sets[0];
-            }
-
-            IsDirty = true;
-        }
-
         private void AddSet()
         {
             if (SelectedFloor == null)
@@ -509,12 +484,11 @@ namespace GirderSchedule.App.ViewModels
                 return;
             }
 
-            var number = SelectedFloor.Sets.Count + 1;
-            var set = CreateScheduleSet("G" + number, SelectedFloor.Setting);
+            var memberName = "G" + (SelectedFloor.Sets.Count + 1);
+            var set = CreateScheduleSet(memberName, SelectedFloor.Setting);
             var node = SelectedFloor.AddSet(set);
 
             SelectedSet = node;
-            Editor.LoadSet(set);
             IsDirty = true;
         }
 
@@ -555,6 +529,16 @@ namespace GirderSchedule.App.ViewModels
             IsDirty = true;
         }
 
+        private void Editor_CurrentSetChanged(object sender, EventArgs e)
+        {
+            if (SelectedSet != null)
+            {
+                SelectedSet.RefreshAll();
+            }
+
+            IsDirty = true;
+        }
+
         private void ShowHelp()
         {
             MessageBox.Show(
@@ -566,6 +550,38 @@ namespace GirderSchedule.App.ViewModels
                 "사용방법",
                 MessageBoxButton.OK,
                 MessageBoxImage.Information);
+        }
+
+        private void ClearTreeSelection()
+        {
+            for (var i = 0; i < Floors.Count; i++)
+            {
+                Floors[i].IsSelected = false;
+                Floors[i].IsChildSelected = false;
+
+                for (var j = 0; j < Floors[i].Sets.Count; j++)
+                {
+                    Floors[i].Sets[j].IsSelected = false;
+                }
+            }
+        }
+
+        private FloorNodeViewModel FindFloorBySet(ScheduleSetNodeViewModel set)
+        {
+            if (set == null)
+            {
+                return null;
+            }
+
+            for (var i = 0; i < Floors.Count; i++)
+            {
+                if (Floors[i].Sets.Contains(set))
+                {
+                    return Floors[i];
+                }
+            }
+
+            return null;
         }
     }
 }
