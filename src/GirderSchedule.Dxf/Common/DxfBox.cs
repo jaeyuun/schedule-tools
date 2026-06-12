@@ -34,5 +34,10 @@
             Right = right;
             Bottom = bottom;
         }
+
+        public DxfBox Move(double offsetX, double offsetY)
+        {
+            return new DxfBox(Left + offsetX, Top + offsetY, Right + offsetX, Bottom + offsetY);
+        }
     }
 }

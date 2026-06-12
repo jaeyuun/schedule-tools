@@ -11,6 +11,8 @@ namespace GirderSchedule.App.ViewModels
         private int _skinRebarDiameter;
         private int _skinRebarSpacing;
 
+        public event EventHandler Changed;
+
         public ScheduleItem Model
         {
             get { return _model; }
@@ -388,16 +390,17 @@ namespace GirderSchedule.App.ViewModels
 
         public bool IsSectionEnabled
         {
-            get { return _isSectionEnabled; }
+            get { return _model.IsSectionEnabled; }
             set
             {
-                if (_isSectionEnabled == value)
+                if (_model.IsSectionEnabled == value)
                 {
                     return;
                 }
 
-                _isSectionEnabled = value;
+                _model.IsSectionEnabled = value;
                 OnPropertyChanged(nameof(IsSectionEnabled));
+                RaiseChanged();
             }
         }
 
@@ -538,6 +541,16 @@ namespace GirderSchedule.App.ViewModels
             if (int.TryParse(parts[1].Trim(), out parsedSpacing))
             {
                 _skinRebarSpacing = parsedSpacing;
+            }
+        }
+
+        private void RaiseChanged()
+        {
+            var handler = Changed;
+
+            if (handler != null)
+            {
+                handler(this, EventArgs.Empty);
             }
         }
     }

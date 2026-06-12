@@ -172,9 +172,9 @@ namespace GirderSchedule.App.ViewModels
             Center = new SectionItemViewModel(_set.Center);
             Right = new SectionItemViewModel(_set.Right);
 
-            Left.IsSectionEnabled = true;
-            Center.IsSectionEnabled = true;
-            Right.IsSectionEnabled = true;
+            Left.Changed += SectionItem_Changed;
+            Center.Changed += SectionItem_Changed;
+            Right.Changed += SectionItem_Changed;
 
             EnsureSheetForCurrentSet();
 
@@ -228,6 +228,12 @@ namespace GirderSchedule.App.ViewModels
             {
                 handler(this, EventArgs.Empty);
             }
+        }
+
+        private void SectionItem_Changed(object sender, EventArgs e)
+        {
+            RefreshItems();
+            RaiseCurrentSetChanged();
         }
 
         private void ApplyFloorSettingToItem(SectionItemViewModel item, FloorSetting setting)

@@ -2,10 +2,12 @@
 using GirderSchedule.App.Services;
 using GirderSchedule.App.Views;
 using GirderSchedule.Domain.Girder.Models;
-using GirderSchedule.Domain.Services;
 using GirderSchedule.Domain.Models;
+using GirderSchedule.Domain.Services;
+using GirderSchedule.Dxf.Export;
 using Microsoft.Win32;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Windows;
@@ -195,7 +197,7 @@ namespace GirderSchedule.App.ViewModels
             EditFloorSettingCommand = new RelayCommand(p => EditFloorSetting());
             AddSetCommand = new RelayCommand(p => AddSet(), p => SelectedFloor != null);
             RemoveSetCommand = new RelayCommand(p => RemoveSet(), p => SelectedFloor != null && SelectedSet != null);
-            ExportCurrentSetCommand = new RelayCommand(p => Editor.ExportDxfCommand.Execute(null));
+            ExportCurrentSetCommand = new RelayCommand(p => ExportProjectDxf());
             HelpCommand = new RelayCommand(p => ShowHelp());
 
             LoadProject(CreateNewProject());
@@ -232,6 +234,10 @@ namespace GirderSchedule.App.ViewModels
             set.Left.Name = memberName;
             set.Center.Name = memberName;
             set.Right.Name = memberName;
+
+            set.Left.IsSectionEnabled = true;
+            set.Center.IsSectionEnabled = true;
+            set.Right.IsSectionEnabled = true;
 
             ApplySetting(set.Left, setting);
             ApplySetting(set.Center, setting);
@@ -340,26 +346,27 @@ namespace GirderSchedule.App.ViewModels
             }
         }
 
-        private void SaveProject()
+        private bool SaveProject()
         {
             if (string.IsNullOrWhiteSpace(CurrentFilePath))
             {
-                SaveAsProject();
-                return;
+                return SaveAsProject();
             }
 
             try
             {
                 _fileService.Save(CurrentFilePath, _project);
                 IsDirty = false;
+                return true;
             }
             catch (Exception ex)
             {
                 MessageBox.Show("프로젝트를 저장할 수 없습니다.\r\n\r\n" + ex.Message, "저장 실패", MessageBoxButton.OK, MessageBoxImage.Error);
+                return false;
             }
         }
 
-        private void SaveAsProject()
+        private bool SaveAsProject()
         {
             var dialog = new SaveFileDialog();
             dialog.Title = "프로젝트 저장";
@@ -370,11 +377,11 @@ namespace GirderSchedule.App.ViewModels
 
             if (dialog.ShowDialog() != true)
             {
-                return;
+                return false;
             }
 
             CurrentFilePath = dialog.FileName;
-            SaveProject();
+            return SaveProject();
         }
 
         public bool ConfirmSaveIfDirty()
@@ -397,8 +404,7 @@ namespace GirderSchedule.App.ViewModels
 
             if (result == MessageBoxResult.Yes)
             {
-                SaveProject();
-                return !IsDirty;
+                return SaveProject();
             }
 
             return true;
@@ -564,6 +570,220 @@ namespace GirderSchedule.App.ViewModels
                     Floors[i].Sets[j].IsSelected = false;
                 }
             }
+        }
+
+        private void ExportProjectDxf()
+        {
+            if (!SaveProjectBeforeExport())
+            {
+                return;
+            }
+
+            var pages = BuildExportPages();
+
+            if (pages.Count == 0)
+            {
+                MessageBox.Show("내보낼 층 또는 부재가 선택되지 않았습니다.", "DXF 내보내기", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            var dialog = new SaveFileDialog();
+            dialog.Title = "DXF 저장";
+            dialog.Filter = "DXF 파일 (*.dxf)|*.dxf";
+            dialog.FileName = BuildDxfFileName();
+            dialog.DefaultExt = ".dxf";
+            dialog.AddExtension = true;
+
+            if (dialog.ShowDialog() != true)
+            {
+                return;
+            }
+
+            ExportPages(dialog.FileName, pages);
+        }
+
+        private void ExportPages(string filePath, List<ScheduleExportPage> pages)
+        {
+            try
+            {
+                var exporter = new ScheduleDxfExporter();
+
+                var options = new ScheduleDxfExportOptions();
+                options.IncludeLeft = true;
+                options.IncludeCenter = true;
+                options.IncludeRight = true;
+                options.TemplatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "GirderTemplate.dxf");
+
+                exporter.ExportPages(pages, filePath, options);
+
+                MessageBox.Show("DXF 파일을 저장했습니다.", "DXF 저장 완료", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (IOException)
+            {
+                MessageBox.Show(
+                    "DXF 파일을 저장할 수 없습니다.\r\n\r\n" +
+                    "저장하려는 파일이 AutoCAD, GstarCAD, 뷰어 또는 다른 프로그램에서 열려 있을 수 있습니다.\r\n" +
+                    "파일을 닫은 뒤 다시 저장해 주세요.\r\n\r\n" +
+                    "파일 경로: " + filePath,
+                    "DXF 저장 실패",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                MessageBox.Show(
+                    "DXF 파일을 저장할 권한이 없습니다.\r\n\r\n" +
+                    "쓰기 권한이 있는 폴더인지 확인하거나 다른 위치에 저장해 주세요.\r\n\r\n" +
+                    "파일 경로: " + filePath,
+                    "DXF 저장 실패",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("DXF 저장 중 오류가 발생했습니다.\r\n\r\n" + ex.Message, "DXF 저장 실패", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private bool SaveProjectBeforeExport()
+        {
+            if (string.IsNullOrWhiteSpace(CurrentFilePath))
+            {
+                var result = MessageBox.Show(
+                    "프로젝트 파일이 아직 저장되지 않았습니다.\r\nDXF 내보내기 전에 프로젝트를 먼저 저장해야 합니다.\r\n\r\n프로젝트를 저장하시겠습니까?",
+                    "프로젝트 저장 필요",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Information);
+
+                if (result != MessageBoxResult.Yes)
+                {
+                    return false;
+                }
+
+                return SaveAsProject();
+            }
+
+            return SaveProject();
+        }
+
+        private string BuildDxfFileName()
+        {
+            var projectName = SanitizeFileName(ProjectName);
+            var scheduleTitle = SanitizeFileName(ScheduleTitle);
+
+            if (string.IsNullOrWhiteSpace(projectName))
+            {
+                projectName = "프로젝트";
+            }
+
+            if (string.IsNullOrWhiteSpace(scheduleTitle))
+            {
+                scheduleTitle = "보일람표";
+            }
+
+            return projectName + "_" + scheduleTitle + ".dxf";
+        }
+
+        private string SanitizeFileName(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return string.Empty;
+            }
+
+            var invalidChars = Path.GetInvalidFileNameChars();
+            var result = value.Trim();
+
+            for (var i = 0; i < invalidChars.Length; i++)
+            {
+                result = result.Replace(invalidChars[i].ToString(), string.Empty);
+            }
+
+            return result;
+        }
+
+        private List<ScheduleExportPage> BuildExportPages()
+        {
+            var pages = new List<ScheduleExportPage>();
+            var pageNumber = 1;
+
+            for (var i = 0; i < Floors.Count; i++)
+            {
+                var floor = Floors[i];
+
+                if (!floor.IsChecked)
+                {
+                    continue;
+                }
+
+                var selectedSets = new List<ScheduleSet>();
+
+                for (var j = 0; j < floor.Sets.Count; j++)
+                {
+                    var setNode = floor.Sets[j];
+
+                    if (!setNode.IsChecked)
+                    {
+                        continue;
+                    }
+
+                    selectedSets.Add(setNode.Model);
+                }
+
+                if (selectedSets.Count == 0)
+                {
+                    continue;
+                }
+
+                for (var start = 0; start < selectedSets.Count; start += 9)
+                {
+                    var page = new ScheduleExportPage();
+                    page.SheetTitle = ScheduleTitle + "-" + pageNumber;
+                    page.FloorName = floor.Name;
+
+                    var count = System.Math.Min(9, selectedSets.Count - start);
+
+                    for (var k = 0; k < count; k++)
+                    {
+                        page.Sets.Add(selectedSets[start + k]);
+                    }
+
+                    pages.Add(page);
+                    pageNumber++;
+                }
+            }
+
+            return pages;
+        }
+
+        private ScheduleSheet CreateSheetFromPage(ScheduleExportPage page)
+        {
+            var sheet = new ScheduleSheet();
+            sheet.Title = page.SheetTitle;
+
+            var rowIndex = 0;
+            var setIndex = 0;
+
+            while (setIndex < page.Sets.Count)
+            {
+                var row = new ScheduleRow();
+
+                for (var i = 0; i < 3; i++)
+                {
+                    if (setIndex >= page.Sets.Count)
+                    {
+                        break;
+                    }
+
+                    row.Sets.Add(page.Sets[setIndex]);
+                    setIndex++;
+                }
+
+                sheet.Rows.Add(row);
+                rowIndex++;
+            }
+
+            return sheet;
         }
 
         private FloorNodeViewModel FindFloorBySet(ScheduleSetNodeViewModel set)

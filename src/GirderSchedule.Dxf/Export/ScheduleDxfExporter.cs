@@ -1,10 +1,13 @@
 ﻿using GirderSchedule.Domain.Girder.Layout;
 using GirderSchedule.Domain.Girder.Models;
+using GirderSchedule.Domain.Models;
 using GirderSchedule.Dxf.Common;
 using GirderSchedule.Dxf.Drawers;
 using GirderSchedule.Dxf.Layout;
 using netDxf;
+using netDxf.Entities;
 using System;
+using System.Collections.Generic;
 
 namespace GirderSchedule.Dxf.Export
 {
@@ -62,14 +65,166 @@ namespace GirderSchedule.Dxf.Export
 
             if (row != null)
             {
-                DrawItems(row, options, sectionLayoutService, sectionDrawer, rebarDrawer, dimensionDrawer, textDrawer);
+                DrawItems(row, 0.0, 0.0, options, sectionLayoutService, sectionDrawer, rebarDrawer, dimensionDrawer, textDrawer);
             }
 
             _saver.Save(document, filePath);
         }
 
+        public void ExportPages(List<ScheduleExportPage> pages, string filePath, ScheduleDxfExportOptions options)
+        {
+            if (pages == null)
+            {
+                throw new ArgumentNullException(nameof(pages));
+            }
+
+            if (string.IsNullOrEmpty(filePath))
+            {
+                throw new ArgumentException("DXF 저장 경로가 비어 있습니다.", nameof(filePath));
+            }
+
+            if (options == null)
+            {
+                options = new ScheduleDxfExportOptions();
+            }
+
+            var template = _loader.LoadTemplateResourcesOnly(options.TemplatePath);
+            var document = template.Document;
+
+            _validator.Ensure(document);
+
+            var pointConverter = new DxfPointConverter();
+            var textDrawer = new TextDrawer(document, pointConverter, template.Overrides);
+            var sectionLayoutService = new SectionDxfLayoutService();
+            var sectionDrawer = new SectionDrawer(document, pointConverter, template.Overrides);
+            var rebarDrawer = new RebarDrawer(document, pointConverter, template.Overrides);
+            var dimensionDrawer = new DimensionDrawer(document, pointConverter, template.Overrides);
+
+            for (var pageIndex = 0; pageIndex < pages.Count; pageIndex++)
+            {
+                var pageBaseX = DxfLayout.GetPageBaseX(pageIndex);
+                var pageBaseY = DxfLayout.GetPageBaseY(pageIndex);
+
+                DrawPage(document, pointConverter, pages[pageIndex], pageBaseX, pageBaseY, options, sectionLayoutService, sectionDrawer, rebarDrawer, dimensionDrawer, textDrawer);
+            }
+
+            _saver.Save(document, filePath);
+        }
+
+        private void DrawPage(
+            DxfDocument document,
+            DxfPointConverter pointConverter,
+            ScheduleExportPage page,
+            double pageBaseX,
+            double pageBaseY,
+            ScheduleDxfExportOptions options,
+            SectionDxfLayoutService sectionLayoutService,
+            SectionDrawer sectionDrawer,
+            RebarDrawer rebarDrawer,
+            DimensionDrawer dimensionDrawer,
+            TextDrawer textDrawer)
+        {
+            if (page == null)
+            {
+                return;
+            }
+
+            DrawPageFrame(document, pointConverter, pageBaseX, pageBaseY);
+
+            var scheduleBaseX = DxfLayout.GetForm2BaseX(pageBaseX);
+            var scheduleBaseY = DxfLayout.GetForm2BaseY(pageBaseY);
+
+            for (var rowIndex = 0; rowIndex < DxfLayout.RowsPerPage; rowIndex++)
+            {
+                DrawScheduleRow(document, pointConverter, pageBaseX, pageBaseY, rowIndex);
+            }
+
+            DrawPageTitle(document, page, pageBaseX, pageBaseY, textDrawer);
+
+            for (var setIndex = 0; setIndex < page.Sets.Count && setIndex < DxfLayout.SetsPerPage; setIndex++)
+            {
+                DrawSet(page.Sets[setIndex], setIndex, scheduleBaseX, scheduleBaseY, options, sectionLayoutService, sectionDrawer, rebarDrawer, dimensionDrawer, textDrawer);
+            }
+        }
+
+        private void DrawPageFrame(DxfDocument document, DxfPointConverter pointConverter, double pageBaseX, double pageBaseY)
+        {
+            DrawBlock(document, pointConverter, DxfBlocks.TitleBlock, pageBaseX, pageBaseY, DxfLayout.PageFrameScale);
+        }
+
+        private void DrawScheduleRow(DxfDocument document, DxfPointConverter pointConverter, double pageBaseX, double pageBaseY, int rowIndex)
+        {
+            var x = DxfLayout.GetRowBaseX(pageBaseX, rowIndex);
+            var y = DxfLayout.GetRowBaseY(pageBaseY, rowIndex);
+
+            DrawBlock(document, pointConverter, DxfBlocks.Form2, x, y, 1.0);
+        }
+
+        private void DrawBlock(DxfDocument document, DxfPointConverter pointConverter, string blockName, double x, double y, double scale)
+        {
+            var block = document.Blocks[blockName];
+
+            if (block == null)
+            {
+                throw new InvalidOperationException("DXF 블록을 찾을 수 없습니다. BlockName: " + blockName);
+            }
+
+            var insert = new Insert(block, pointConverter.ToVector3(x, y));
+            insert.Scale = new Vector3(scale, scale, scale);
+
+            document.Entities.Add(insert);
+        }
+
+        private void DrawPageTitle(DxfDocument document, ScheduleExportPage page, double pageBaseX, double pageBaseY, TextDrawer textDrawer)
+        {
+            if (page == null)
+            {
+                return;
+            }
+
+            DrawTitleCircle(document, pageBaseX, pageBaseY);
+            DrawTitleLine(document, pageBaseX, pageBaseY);
+
+            textDrawer.DrawValueText(
+                "1",
+                pageBaseX + DxfLayout.XrefTitleNumberX,
+                pageBaseY + DxfLayout.XrefTitleNumberY,
+                DxfLayout.XrefTitleNumberHeight);
+
+            var title = string.IsNullOrWhiteSpace(page.SheetTitle) ? "보 일람표" : page.SheetTitle;
+
+            textDrawer.DrawValueText(
+                title,
+                pageBaseX + DxfLayout.XrefTitleTextX,
+                pageBaseY + DxfLayout.XrefTitleTextY,
+                DxfLayout.XrefTitleTextHeight);
+        }
+
+        private void DrawTitleCircle(DxfDocument document, double pageBaseX, double pageBaseY)
+        {
+            var centerX = pageBaseX + DxfLayout.XrefTitleCircleCenterX;
+            var centerY = pageBaseY + DxfLayout.XrefTitleCircleCenterY;
+
+            var circle = new Circle(new Vector3(centerX, centerY, 0.0), DxfLayout.XrefTitleCircleRadius);
+            circle.Layer = document.Layers[DxfLayers.FormText];
+            document.Entities.Add(circle);
+        }
+
+        private void DrawTitleLine(DxfDocument document, double pageBaseX, double pageBaseY)
+        {
+            var startX = pageBaseX + DxfLayout.XrefTitleLineStartX;
+            var endX = pageBaseX + DxfLayout.XrefTitleLineEndX;
+            var y = pageBaseY + DxfLayout.XrefTitleLineY;
+
+            var line = new Line(new Vector3(startX, y, 0.0), new Vector3(endX, y, 0.0));
+            line.Layer = document.Layers[DxfLayers.FormText];
+            document.Entities.Add(line);
+        }
+
         private void DrawItems(
             ScheduleRow row,
+            double pageBaseX,
+            double pageBaseY,
             ScheduleDxfExportOptions options,
             SectionDxfLayoutService layoutService,
             SectionDrawer sectionDrawer,
@@ -77,15 +232,17 @@ namespace GirderSchedule.Dxf.Export
             DimensionDrawer dimensionDrawer,
             TextDrawer textDrawer)
         {
-            for (var setIndex = 0; setIndex < row.Sets.Count; setIndex++)
+            for (var setIndex = 0; setIndex < row.Sets.Count && setIndex < DxfLayout.SetsPerPage; setIndex++)
             {
-                DrawSet(row.Sets[setIndex], setIndex, options, layoutService, sectionDrawer, rebarDrawer, dimensionDrawer, textDrawer);
+                DrawSet(row.Sets[setIndex], setIndex, pageBaseX, pageBaseY, options, layoutService, sectionDrawer, rebarDrawer, dimensionDrawer, textDrawer);
             }
         }
 
         private void DrawSet(
             ScheduleSet set,
             int setIndex,
+            double pageBaseX,
+            double pageBaseY,
             ScheduleDxfExportOptions options,
             SectionDxfLayoutService layoutService,
             SectionDrawer sectionDrawer,
@@ -93,45 +250,66 @@ namespace GirderSchedule.Dxf.Export
             DimensionDrawer dimensionDrawer,
             TextDrawer textDrawer)
         {
-            DrawMemberName(set, setIndex, textDrawer);
+            if (set == null)
+            {
+                return;
+            }
 
-            DrawSlot(set, setIndex, ScheduleSlotType.Left, options.IncludeLeft, options, layoutService, sectionDrawer, rebarDrawer, dimensionDrawer, textDrawer);
-            DrawSlot(set, setIndex, ScheduleSlotType.Center, true, options, layoutService, sectionDrawer, rebarDrawer, dimensionDrawer, textDrawer);
-            DrawSlot(set, setIndex, ScheduleSlotType.Right, options.IncludeRight, options, layoutService, sectionDrawer, rebarDrawer, dimensionDrawer, textDrawer);
+            DrawMemberName(set, setIndex, pageBaseX, pageBaseY, textDrawer);
+
+            DrawSlot(set, setIndex, ScheduleSlotType.Left, IsSlotEnabled(set.Left), pageBaseX, pageBaseY, options, layoutService, sectionDrawer, rebarDrawer, dimensionDrawer, textDrawer);
+            DrawSlot(set, setIndex, ScheduleSlotType.Center, true, pageBaseX, pageBaseY, options, layoutService, sectionDrawer, rebarDrawer, dimensionDrawer, textDrawer);
+            DrawSlot(set, setIndex, ScheduleSlotType.Right, IsSlotEnabled(set.Right), pageBaseX, pageBaseY, options, layoutService, sectionDrawer, rebarDrawer, dimensionDrawer, textDrawer);
         }
 
-        private void DrawMemberName(ScheduleSet set, int setIndex, TextDrawer textDrawer)
+        private bool IsSlotEnabled(ScheduleItem item)
         {
-            var box = DxfLayout.GetMemberNameBox(setIndex);
-            var item = GetHeaderItem(set);
+            if (item == null)
+            {
+                return false;
+            }
 
-            textDrawer.DrawValueText(set.MemberName, box.CenterX, DxfLayout.HeaderMemberNameTextY, DxfLayout.HeaderTextHeight);
+            return item.IsSectionEnabled;
+        }
+
+        private void DrawMemberName(ScheduleSet set, int setIndex, double pageBaseX, double pageBaseY, TextDrawer textDrawer)
+        {
+            var box = DxfLayout.GetMemberNameBox(setIndex).Move(pageBaseX, pageBaseY);
+            var item = GetHeaderItem(set);
+            var rowOffsetY = DxfLayout.GetRowOffsetY(setIndex);
+
+            textDrawer.DrawValueText(set.MemberName, box.CenterX, pageBaseY + rowOffsetY + DxfLayout.HeaderMemberNameTextY, DxfLayout.HeaderTextHeight);
 
             if (item == null || item.Section == null)
             {
                 return;
             }
 
-            DrawSectionSizeValues(textDrawer, item, box.CenterX);
+            DrawSectionSizeValues(textDrawer, item, box.CenterX, pageBaseY + rowOffsetY);
         }
 
-        private void DrawSectionSizeValues(TextDrawer textDrawer, ScheduleItem item, double centerX)
+        private void DrawSectionSizeValues(TextDrawer textDrawer, ScheduleItem item, double centerX, double baseY)
         {
             textDrawer.DrawValueText(
                 item.Section.Width.ToString("0"),
                 centerX + DxfLayout.HeaderWidthValueOffsetX,
-                DxfLayout.HeaderSectionSizeTextY,
+                baseY + DxfLayout.HeaderSectionSizeTextY,
                 DxfLayout.HeaderTextHeight);
 
             textDrawer.DrawValueText(
                 item.Section.Height.ToString("0"),
                 centerX + DxfLayout.HeaderHeightValueOffsetX,
-                DxfLayout.HeaderSectionSizeTextY,
+                baseY + DxfLayout.HeaderSectionSizeTextY,
                 DxfLayout.HeaderTextHeight);
         }
 
         private ScheduleItem GetHeaderItem(ScheduleSet set)
         {
+            if (set == null)
+            {
+                return null;
+            }
+
             if (set.Center != null)
             {
                 return set.Center;
@@ -150,6 +328,8 @@ namespace GirderSchedule.Dxf.Export
             int setIndex,
             ScheduleSlotType type,
             bool enabled,
+            double pageBaseX,
+            double pageBaseY,
             ScheduleDxfExportOptions options,
             SectionDxfLayoutService layoutService,
             SectionDrawer sectionDrawer,
@@ -157,7 +337,7 @@ namespace GirderSchedule.Dxf.Export
             DimensionDrawer dimensionDrawer,
             TextDrawer textDrawer)
         {
-            var sectionBox = DxfLayout.GetSectionBox(setIndex, type);
+            var sectionBox = DxfLayout.GetSectionBox(setIndex, type).Move(pageBaseX, pageBaseY);
 
             if (!enabled)
             {
@@ -172,11 +352,11 @@ namespace GirderSchedule.Dxf.Export
                 return;
             }
 
-            var positionBox = DxfLayout.GetPositionBox(setIndex, type);
-            var topBox = DxfLayout.GetTopRebarBox(setIndex, type);
-            var bottomBox = DxfLayout.GetBottomRebarBox(setIndex, type);
-            var stirrupBox = DxfLayout.GetStirrupBox(setIndex, type);
-            var skinBox = DxfLayout.GetSkinBox(setIndex, type);
+            var positionBox = DxfLayout.GetPositionBox(setIndex, type).Move(pageBaseX, pageBaseY);
+            var topBox = DxfLayout.GetTopRebarBox(setIndex, type).Move(pageBaseX, pageBaseY);
+            var bottomBox = DxfLayout.GetBottomRebarBox(setIndex, type).Move(pageBaseX, pageBaseY);
+            var stirrupBox = DxfLayout.GetStirrupBox(setIndex, type).Move(pageBaseX, pageBaseY);
+            var skinBox = DxfLayout.GetSkinBox(setIndex, type).Move(pageBaseX, pageBaseY);
 
             DrawPositionText(textDrawer, item, positionBox);
             DrawMemberForces(textDrawer, item, sectionBox);
@@ -204,8 +384,7 @@ namespace GirderSchedule.Dxf.Export
         {
             var moment = FormatMoment(item);
             var shear = FormatShear(item);
-
-            var y = DxfLayout.MemberForceCenterY;
+            var y = sectionBox.Top + (DxfLayout.MemberForceCenterY - DxfLayout.SectionTopY);
 
             if (!string.IsNullOrWhiteSpace(moment))
             {
@@ -348,7 +527,7 @@ namespace GirderSchedule.Dxf.Export
 
         private void DrawSkinRebarValue(TextDrawer textDrawer, ScheduleItem item, DxfBox skinBox)
         {
-            if (string.IsNullOrWhiteSpace(item.SkinRebarText))
+            if (item == null || string.IsNullOrWhiteSpace(item.SkinRebarText))
             {
                 return;
             }

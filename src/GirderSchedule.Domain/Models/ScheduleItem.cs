@@ -5,6 +5,8 @@
         public string Name { get; set; }
         public string Position { get; set; }
 
+        public bool IsSectionEnabled { get; set; }
+
         public SectionData Section { get; set; }
         public RebarSet TopRebar { get; set; }
         public RebarSet BottomRebar { get; set; }
@@ -18,6 +20,8 @@
         {
             Name = string.Empty;
             Position = string.Empty;
+
+            IsSectionEnabled = true;
 
             Section = new SectionData();
             TopRebar = new RebarSet();

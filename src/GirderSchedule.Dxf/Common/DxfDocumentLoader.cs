@@ -35,6 +35,7 @@ namespace GirderSchedule.Dxf.Common
             return new DxfTemplateDocument(document, overrides);
         }
 
+        // TODO: 기존 엔티티 삭제 메서드
         private void ClearModelEntities(DxfDocument document)
         {
             var entities = document.Entities.All.ToList();
