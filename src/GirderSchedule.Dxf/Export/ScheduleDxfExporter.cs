@@ -139,7 +139,8 @@ namespace GirderSchedule.Dxf.Export
                 DrawScheduleRow(document, pointConverter, pageBaseX, pageBaseY, rowIndex);
             }
 
-            DrawPageTitle(document, page, pageBaseX, pageBaseY, textDrawer);
+            DrawPageTitle(document, page, pageBaseX, pageBaseY, pointConverter, textDrawer);
+            DrawXrefDrawingName(page, pageBaseX, pageBaseY, textDrawer);
 
             for (var setIndex = 0; setIndex < page.Sets.Count && setIndex < DxfLayout.SetsPerPage; setIndex++)
             {
@@ -175,17 +176,17 @@ namespace GirderSchedule.Dxf.Export
             document.Entities.Add(insert);
         }
 
-        private void DrawPageTitle(DxfDocument document, ScheduleExportPage page, double pageBaseX, double pageBaseY, TextDrawer textDrawer)
+        private void DrawPageTitle(DxfDocument document, ScheduleExportPage page, double pageBaseX, double pageBaseY, DxfPointConverter pointConverter, TextDrawer textDrawer)
         {
             if (page == null)
             {
                 return;
             }
 
-            DrawTitleCircle(document, pageBaseX, pageBaseY);
-            DrawTitleLine(document, pageBaseX, pageBaseY);
+            DrawTitleCircle(document, pointConverter, pageBaseX, pageBaseY);
+            DrawTitleLine(document, pointConverter, pageBaseX, pageBaseY);
 
-            textDrawer.DrawValueText(
+            textDrawer.DrawFormText(
                 "1",
                 pageBaseX + DxfLayout.XrefTitleNumberX,
                 pageBaseY + DxfLayout.XrefTitleNumberY,
@@ -193,32 +194,48 @@ namespace GirderSchedule.Dxf.Export
 
             var title = string.IsNullOrWhiteSpace(page.SheetTitle) ? "보 일람표" : page.SheetTitle;
 
-            textDrawer.DrawValueText(
+            textDrawer.DrawFormText(
                 title,
                 pageBaseX + DxfLayout.XrefTitleTextX,
                 pageBaseY + DxfLayout.XrefTitleTextY,
                 DxfLayout.XrefTitleTextHeight);
         }
 
-        private void DrawTitleCircle(DxfDocument document, double pageBaseX, double pageBaseY)
+        private void DrawTitleCircle(DxfDocument document, DxfPointConverter pointConverter, double pageBaseX, double pageBaseY)
         {
             var centerX = pageBaseX + DxfLayout.XrefTitleCircleCenterX;
             var centerY = pageBaseY + DxfLayout.XrefTitleCircleCenterY;
 
-            var circle = new Circle(new Vector3(centerX, centerY, 0.0), DxfLayout.XrefTitleCircleRadius);
-            circle.Layer = document.Layers[DxfLayers.FormText];
+            var circle = new Circle(pointConverter.ToVector3(centerX, centerY), DxfLayout.XrefTitleCircleRadius);
+            DxfEntityStyle.ApplyByLayer(circle, document.Layers[DxfLayers.FormText]);
             document.Entities.Add(circle);
         }
 
-        private void DrawTitleLine(DxfDocument document, double pageBaseX, double pageBaseY)
+        private void DrawTitleLine(DxfDocument document, DxfPointConverter pointConverter, double pageBaseX, double pageBaseY)
         {
             var startX = pageBaseX + DxfLayout.XrefTitleLineStartX;
             var endX = pageBaseX + DxfLayout.XrefTitleLineEndX;
             var y = pageBaseY + DxfLayout.XrefTitleLineY;
 
-            var line = new Line(new Vector3(startX, y, 0.0), new Vector3(endX, y, 0.0));
-            line.Layer = document.Layers[DxfLayers.FormText];
+            var line = new Line(pointConverter.ToVector3(startX, y), pointConverter.ToVector3(endX, y));
+            DxfEntityStyle.ApplyByLayer(line, document.Layers[DxfLayers.FormText]);
             document.Entities.Add(line);
+        }
+
+        private void DrawXrefDrawingName(ScheduleExportPage page, double pageBaseX, double pageBaseY, TextDrawer textDrawer)
+        {
+            if (page == null)
+            {
+                return;
+            }
+
+            var drawingName = string.IsNullOrWhiteSpace(page.SheetTitleName) ? "보 일람표-1" : page.SheetTitleName;
+
+            textDrawer.DrawValueText(
+                drawingName,
+                pageBaseX + DxfLayout.XrefDrawingNameTextX,
+                pageBaseY + DxfLayout.XrefDrawingNameTextY,
+                DxfLayout.XrefDrawingNameTextHeight);
         }
 
         private void DrawItems(

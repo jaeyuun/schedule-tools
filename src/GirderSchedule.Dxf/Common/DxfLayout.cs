@@ -28,17 +28,21 @@ namespace GirderSchedule.Dxf.Common
         public const double XrefTitleCircleCenterY = 17645.0;
         public const double XrefTitleCircleRadius = 325.0;
 
-        public const double XrefTitleNumberX = 11950.0;
-        public const double XrefTitleNumberY = 17555.0;
+        public const double XrefTitleNumberX = 12020.0;
+        public const double XrefTitleNumberY = 17645.0;
         public const double XrefTitleNumberHeight = 180.0;
 
         public const double XrefTitleLineStartX = XrefTitleCircleCenterX + XrefTitleCircleRadius;
         public const double XrefTitleLineEndX = 14840.0;
         public const double XrefTitleLineY = XrefTitleCircleCenterY;
 
-        public const double XrefTitleTextX = 12900.0;
-        public const double XrefTitleTextY = 17725.0;
+        public const double XrefTitleTextX = 13650.0;
+        public const double XrefTitleTextY = 17840.0;
         public const double XrefTitleTextHeight = 230.0;
+
+        public const double XrefDrawingNameTextX = 25350.0;
+        public const double XrefDrawingNameTextY = 1775.0;
+        public const double XrefDrawingNameTextHeight = 120.0;
 
         public const double Form2Width = 22710.0;
         public const double Form2Height = 5250.0;

@@ -738,8 +738,9 @@ namespace GirderSchedule.App.ViewModels
                 for (var start = 0; start < selectedSets.Count; start += 9)
                 {
                     var page = new ScheduleExportPage();
-                    page.SheetTitle = ScheduleTitle + "-" + pageNumber;
+                    page.SheetTitle = ScheduleTitle;
                     page.FloorName = floor.Name;
+                    page.SheetTitleName = ScheduleTitle + "-" + pageNumber;
 
                     var count = System.Math.Min(9, selectedSets.Count - start);
 
