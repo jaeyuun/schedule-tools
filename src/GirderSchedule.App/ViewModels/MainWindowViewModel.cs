@@ -18,6 +18,7 @@ namespace GirderSchedule.App.ViewModels
     public sealed class MainWindowViewModel : ViewModelBase
     {
         private readonly ProjectFileService _fileService = new ProjectFileService();
+        private readonly RecentProjectService _recentProjectService = new RecentProjectService();
         private ScheduleProject _project;
         private FloorNodeViewModel _selectedFloor;
         private ScheduleSetNodeViewModel _selectedSet;
@@ -34,9 +35,14 @@ namespace GirderSchedule.App.ViewModels
 
         public string ProjectName
         {
-            get { return _project.ProjectName; }
+            get { return _project == null ? string.Empty : _project.ProjectName; }
             set
             {
+                if (_project == null)
+                {
+                    return;
+                }
+
                 if (_project.ProjectName == value)
                 {
                     return;
@@ -51,9 +57,14 @@ namespace GirderSchedule.App.ViewModels
 
         public string ScheduleTitle
         {
-            get { return _project.ScheduleTitle; }
+            get { return _project == null ? string.Empty : _project.ScheduleTitle; }
             set
             {
+                if (_project == null)
+                {
+                    return;
+                }
+
                 if (_project.ScheduleTitle == value)
                 {
                     return;
@@ -62,13 +73,14 @@ namespace GirderSchedule.App.ViewModels
                 _project.ScheduleTitle = value;
                 IsDirty = true;
                 OnPropertyChanged(nameof(ScheduleTitle));
+                OnPropertyChanged(nameof(WindowTitle));
             }
         }
 
         public string CurrentFilePath
         {
             get { return _currentFilePath; }
-            private set
+            set
             {
                 if (_currentFilePath == value)
                 {
@@ -84,7 +96,7 @@ namespace GirderSchedule.App.ViewModels
         public bool IsDirty
         {
             get { return _isDirty; }
-            private set
+            set
             {
                 if (_isDirty == value)
                 {
@@ -101,9 +113,11 @@ namespace GirderSchedule.App.ViewModels
         {
             get
             {
-                var name = string.IsNullOrWhiteSpace(ProjectName) ? "새 프로젝트" : ProjectName;
-                var dirty = IsDirty ? " *" : string.Empty;
-                return name + dirty + " - 보 일람표 툴";
+                var scheduleTitle = _project == null || string.IsNullOrWhiteSpace(_project.ScheduleTitle) ? "보 일람표" : _project.ScheduleTitle;
+                var projectName = _project == null || string.IsNullOrWhiteSpace(_project.ProjectName) ? "새 프로젝트" : _project.ProjectName;
+                var dirty = IsDirty || string.IsNullOrWhiteSpace(CurrentFilePath) ? " *" : string.Empty;
+
+                return scheduleTitle + " (" + projectName + ")" + dirty;
             }
         }
 
@@ -186,6 +200,25 @@ namespace GirderSchedule.App.ViewModels
 
         public MainWindowViewModel()
         {
+            InitializeCommands();
+
+            var project = CreateNewProject("새 프로젝트");
+            CurrentFilePath = string.Empty;
+            LoadProject(project);
+            IsDirty = false;
+        }
+
+        public MainWindowViewModel(ScheduleProject project, string filePath)
+        {
+            InitializeCommands();
+
+            CurrentFilePath = filePath;
+            LoadProject(project);
+            IsDirty = false;
+        }
+
+        private void InitializeCommands()
+        {
             Editor = new ScheduleViewModel();
             Editor.CurrentSetChanged += Editor_CurrentSetChanged;
             Floors = new ObservableCollection<FloorNodeViewModel>();
@@ -199,15 +232,12 @@ namespace GirderSchedule.App.ViewModels
             RemoveSetCommand = new RelayCommand(p => RemoveSet(), p => SelectedFloor != null && SelectedSet != null);
             ExportCurrentSetCommand = new RelayCommand(p => ExportProjectDxf());
             HelpCommand = new RelayCommand(p => ShowHelp());
-
-            LoadProject(CreateNewProject());
-            IsDirty = false;
         }
 
-        private ScheduleProject CreateNewProject()
+        public static ScheduleProject CreateNewProject(string projectName)
         {
             var project = new ScheduleProject();
-            project.ProjectName = "새 프로젝트";
+            project.ProjectName = string.IsNullOrWhiteSpace(projectName) ? "새 프로젝트" : projectName;
             project.ScheduleTitle = "보 일람표";
 
             var floor = new ScheduleFloor();
@@ -217,10 +247,64 @@ namespace GirderSchedule.App.ViewModels
             floor.Setting.StirrupDiameter = 10;
             floor.Setting.SkinRebarDiameter = 10;
 
-            floor.Sets.Add(CreateScheduleSet("G1", floor.Setting));
+            floor.Sets.Add(CreateScheduleSetStatic("G1", floor.Setting));
 
             project.Floors.Add(floor);
             return project;
+        }
+
+        private static ScheduleSet CreateScheduleSetStatic(string memberName, FloorSetting setting)
+        {
+            var service = new ScheduleBuildService();
+            var sheet = service.CreateSample();
+            var set = sheet.Rows[0].Sets[0];
+
+            set.MemberName = memberName;
+
+            set.Left.Name = memberName;
+            set.Center.Name = memberName;
+            set.Right.Name = memberName;
+
+            set.Left.IsSectionEnabled = true;
+            set.Center.IsSectionEnabled = true;
+            set.Right.IsSectionEnabled = true;
+
+            ApplySettingStatic(set.Left, setting);
+            ApplySettingStatic(set.Center, setting);
+            ApplySettingStatic(set.Right, setting);
+
+            return set;
+        }
+
+        private static void ApplySettingStatic(ScheduleItem item, FloorSetting setting)
+        {
+            if (setting == null)
+            {
+                return;
+            }
+
+            if (setting.MainRebarDiameter > 0)
+            {
+                item.TopRebar.Diameter = setting.MainRebarDiameter;
+                item.BottomRebar.Diameter = setting.MainRebarDiameter;
+            }
+
+            if (setting.StirrupDiameter > 0)
+            {
+                item.Stirrup.Diameter = setting.StirrupDiameter;
+            }
+
+            if (setting.SkinRebarDiameter > 0)
+            {
+                var spacing = string.Empty;
+
+                if (!string.IsNullOrWhiteSpace(item.SkinRebarText) && item.SkinRebarText.Contains("@"))
+                {
+                    spacing = item.SkinRebarText.Substring(item.SkinRebarText.IndexOf("@") + 1).Trim();
+                }
+
+                item.SkinRebarText = string.IsNullOrWhiteSpace(spacing) ? "HD" + setting.SkinRebarDiameter : "HD" + setting.SkinRebarDiameter + "@" + spacing;
+            }
         }
 
         private ScheduleSet CreateScheduleSet(string memberName, FloorSetting setting)
@@ -280,28 +364,32 @@ namespace GirderSchedule.App.ViewModels
         private void LoadProject(ScheduleProject project)
         {
             _project = project;
+
             Floors.Clear();
+
+            if (_project == null)
+            {
+                SelectedFloor = null;
+                SelectedSet = null;
+                OnPropertyChanged(nameof(Project));
+                OnPropertyChanged(nameof(ProjectName));
+                OnPropertyChanged(nameof(ScheduleTitle));
+                OnPropertyChanged(nameof(WindowTitle));
+                return;
+            }
 
             for (var i = 0; i < _project.Floors.Count; i++)
             {
-                Floors.Add(new FloorNodeViewModel(_project.Floors[i]));
+                var floorViewModel = new FloorNodeViewModel(_project.Floors[i]);
+                Floors.Add(floorViewModel);
             }
+
+            SelectedFloor = Floors.Count > 0 ? Floors[0] : null;
 
             OnPropertyChanged(nameof(Project));
             OnPropertyChanged(nameof(ProjectName));
             OnPropertyChanged(nameof(ScheduleTitle));
-            OnPropertyChanged(nameof(Floors));
             OnPropertyChanged(nameof(WindowTitle));
-
-            if (Floors.Count > 0)
-            {
-                SelectedFloor = Floors[0];
-
-                if (Floors[0].Sets.Count > 0)
-                {
-                    SelectedSet = Floors[0].Sets[0];
-                }
-            }
         }
 
         private void NewProject()
@@ -312,7 +400,7 @@ namespace GirderSchedule.App.ViewModels
             }
 
             CurrentFilePath = string.Empty;
-            LoadProject(CreateNewProject());
+            LoadProject(CreateNewProject("새 프로젝트"));
             IsDirty = false;
         }
 
@@ -338,6 +426,7 @@ namespace GirderSchedule.App.ViewModels
                 var project = _fileService.Load(dialog.FileName);
                 CurrentFilePath = dialog.FileName;
                 LoadProject(project);
+                _recentProjectService.AddOrUpdate(dialog.FileName, project.ProjectName);
                 IsDirty = false;
             }
             catch (Exception ex)
@@ -356,6 +445,7 @@ namespace GirderSchedule.App.ViewModels
             try
             {
                 _fileService.Save(CurrentFilePath, _project);
+                _recentProjectService.AddOrUpdate(CurrentFilePath, _project.ProjectName);
                 IsDirty = false;
                 return true;
             }
@@ -380,8 +470,19 @@ namespace GirderSchedule.App.ViewModels
                 return false;
             }
 
-            CurrentFilePath = dialog.FileName;
-            return SaveProject();
+            try
+            {
+                CurrentFilePath = dialog.FileName;
+                _fileService.Save(CurrentFilePath, _project);
+                _recentProjectService.AddOrUpdate(CurrentFilePath, _project.ProjectName);
+                IsDirty = false;
+                return true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("프로젝트를 저장할 수 없습니다.\r\n\r\n" + ex.Message, "저장 실패", MessageBoxButton.OK, MessageBoxImage.Error);
+                return false;
+            }
         }
 
         public bool ConfirmSaveIfDirty()

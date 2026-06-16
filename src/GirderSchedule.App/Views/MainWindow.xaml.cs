@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Windows;
 using GirderSchedule.App.ViewModels;
+using GirderSchedule.Domain.Models;
 
 namespace GirderSchedule.App.Views
 {
@@ -10,6 +11,12 @@ namespace GirderSchedule.App.Views
         {
             InitializeComponent();
             DataContext = new MainWindowViewModel();
+        }
+
+        public MainWindow(ScheduleProject project, string filePath)
+        {
+            InitializeComponent();
+            DataContext = new MainWindowViewModel(project, filePath);
         }
 
         private void Window_Closing(object sender, CancelEventArgs e)

@@ -7,7 +7,7 @@ using System.Windows.Shapes;
 using GirderSchedule.App.ViewModels;
 using GirderSchedule.Domain.Girder.Models;
 
-namespace GirderSchedule.App.Views
+namespace GirderSchedule.App.Views.Controls
 {
     public partial class SchedulePreview : UserControl
     {

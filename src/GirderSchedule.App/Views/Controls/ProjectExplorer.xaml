@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="GirderSchedule.App.Views.ProjectExplorer"
+﻿<UserControl x:Class="GirderSchedule.App.Views.Controls.ProjectExplorer"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="clr-namespace:GirderSchedule.App.ViewModels">

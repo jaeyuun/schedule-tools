@@ -2,7 +2,7 @@
 using System.Windows.Controls;
 using GirderSchedule.App.ViewModels;
 
-namespace GirderSchedule.App.Views
+namespace GirderSchedule.App.Views.Controls
 {
     public partial class ProjectExplorer : UserControl
     {
