@@ -9,6 +9,7 @@
         public bool IsWidthOver { get; set; }
         public bool IsHeightOver { get; set; }
 
+        public int FormColumnCount { get; set; }
         public string TemplatePath { get; set; }
 
         public ScheduleDxfExportOptions()
@@ -18,6 +19,7 @@
             IncludeRight = true;
             IsWidthOver = false;
             IsHeightOver = false;
+            FormColumnCount = 3;
             TemplatePath = string.Empty;
         }
     }

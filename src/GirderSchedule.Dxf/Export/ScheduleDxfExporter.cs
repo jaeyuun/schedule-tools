@@ -88,6 +88,13 @@ namespace GirderSchedule.Dxf.Export
                 options = new ScheduleDxfExportOptions();
             }
 
+            var formColumnCount = options.FormColumnCount;
+
+            if (formColumnCount < 1)
+            {
+                formColumnCount = 3;
+            }
+
             var template = _loader.LoadTemplateResourcesOnly(options.TemplatePath);
             var document = template.Document;
 
@@ -102,8 +109,8 @@ namespace GirderSchedule.Dxf.Export
 
             for (var pageIndex = 0; pageIndex < pages.Count; pageIndex++)
             {
-                var pageBaseX = DxfLayout.GetPageBaseX(pageIndex);
-                var pageBaseY = DxfLayout.GetPageBaseY(pageIndex);
+                var pageBaseX = DxfLayout.GetPageBaseX(pageIndex, formColumnCount);
+                var pageBaseY = DxfLayout.GetPageBaseY(pageIndex, formColumnCount);
 
                 DrawPage(document, pointConverter, pages[pageIndex], pageBaseX, pageBaseY, options, sectionLayoutService, sectionDrawer, rebarDrawer, dimensionDrawer, textDrawer);
             }

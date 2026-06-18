@@ -17,6 +17,7 @@ namespace GirderSchedule.Dxf.Common
         public const double PageFrameWidth = PageFrameSourceWidth * PageFrameScale;
         public const double PageFrameHeight = PageFrameSourceHeight * PageFrameScale;
         public const double PageSpacingY = PageFrameHeight + 1200.0;
+        public const double PageSpacingX = PageFrameWidth + 1200.0;
 
         public const double XrefToForm2X = 995.0;
         public const double XrefToForm2Y = 16975.0;
@@ -114,6 +115,26 @@ namespace GirderSchedule.Dxf.Common
         public static double GetPageBaseY(int pageIndex)
         {
             return -pageIndex * PageSpacingY;
+        }
+
+        public static double GetPageBaseX(int pageIndex, int formColumnCount)
+        {
+            if (formColumnCount < 1)
+            {
+                formColumnCount = 3;
+            }
+
+            return (pageIndex % formColumnCount) * PageSpacingX;
+        }
+
+        public static double GetPageBaseY(int pageIndex, int formColumnCount)
+        {
+            if (formColumnCount < 1)
+            {
+                formColumnCount = 3;
+            }
+
+            return -(pageIndex / formColumnCount) * PageSpacingY;
         }
 
         public static double GetForm2BaseX(double pageBaseX)

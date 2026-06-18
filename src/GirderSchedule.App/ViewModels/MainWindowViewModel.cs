@@ -680,7 +680,14 @@ namespace GirderSchedule.App.ViewModels
                 return;
             }
 
-            var pages = BuildExportPages();
+            var setting = ShowDxfExportSettingWindow();
+
+            if (setting == null)
+            {
+                return;
+            }
+
+            var pages = BuildExportPages(setting);
 
             if (pages.Count == 0)
             {
@@ -700,10 +707,26 @@ namespace GirderSchedule.App.ViewModels
                 return;
             }
 
-            ExportPages(dialog.FileName, pages);
+            ExportPages(dialog.FileName, pages, setting);
         }
 
-        private void ExportPages(string filePath, List<ScheduleExportPage> pages)
+        private DxfExportSetting ShowDxfExportSettingWindow()
+        {
+            var viewModel = new DxfExportSettingWindowViewModel();
+
+            var window = new DxfExportSettingWindow();
+            window.Owner = Application.Current.MainWindow;
+            window.DataContext = viewModel;
+
+            if (window.ShowDialog() != true)
+            {
+                return null;
+            }
+
+            return viewModel.CreateSetting();
+        }
+
+        private void ExportPages(string filePath, List<ScheduleExportPage> pages, DxfExportSetting setting)
         {
             try
             {
@@ -713,6 +736,7 @@ namespace GirderSchedule.App.ViewModels
                 options.IncludeLeft = true;
                 options.IncludeCenter = true;
                 options.IncludeRight = true;
+                options.FormColumnCount = setting == null ? 3 : setting.FormColumnCount;
                 options.TemplatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "GirderTemplate.dxf");
 
                 exporter.ExportPages(pages, filePath, options);
@@ -803,10 +827,24 @@ namespace GirderSchedule.App.ViewModels
             return result;
         }
 
-        private List<ScheduleExportPage> BuildExportPages()
+        private List<ScheduleExportPage> BuildExportPages(DxfExportSetting setting)
         {
-            var pages = new List<ScheduleExportPage>();
-            var pageNumber = 1;
+            if (setting == null)
+            {
+                setting = new DxfExportSetting();
+            }
+
+            if (setting.ContinueAcrossFloors)
+            {
+                return BuildContinuousExportPages();
+            }
+
+            return BuildFloorSeparatedExportPages();
+        }
+
+        private List<ScheduleExportPage> BuildContinuousExportPages()
+        {
+            var sets = new List<ScheduleSet>();
 
             for (var i = 0; i < Floors.Count; i++)
             {
@@ -817,7 +855,36 @@ namespace GirderSchedule.App.ViewModels
                     continue;
                 }
 
-                var selectedSets = new List<ScheduleSet>();
+                for (var j = 0; j < floor.Sets.Count; j++)
+                {
+                    var setNode = floor.Sets[j];
+
+                    if (!setNode.IsChecked)
+                    {
+                        continue;
+                    }
+
+                    sets.Add(setNode.Model);
+                }
+            }
+
+            return BuildPagesFromSets(sets);
+        }
+
+        private List<ScheduleExportPage> BuildFloorSeparatedExportPages()
+        {
+            var sets = new List<ScheduleSet>();
+
+            for (var i = 0; i < Floors.Count; i++)
+            {
+                var floor = Floors[i];
+
+                if (!floor.IsChecked)
+                {
+                    continue;
+                }
+
+                var floorSetCount = 0;
 
                 for (var j = 0; j < floor.Sets.Count; j++)
                 {
@@ -828,31 +895,65 @@ namespace GirderSchedule.App.ViewModels
                         continue;
                     }
 
-                    selectedSets.Add(setNode.Model);
+                    sets.Add(setNode.Model);
+                    floorSetCount++;
                 }
 
-                if (selectedSets.Count == 0)
+                if (floorSetCount == 0)
                 {
                     continue;
                 }
 
-                for (var start = 0; start < selectedSets.Count; start += 9)
+                var remainder = sets.Count % 3;
+
+                if (remainder == 0)
                 {
-                    var page = new ScheduleExportPage();
-                    page.SheetTitle = ScheduleTitle;
-                    page.FloorName = floor.Name;
-                    page.SheetTitleName = ScheduleTitle + "-" + pageNumber;
-
-                    var count = System.Math.Min(9, selectedSets.Count - start);
-
-                    for (var k = 0; k < count; k++)
-                    {
-                        page.Sets.Add(selectedSets[start + k]);
-                    }
-
-                    pages.Add(page);
-                    pageNumber++;
+                    continue;
                 }
+
+                var blankCount = 3 - remainder;
+
+                for (var k = 0; k < blankCount; k++)
+                {
+                    sets.Add(null);
+                }
+            }
+
+            while (sets.Count > 0 && sets[sets.Count - 1] == null)
+            {
+                sets.RemoveAt(sets.Count - 1);
+            }
+
+            return BuildPagesFromSets(sets);
+        }
+
+        private List<ScheduleExportPage> BuildPagesFromSets(List<ScheduleSet> sets)
+        {
+            var pages = new List<ScheduleExportPage>();
+
+            if (sets == null || sets.Count == 0)
+            {
+                return pages;
+            }
+
+            var pageNumber = 1;
+
+            for (var start = 0; start < sets.Count; start += 9)
+            {
+                var page = new ScheduleExportPage();
+                page.SheetTitle = ScheduleTitle;
+                page.FloorName = string.Empty;
+                page.SheetTitleName = ScheduleTitle + "-" + pageNumber;
+
+                var count = Math.Min(9, sets.Count - start);
+
+                for (var i = 0; i < count; i++)
+                {
+                    page.Sets.Add(sets[start + i]);
+                }
+
+                pages.Add(page);
+                pageNumber++;
             }
 
             return pages;
