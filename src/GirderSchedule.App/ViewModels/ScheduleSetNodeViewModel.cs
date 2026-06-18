@@ -1,17 +1,24 @@
 ﻿using GirderSchedule.Domain.Girder.Models;
-using GirderSchedule.Domain.Models;
 
 namespace GirderSchedule.App.ViewModels
 {
     public sealed class ScheduleSetNodeViewModel : ViewModelBase
     {
         private readonly ScheduleSet _model;
+        private FloorNodeViewModel _parent;
         private bool _isChecked = true;
         private bool _isSelected;
+        private bool _isInternalChanging;
 
         public ScheduleSet Model
         {
             get { return _model; }
+        }
+
+        public FloorNodeViewModel Parent
+        {
+            get { return _parent; }
+            set { _parent = value; }
         }
 
         public string MemberName
@@ -48,13 +55,7 @@ namespace GirderSchedule.App.ViewModels
             get { return _isChecked; }
             set
             {
-                if (_isChecked == value)
-                {
-                    return;
-                }
-
-                _isChecked = value;
-                OnPropertyChanged(nameof(IsChecked));
+                SetChecked(value, true);
             }
         }
 
@@ -76,6 +77,31 @@ namespace GirderSchedule.App.ViewModels
         public ScheduleSetNodeViewModel(ScheduleSet model)
         {
             _model = model;
+        }
+
+        public void SetCheckedFromParent(bool value)
+        {
+            SetChecked(value, false);
+        }
+
+        private void SetChecked(bool value, bool updateParent)
+        {
+            if (_isChecked == value)
+            {
+                return;
+            }
+
+            _isChecked = value;
+            OnPropertyChanged(nameof(IsChecked));
+
+            if (!updateParent || _isInternalChanging || Parent == null)
+            {
+                return;
+            }
+
+            _isInternalChanging = true;
+            Parent.UpdateCheckedFromChildren();
+            _isInternalChanging = false;
         }
 
         public void RefreshAll()

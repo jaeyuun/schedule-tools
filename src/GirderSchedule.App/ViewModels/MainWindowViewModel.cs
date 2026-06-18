@@ -888,6 +888,223 @@ namespace GirderSchedule.App.ViewModels
             return sheet;
         }
 
+        public void MoveFloor(FloorNodeViewModel source, FloorNodeViewModel target, bool isAfter)
+        {
+            if (source == null || target == null || ReferenceEquals(source, target))
+            {
+                return;
+            }
+
+            var oldIndex = Floors.IndexOf(source);
+            var insertIndex = Floors.IndexOf(target);
+
+            if (oldIndex < 0 || insertIndex < 0)
+            {
+                return;
+            }
+
+            if (isAfter)
+            {
+                insertIndex++;
+            }
+
+            if (insertIndex > oldIndex)
+            {
+                insertIndex--;
+            }
+
+            if (insertIndex < 0)
+            {
+                insertIndex = 0;
+            }
+
+            if (insertIndex >= Floors.Count)
+            {
+                insertIndex = Floors.Count - 1;
+            }
+
+            if (oldIndex == insertIndex)
+            {
+                SelectedFloor = source;
+                return;
+            }
+
+            Floors.Move(oldIndex, insertIndex);
+            SyncProjectFloors();
+
+            SelectedFloor = source;
+            IsDirty = true;
+        }
+
+        public void MoveSet(ScheduleSetNodeViewModel source, ScheduleSetNodeViewModel target, bool isAfter)
+        {
+            if (source == null || target == null || ReferenceEquals(source, target))
+            {
+                return;
+            }
+
+            var sourceFloor = FindFloorBySet(source);
+            var targetFloor = FindFloorBySet(target);
+
+            if (sourceFloor == null || targetFloor == null)
+            {
+                return;
+            }
+
+            var insertIndex = targetFloor.Sets.IndexOf(target);
+
+            if (insertIndex < 0)
+            {
+                return;
+            }
+
+            if (isAfter)
+            {
+                insertIndex++;
+            }
+
+            MoveSetToFloorIndex(source, sourceFloor, targetFloor, insertIndex);
+        }
+
+        public void MoveSetToFloorAroundFloor(ScheduleSetNodeViewModel source, FloorNodeViewModel targetFloor, bool isAfter)
+        {
+            if (source == null || targetFloor == null)
+            {
+                return;
+            }
+
+            var sourceFloor = FindFloorBySet(source);
+
+            if (sourceFloor == null)
+            {
+                return;
+            }
+
+            if (!isAfter)
+            {
+                MoveSetToFloorIndex(source, sourceFloor, targetFloor, 0);
+                return;
+            }
+
+            MoveSetToFloorIndex(source, sourceFloor, targetFloor, targetFloor.Sets.Count);
+        }
+
+        public void MoveSetToFloor(ScheduleSetNodeViewModel source, FloorNodeViewModel targetFloor)
+        {
+            if (source == null || targetFloor == null)
+            {
+                return;
+            }
+
+            var sourceFloor = FindFloorBySet(source);
+
+            if (sourceFloor == null)
+            {
+                return;
+            }
+
+            MoveSetToFloorIndex(source, sourceFloor, targetFloor, targetFloor.Sets.Count);
+        }
+
+        private void MoveSetToFloorIndex(ScheduleSetNodeViewModel source, FloorNodeViewModel sourceFloor, FloorNodeViewModel targetFloor, int insertIndex)
+        {
+            if (source == null || sourceFloor == null || targetFloor == null)
+            {
+                return;
+            }
+
+            var oldIndex = sourceFloor.Sets.IndexOf(source);
+
+            if (oldIndex < 0)
+            {
+                return;
+            }
+
+            if (ReferenceEquals(sourceFloor, targetFloor) && insertIndex > oldIndex)
+            {
+                insertIndex--;
+            }
+
+            if (insertIndex < 0)
+            {
+                insertIndex = 0;
+            }
+
+            if (insertIndex > targetFloor.Sets.Count)
+            {
+                insertIndex = targetFloor.Sets.Count;
+            }
+
+            if (ReferenceEquals(sourceFloor, targetFloor) && oldIndex == insertIndex)
+            {
+                SelectedSet = source;
+                return;
+            }
+
+            sourceFloor.Sets.Remove(source);
+            sourceFloor.Model.Sets.Remove(source.Model);
+
+            if (insertIndex > targetFloor.Sets.Count)
+            {
+                insertIndex = targetFloor.Sets.Count;
+            }
+
+            targetFloor.Sets.Insert(insertIndex, source);
+            targetFloor.Model.Sets.Insert(insertIndex, source.Model);
+
+            sourceFloor.UpdateCheckedFromChildren();
+            targetFloor.UpdateCheckedFromChildren();
+
+            SelectedFloor = targetFloor;
+            SelectedSet = source;
+            IsDirty = true;
+        }
+
+        private void MoveSetInSameFloor(FloorNodeViewModel floor, ScheduleSetNodeViewModel source, ScheduleSetNodeViewModel target)
+        {
+            var oldIndex = floor.Sets.IndexOf(source);
+            var targetIndex = floor.Sets.IndexOf(target);
+
+            if (oldIndex < 0 || targetIndex < 0)
+            {
+                return;
+            }
+
+            if (oldIndex < targetIndex)
+            {
+                targetIndex--;
+            }
+
+            if (oldIndex == targetIndex)
+            {
+                return;
+            }
+
+            floor.Sets.Move(oldIndex, targetIndex);
+            floor.Model.Sets.Remove(source.Model);
+            floor.Model.Sets.Insert(targetIndex, source.Model);
+        }
+
+        private void MoveSetToOtherFloor(FloorNodeViewModel sourceFloor, FloorNodeViewModel targetFloor, ScheduleSetNodeViewModel source, ScheduleSetNodeViewModel target)
+        {
+            var targetIndex = targetFloor.Sets.IndexOf(target);
+
+            if (targetIndex < 0)
+            {
+                return;
+            }
+
+            sourceFloor.Sets.Remove(source);
+            sourceFloor.Model.Sets.Remove(source.Model);
+
+            source.Parent = targetFloor;
+            targetFloor.Sets.Insert(targetIndex, source);
+            targetFloor.Model.Sets.Insert(targetIndex, source.Model);
+
+            sourceFloor.UpdateCheckedFromChildren();
+            targetFloor.UpdateCheckedFromChildren();
+        }
+
         private FloorNodeViewModel FindFloorBySet(ScheduleSetNodeViewModel set)
         {
             if (set == null)

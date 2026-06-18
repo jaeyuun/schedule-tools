@@ -7,11 +7,11 @@
         Height="800"
         WindowStartupLocation="CenterScreen"
         Closing="Window_Closing">
-    
+
     <Window.InputBindings>
         <KeyBinding Key="S" Modifiers="Control" Command="{Binding SaveProjectCommand}"/>
     </Window.InputBindings>
-    
+
     <DockPanel>
         <Border DockPanel.Dock="Top" Height="32" Background="#FAFAFA" BorderBrush="#B8B8B8" BorderThickness="0,0,0,1">
             <Menu Background="Transparent">
@@ -33,7 +33,15 @@
             </Grid.ColumnDefinitions>
 
             <Border Grid.Column="0" Background="#F7F7F7">
-                <views:SchedulePreview DataContext="{Binding Editor}" Margin="16"/>
+                <TabControl Margin="16">
+                    <TabItem Header="부재 편집">
+                        <views:ScheduleSetEditor DataContext="{Binding Editor}"/>
+                    </TabItem>
+
+                    <TabItem Header="미리보기">
+                        <views:ScheduleExportPreview Floors="{Binding Floors}"/>
+                    </TabItem>
+                </TabControl>
             </Border>
 
             <views:ProjectExplorer Grid.Column="1"/>

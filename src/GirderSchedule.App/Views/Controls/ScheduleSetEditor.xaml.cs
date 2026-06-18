@@ -9,7 +9,7 @@ using GirderSchedule.Domain.Girder.Models;
 
 namespace GirderSchedule.App.Views.Controls
 {
-    public partial class SchedulePreview : UserControl
+    public partial class ScheduleSetEditor : UserControl
     {
         private const double BarRadius = 3.0;
         private const double StirrupTouchOffset = BarRadius;
@@ -18,7 +18,7 @@ namespace GirderSchedule.App.Views.Controls
 
         private bool _isRedrawQueued;
 
-        public SchedulePreview()
+        public ScheduleSetEditor()
         {
             InitializeComponent();
 

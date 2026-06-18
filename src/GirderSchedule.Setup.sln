@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36127.28 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "GirderSchedule.Setup", "GirderSchedule.Setup\GirderSchedule.Setup.vdproj", "{A6F5A8B4-CFBB-FD57-7A03-A624E714D05F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Default = Debug|Default
+		Release|Default = Release|Default
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A6F5A8B4-CFBB-FD57-7A03-A624E714D05F}.Debug|Default.ActiveCfg = Debug
+		{A6F5A8B4-CFBB-FD57-7A03-A624E714D05F}.Debug|Default.Build.0 = Debug
+		{A6F5A8B4-CFBB-FD57-7A03-A624E714D05F}.Release|Default.ActiveCfg = Release
+		{A6F5A8B4-CFBB-FD57-7A03-A624E714D05F}.Release|Default.Build.0 = Release
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {77A07000-4AFC-4B85-BE61-A506747E4A1A}
+	EndGlobalSection
+EndGlobal

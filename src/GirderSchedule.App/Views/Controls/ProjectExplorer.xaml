@@ -41,7 +41,17 @@
                 <Button Grid.Column="2" Content="부재 삭제" Height="24" Command="{Binding RemoveSetCommand}"/>
             </Grid>
 
-            <TreeView Grid.Row="3" ItemsSource="{Binding Floors}" Background="White" BorderBrush="#C8C8C8" BorderThickness="1">
+            <TreeView x:Name="ProjectTreeView"
+                    Grid.Row="3"
+                    ItemsSource="{Binding Floors}"
+                    Background="White"
+                    BorderBrush="#C8C8C8"
+                    BorderThickness="1"
+                    AllowDrop="True"
+                    PreviewMouseLeftButtonDown="ProjectTreeView_PreviewMouseLeftButtonDown"
+                    MouseMove="ProjectTreeView_MouseMove"
+                    DragOver="ProjectTreeView_DragOver"
+                    Drop="ProjectTreeView_Drop">
                 <TreeView.Resources>
                     <Style x:Key="FullRowTreeViewItemStyle" TargetType="{x:Type TreeViewItem}">
                         <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}"/>
@@ -51,6 +61,8 @@
                         <Setter Property="VerticalContentAlignment" Value="Center"/>
                         <Setter Property="MinHeight" Value="24"/>
                         <Setter Property="Padding" Value="0"/>
+                        <Setter Property="BorderBrush" Value="Transparent"/>
+                        <Setter Property="BorderThickness" Value="0"/>
                         <Setter Property="Template">
                             <Setter.Value>
                                 <ControlTemplate TargetType="{x:Type TreeViewItem}">
@@ -61,11 +73,12 @@
                                         </Grid.RowDefinitions>
 
                                         <Border x:Name="Bd"
-                                                Grid.Row="0"
-                                                Background="Transparent"
-                                                BorderThickness="0"
-                                                MinHeight="{TemplateBinding MinHeight}"
-                                                Padding="0">
+                                            Grid.Row="0"
+                                            Background="Transparent"
+                                            BorderBrush="{TemplateBinding BorderBrush}"
+                                            BorderThickness="{TemplateBinding BorderThickness}"
+                                            MinHeight="{TemplateBinding MinHeight}"
+                                            Padding="0">
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="18"/>

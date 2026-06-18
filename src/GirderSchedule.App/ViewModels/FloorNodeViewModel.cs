@@ -10,6 +10,7 @@ namespace GirderSchedule.App.ViewModels
         private bool _isChecked = true;
         private bool _isSelected;
         private bool _isChildSelected;
+        private bool _isInternalChanging;
 
         public ScheduleFloor Model
         {
@@ -134,10 +135,19 @@ namespace GirderSchedule.App.ViewModels
                 _isChecked = value;
                 OnPropertyChanged(nameof(IsChecked));
 
+                if (_isInternalChanging)
+                {
+                    return;
+                }
+
+                _isInternalChanging = true;
+
                 for (var i = 0; i < Sets.Count; i++)
                 {
-                    Sets[i].IsChecked = value;
+                    Sets[i].SetCheckedFromParent(value);
                 }
+
+                _isInternalChanging = false;
             }
         }
 
@@ -194,17 +204,52 @@ namespace GirderSchedule.App.ViewModels
 
             for (var i = 0; i < _model.Sets.Count; i++)
             {
-                Sets.Add(new ScheduleSetNodeViewModel(_model.Sets[i]));
+                var node = new ScheduleSetNodeViewModel(_model.Sets[i]);
+                node.Parent = this;
+                Sets.Add(node);
             }
         }
 
         public ScheduleSetNodeViewModel AddSet(ScheduleSet set)
         {
-            _model.Sets.Add(set);
-
             var node = new ScheduleSetNodeViewModel(set);
+            node.Parent = this;
+
             Sets.Add(node);
+            Model.Sets.Add(set);
+
+            UpdateCheckedFromChildren();
+
             return node;
+        }
+
+        public void UpdateCheckedFromChildren()
+        {
+            if (_isInternalChanging)
+            {
+                return;
+            }
+
+            var hasCheckedChild = false;
+
+            for (var i = 0; i < Sets.Count; i++)
+            {
+                if (Sets[i].IsChecked)
+                {
+                    hasCheckedChild = true;
+                    break;
+                }
+            }
+
+            if (_isChecked == hasCheckedChild)
+            {
+                return;
+            }
+
+            _isInternalChanging = true;
+            _isChecked = hasCheckedChild;
+            OnPropertyChanged(nameof(IsChecked));
+            _isInternalChanging = false;
         }
 
         public void RemoveSet(ScheduleSetNodeViewModel node)
@@ -216,6 +261,8 @@ namespace GirderSchedule.App.ViewModels
 
             _model.Sets.Remove(node.Model);
             Sets.Remove(node);
+
+            UpdateCheckedFromChildren();
         }
 
         public void RefreshAll()
