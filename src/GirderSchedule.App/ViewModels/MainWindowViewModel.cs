@@ -1,5 +1,6 @@
 ﻿using GirderSchedule.App.Commands;
 using GirderSchedule.App.Services;
+using GirderSchedule.App.Utils;
 using GirderSchedule.App.Views;
 using GirderSchedule.Domain.Girder.Models;
 using GirderSchedule.Domain.Models;
@@ -12,6 +13,8 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Windows;
 using System.Windows.Input;
+using ExcelExportOptions = GirderSchedule.Excel.Girder.ExportOptions;
+using ExcelScheduleExporter = GirderSchedule.Excel.Girder.ScheduleExporter;
 
 namespace GirderSchedule.App.ViewModels
 {
@@ -196,6 +199,7 @@ namespace GirderSchedule.App.ViewModels
         public ICommand AddSetCommand { get; private set; }
         public ICommand RemoveSetCommand { get; private set; }
         public ICommand ExportCurrentSetCommand { get; private set; }
+        public ICommand ExportExcelCommand { get; private set; }
         public ICommand HelpCommand { get; private set; }
 
         public MainWindowViewModel()
@@ -231,6 +235,7 @@ namespace GirderSchedule.App.ViewModels
             AddSetCommand = new RelayCommand(p => AddSet(), p => SelectedFloor != null);
             RemoveSetCommand = new RelayCommand(p => RemoveSet(), p => SelectedFloor != null && SelectedSet != null);
             ExportCurrentSetCommand = new RelayCommand(p => ExportProjectDxf());
+            ExportExcelCommand = new RelayCommand(p => ExportProjectExcel());
             HelpCommand = new RelayCommand(p => ShowHelp());
         }
 
@@ -768,6 +773,128 @@ namespace GirderSchedule.App.ViewModels
             {
                 MessageBox.Show("DXF 저장 중 오류가 발생했습니다.\r\n\r\n" + ex.Message, "DXF 저장 실패", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+        }
+
+        private void ExportProjectExcel()
+        {
+            var exportProject = BuildExcelExportProject();
+
+            if (exportProject == null || exportProject.Floors.Count == 0)
+            {
+                MessageBox.Show("내보낼 층 또는 부재가 선택되지 않았습니다.", "Excel 내보내기", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            var dialog = new SaveFileDialog();
+            dialog.Title = "Excel 저장";
+            dialog.Filter = "Excel 파일 (*.xlsx)|*.xlsx";
+            dialog.InitialDirectory = PathUtil.GetDownloadsDirectory();
+            dialog.FileName = PathUtil.GetDefaultExcelFileName(exportProject.ProjectName);
+            dialog.DefaultExt = ".xlsx";
+            dialog.AddExtension = true;
+
+            if (dialog.ShowDialog() != true)
+            {
+                return;
+            }
+
+            try
+            {
+                var exporter = new ExcelScheduleExporter();
+
+                var options = new ExcelExportOptions();
+                options.SheetName = "보 일람표";
+                options.DefaultCover = 40;
+                options.ContinueAcrossFloors = false;
+
+                exporter.Export(exportProject, dialog.FileName, options);
+
+                MessageBox.Show("Excel 파일을 저장했습니다.", "Excel 저장 완료", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (IOException)
+            {
+                MessageBox.Show(
+                    "Excel 파일을 저장할 수 없습니다.\r\n\r\n" +
+                    "저장하려는 파일이 Excel 또는 다른 프로그램에서 열려 있을 수 있습니다.\r\n" +
+                    "파일을 닫은 뒤 다시 저장해 주세요.\r\n\r\n" +
+                    "파일 경로: " + dialog.FileName,
+                    "Excel 저장 실패",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                MessageBox.Show(
+                    "Excel 파일을 저장할 권한이 없습니다.\r\n\r\n" +
+                    "쓰기 권한이 있는 폴더인지 확인하거나 다른 위치에 저장해 주세요.\r\n\r\n" +
+                    "파일 경로: " + dialog.FileName,
+                    "Excel 저장 실패",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Excel 저장 중 오류가 발생했습니다.\r\n\r\n" + ex.Message, "Excel 저장 실패", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private ScheduleProject BuildExcelExportProject()
+        {
+            if (Project == null)
+            {
+                return null;
+            }
+
+            var exportProject = new ScheduleProject();
+            exportProject.ProjectName = Project.ProjectName;
+            exportProject.ScheduleTitle = Project.ScheduleTitle;
+
+            for (var i = 0; i < Floors.Count; i++)
+            {
+                var floorNode = Floors[i];
+
+                if (floorNode == null || !floorNode.IsChecked)
+                {
+                    continue;
+                }
+
+                var sourceFloor = floorNode.Model;
+
+                if (sourceFloor == null)
+                {
+                    continue;
+                }
+
+                var exportFloor = new ScheduleFloor();
+                exportFloor.Name = sourceFloor.Name;
+                exportFloor.Setting = sourceFloor.Setting;
+
+                for (var j = 0; j < floorNode.Sets.Count; j++)
+                {
+                    var setNode = floorNode.Sets[j];
+
+                    if (setNode == null || !setNode.IsChecked)
+                    {
+                        continue;
+                    }
+
+                    if (setNode.Model == null)
+                    {
+                        continue;
+                    }
+
+                    exportFloor.Sets.Add(setNode.Model);
+                }
+
+                if (exportFloor.Sets.Count == 0)
+                {
+                    continue;
+                }
+
+                exportProject.Floors.Add(exportFloor);
+            }
+
+            return exportProject;
         }
 
         private bool SaveProjectBeforeExport()

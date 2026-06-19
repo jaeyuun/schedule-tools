@@ -18,6 +18,7 @@
   <ItemGroup>
     <ProjectReference Include="..\GirderSchedule.Domain\GirderSchedule.Domain.csproj" />
     <ProjectReference Include="..\GirderSchedule.Dxf\GirderSchedule.Dxf.csproj" />
+    <ProjectReference Include="..\GirderSchedule.Excel\GirderSchedule.Excel.csproj" />
   </ItemGroup>
 
   <ItemGroup>

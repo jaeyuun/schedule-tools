@@ -220,9 +220,10 @@
             </TreeView>
 
             <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,14,0,0">
-                <Button Content="층 설정" Width="76" Height="28" Margin="0,0,8,0" Command="{Binding EditFloorSettingCommand}"/>
-                <Button Content="저장" Width="70" Height="28" Margin="0,0,8,0" Command="{Binding SaveProjectCommand}"/>
-                <Button Content="내보내기" Width="80" Height="28" Command="{Binding ExportCurrentSetCommand}"/>
+                <Button Content="층 설정" Height="28" Margin="0,0,8,0" Command="{Binding EditFloorSettingCommand}"/>
+                <Button Content="저장" Height="28" Margin="0,0,8,0" Command="{Binding SaveProjectCommand}"/>
+                <Button Content="Excel 내보내기" Height="28" Margin="0,0,8,0" Command="{Binding ExportExcelCommand}"/>
+                <Button Content="Dxf 내보내기" Height="28" Command="{Binding ExportCurrentSetCommand}"/>
             </StackPanel>
         </Grid>
     </Border>

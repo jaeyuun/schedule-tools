@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GirderSchedule.Dxf", "Girde
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "GirderSchedule.Setup", "GirderSchedule.Setup\GirderSchedule.Setup.vdproj", "{A6F5A8B4-CFBB-FD57-7A03-A624E714D05F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GirderSchedule.Excel", "GirderSchedule.Excel\GirderSchedule.Excel.csproj", "{4DCE88E2-D4B2-44B9-BC2B-BD6C866D5CC2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -32,6 +34,10 @@ Global
 		{A6F5A8B4-CFBB-FD57-7A03-A624E714D05F}.Debug|Any CPU.ActiveCfg = Debug
 		{A6F5A8B4-CFBB-FD57-7A03-A624E714D05F}.Release|Any CPU.ActiveCfg = Release
 		{A6F5A8B4-CFBB-FD57-7A03-A624E714D05F}.Release|Any CPU.Build.0 = Release
+		{4DCE88E2-D4B2-44B9-BC2B-BD6C866D5CC2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4DCE88E2-D4B2-44B9-BC2B-BD6C866D5CC2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4DCE88E2-D4B2-44B9-BC2B-BD6C866D5CC2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4DCE88E2-D4B2-44B9-BC2B-BD6C866D5CC2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
