@@ -1,86 +1,60 @@
-﻿using netDxf;
+﻿using GirderSchedule.Domain.Girder.Models;
+using GirderSchedule.Dxf.Constants;
+using GirderSchedule.Dxf.Geometry;
+using GirderSchedule.Dxf.Layouts;
+using GirderSchedule.Dxf.Styles;
+using netDxf;
 using netDxf.Entities;
 using netDxf.Tables;
-using GirderSchedule.Domain.Girder.Models;
-using GirderSchedule.Dxf.Common;
-using GirderSchedule.Dxf.Common.Overrides;
-using GirderSchedule.Dxf.Layout;
 
 namespace GirderSchedule.Dxf.Drawers
 {
     public sealed class DimensionDrawer
     {
-        private const double WidthDimensionOffset = 200;
-        private const double HeightDimensionOffset = -250;
+        private const double WidthDimensionOffset = 200.0;
+        private const double HeightDimensionOffset = -250.0;
 
         private readonly DxfDocument _document;
-        private readonly DxfPointConverter _pointConverter;
-        private readonly DxfOverrideTemplateSet _overrides;
+        private readonly DxfEntityStyler _styler;
 
-        public DimensionDrawer(DxfDocument document, DxfPointConverter pointConverter, DxfOverrideTemplateSet overrides)
+        public DimensionDrawer(DxfDocument document, DxfEntityStyler styler)
         {
             _document = document;
-            _pointConverter = pointConverter;
-            _overrides = overrides;
+            _styler = styler;
         }
 
-        public void Draw(SectionDxfLayout layout, ScheduleItem item, bool isWidthOver, bool isHeightOver)
+        public void Draw(SectionLayout layout, ScheduleItem item, bool isWidthOver, bool isHeightOver)
         {
-            DrawWidthDimension(layout, item, isWidthOver);
-            DrawHeightDimension(layout, item, isHeightOver);
+            if (layout == null || item == null || item.Section == null)
+            {
+                return;
+            }
+
+            DrawWidthDimension(layout, item.Section.Width, isWidthOver);
+            DrawHeightDimension(layout, item.Section.Height, isHeightOver);
         }
 
-        private void DrawWidthDimension(SectionDxfLayout layout, ScheduleItem item, bool isWidthOver)
+        private void DrawWidthDimension(SectionLayout layout, double width, bool isWidthOver)
         {
-            AddAlignedDimension(
-                layout.SectionLeft,
-                layout.OuterTop,
-                layout.SectionRight,
-                layout.OuterTop,
-                WidthDimensionOffset,
-                FormatUserText(item.Section.Width, isWidthOver));
+            AddAlignedDimension(layout.SectionLeft, layout.OuterTop, layout.SectionRight, layout.OuterTop, WidthDimensionOffset, FormatUserText(width, isWidthOver));
         }
 
-        private void DrawHeightDimension(SectionDxfLayout layout, ScheduleItem item, bool isHeightOver)
+        private void DrawHeightDimension(SectionLayout layout, double height, bool isHeightOver)
         {
             var outerLeftX = layout.OuterLeft - layout.SideWing;
-
-            AddAlignedDimension(
-                outerLeftX,
-                layout.OuterTop,
-                outerLeftX,
-                layout.OuterBottom,
-                HeightDimensionOffset,
-                FormatUserText(item.Section.Height, isHeightOver));
+            AddAlignedDimension(outerLeftX, layout.OuterTop, outerLeftX, layout.OuterBottom, HeightDimensionOffset, FormatUserText(height, isHeightOver));
         }
 
         private string FormatUserText(double value, bool isOver)
         {
-            if (!isOver)
-            {
-                return string.Empty;
-            }
-
-            return value.ToString("0") + " 이상";
+            return isOver ? value.ToString("0") + " 이상" : string.Empty;
         }
 
         private void AddAlignedDimension(double x1, double y1, double x2, double y2, double offset, string userText)
         {
-            var style = GetDimensionStyle();
+            var dimension = new AlignedDimension(DxfPointConverter.ToVector2(x1, y1), DxfPointConverter.ToVector2(x2, y2), offset, GetDimensionStyle());
 
-            var dimension = new AlignedDimension(
-                _pointConverter.ToVector2(x1, y1),
-                _pointConverter.ToVector2(x2, y2),
-                offset,
-                style);
-
-            DxfEntityStyle.ApplyDimension(dimension, _document);
-            ApplyOverrides(dimension);
-
-            dimension.Layer = _document.Layers[DxfLayers.Dim];
-            dimension.Color = AciColor.ByLayer;
-            dimension.Linetype = Linetype.ByLayer;
-            dimension.Lineweight = Lineweight.ByLayer;
+            _styler.Apply(dimension, DxfStyleRole.Dimension);
 
             if (!string.IsNullOrWhiteSpace(userText))
             {
@@ -88,7 +62,6 @@ namespace GirderSchedule.Dxf.Drawers
             }
 
             dimension.Update();
-
             _document.Entities.Add(dimension);
         }
 
@@ -100,14 +73,6 @@ namespace GirderSchedule.Dxf.Drawers
             }
 
             return DimensionStyle.Default;
-        }
-
-        private void ApplyOverrides(EntityObject entity)
-        {
-            if (_overrides != null)
-            {
-                _overrides.Apply(entity);
-            }
         }
     }
 }

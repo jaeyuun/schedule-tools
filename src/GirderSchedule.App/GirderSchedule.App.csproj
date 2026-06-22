@@ -1,34 +1,39 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows</TargetFramework>
-    <Nullable>disable</Nullable>
-    <UseWPF>true</UseWPF>
-	<UseWindowsForms>true</UseWindowsForms>
-	<RootNamespace>GirderSchedule.App</RootNamespace>
-	<AssemblyName>GirderSchedule.App</AssemblyName>
-  </PropertyGroup>
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net8.0-windows</TargetFramework>
+		<Nullable>disable</Nullable>
+		<UseWPF>true</UseWPF>
+		<UseWindowsForms>true</UseWindowsForms>
+		<RootNamespace>GirderSchedule.App</RootNamespace>
+		<AssemblyName>GirderSchedule.App</AssemblyName>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <None Remove="Resources\GirderTemplate.bak" />
-    <None Remove="Resources\GirderTemplate.dwg" />
-  </ItemGroup>
+	<ItemGroup>
+		<Compile Remove="Resources\**" />
+		<EmbeddedResource Remove="Resources\**" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\GirderSchedule.Domain\GirderSchedule.Domain.csproj" />
-    <ProjectReference Include="..\GirderSchedule.Dxf\GirderSchedule.Dxf.csproj" />
-    <ProjectReference Include="..\GirderSchedule.Excel\GirderSchedule.Excel.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+	  <None Remove="Resources\GirderTemplate.bak" />
+	  <None Remove="Resources\GirderTemplate.dwg" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Resources\" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\GirderSchedule.Domain\GirderSchedule.Domain.csproj" />
+		<ProjectReference Include="..\GirderSchedule.Dxf\GirderSchedule.Dxf.csproj" />
+		<ProjectReference Include="..\GirderSchedule.Excel\GirderSchedule.Excel.csproj" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <None Update="Resources\GirderTemplate.dxf">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
+	<ItemGroup>
+		<Folder Include="Resources\" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Update="Resources\GirderTemplate.dxf">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
 
 </Project>
