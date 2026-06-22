@@ -1,4 +1,4 @@
-﻿namespace GirderSchedule.Domain.Girder.Models
+﻿namespace GirderSchedule.Domain.Models
 {
     public sealed class RebarLayer
     {

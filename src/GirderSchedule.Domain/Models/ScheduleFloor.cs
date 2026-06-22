@@ -1,4 +1,4 @@
-﻿using GirderSchedule.Domain.Girder.Models;
+﻿using GirderSchedule.Domain.Models;
 using System.Collections.Generic;
 
 namespace GirderSchedule.Domain.Models

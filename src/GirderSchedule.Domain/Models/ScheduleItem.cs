@@ -1,10 +1,9 @@
-﻿namespace GirderSchedule.Domain.Girder.Models
+﻿namespace GirderSchedule.Domain.Models
 {
     public sealed class ScheduleItem
     {
         public string Name { get; set; }
         public string Position { get; set; }
-
         public bool IsSectionEnabled { get; set; }
 
         public SectionData Section { get; set; }
@@ -12,15 +11,13 @@
         public RebarSet BottomRebar { get; set; }
         public StirrupData Stirrup { get; set; }
         public MemberForceData MemberForce { get; set; }
-
-        public string SkinRebarText { get; set; }
+        public SkinRebarData SkinRebar { get; set; }
         public string Note { get; set; }
 
         public ScheduleItem()
         {
             Name = string.Empty;
             Position = string.Empty;
-
             IsSectionEnabled = true;
 
             Section = new SectionData();
@@ -28,8 +25,7 @@
             BottomRebar = new RebarSet();
             Stirrup = new StirrupData();
             MemberForce = new MemberForceData();
-
-            SkinRebarText = string.Empty;
+            SkinRebar = new SkinRebarData();
             Note = string.Empty;
         }
     }

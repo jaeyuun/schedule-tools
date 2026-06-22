@@ -1,4 +1,4 @@
-﻿using GirderSchedule.Domain.Girder.Models;
+﻿using GirderSchedule.Domain.Models;
 
 namespace GirderSchedule.Domain.Services
 {
@@ -11,9 +11,9 @@ namespace GirderSchedule.Domain.Services
 
             var set = new ScheduleSet();
             set.MemberName = "1G1";
-            set.Left = CreateItem("LEFT");
-            set.Center = CreateItem("CENTER");
-            set.Right = CreateItem("RIGHT");
+            set.Left = CreateItem("END");
+            set.Center = CreateItem("CEN");
+            set.Right = CreateItem("END");
 
             row.Sets.Add(set);
             sheet.Rows.Add(row);
@@ -30,23 +30,21 @@ namespace GirderSchedule.Domain.Services
 
             item.Section.Width = 400;
             item.Section.Height = 600;
-            item.Section.SlabLeft = 100;
-            item.Section.SlabRight = 100;
-            item.Section.SlabThickness = 150;
 
-            item.TopRebar.Diameter = 19;
-            item.TopRebar.FirstLayer.Count = 4;
-            item.TopRebar.SecondLayer.Count = 4;
+            item.TopRebar.Diameter = 0;
+            item.TopRebar.FirstLayer.Count = 0;
+            item.TopRebar.SecondLayer.Count = 0;
 
-            item.BottomRebar.Diameter = 19;
-            item.BottomRebar.FirstLayer.Count = 4;
-            item.BottomRebar.SecondLayer.Count = 2;
+            item.BottomRebar.Diameter = 0;
+            item.BottomRebar.FirstLayer.Count = 0;
+            item.BottomRebar.SecondLayer.Count = 0;
 
             item.Stirrup.Legs = 2;
-            item.Stirrup.Diameter = 10;
-            item.Stirrup.Spacing = 250;
+            item.Stirrup.Diameter = 0;
+            item.Stirrup.Spacing = 0;
 
-            item.SkinRebarText = "-";
+            item.SkinRebar.Diameter = 0;
+            item.SkinRebar.Spacing = 0;
 
             return item;
         }

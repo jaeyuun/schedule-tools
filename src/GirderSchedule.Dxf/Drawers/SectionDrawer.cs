@@ -1,33 +1,28 @@
-﻿using GirderSchedule.Dxf.Common;
-using GirderSchedule.Dxf.Common.Overrides;
-using GirderSchedule.Dxf.Layout;
-using netDxf;
-using netDxf.Entities;
+﻿using GirderSchedule.Dxf.Drawers.Common;
+using GirderSchedule.Dxf.Geometry;
+using GirderSchedule.Dxf.Layouts;
+using GirderSchedule.Dxf.Styles;
 
 namespace GirderSchedule.Dxf.Drawers
 {
     public sealed class SectionDrawer
     {
-        private readonly DxfDocument _document;
-        private readonly DxfPointConverter _pointConverter;
-        private readonly DxfOverrideTemplateSet _overrides;
+        private readonly DxfEntityDrawer _entityDrawer;
 
-        public SectionDrawer(DxfDocument document, DxfPointConverter pointConverter, DxfOverrideTemplateSet overrides)
+        public SectionDrawer(DxfEntityDrawer entityDrawer)
         {
-            _document = document;
-            _pointConverter = pointConverter;
-            _overrides = overrides;
+            _entityDrawer = entityDrawer;
         }
 
-        public void Draw(SectionDxfLayout layout)
+        public void Draw(SectionLayout layout)
         {
-            AddLine(
-                layout.OuterLeft - layout.SideWing,
-                layout.OuterTop,
-                layout.OuterRight + layout.SideWing,
-                layout.OuterTop);
+            if (layout == null)
+            {
+                return;
+            }
 
-            AddPolyline(
+            _entityDrawer.AddLine(DxfStyleRole.Girder, layout.OuterLeft - layout.SideWing, layout.OuterTop, layout.OuterRight + layout.SideWing, layout.OuterTop);
+            _entityDrawer.AddPolyline(DxfStyleRole.Girder, false,
                 layout.OuterLeft - layout.SideWing, layout.OuterShelfY,
                 layout.OuterLeft, layout.OuterShelfY,
                 layout.OuterLeft, layout.OuterBottom,
@@ -38,46 +33,12 @@ namespace GirderSchedule.Dxf.Drawers
 
         public void DrawDisabled(DxfBox box)
         {
-            AddDisabledLine(box.Left, box.Top, box.Right, box.Bottom);
-        }
-
-        private void AddLine(double x1, double y1, double x2, double y2)
-        {
-            var line = new Line(_pointConverter.ToVector3(x1, y1), _pointConverter.ToVector3(x2, y2));
-            DxfEntityStyle.ApplyRcGir(line, _document);
-            _document.Entities.Add(line);
-        }
-
-        private void AddDisabledLine(double x1, double y1, double x2, double y2)
-        {
-            var line = new Line(_pointConverter.ToVector3(x1, y1), _pointConverter.ToVector3(x2, y2));
-            DxfEntityStyle.ApplyRebar(line, _document);
-            _document.Entities.Add(line);
-        }
-
-        private void AddPolyline(params double[] values)
-        {
-            if (values == null || values.Length == 0)
+            if (box == null)
             {
                 return;
             }
 
-            if (values.Length % 2 != 0)
-            {
-                return;
-            }
-
-            var polyline = new Polyline2D();
-
-            for (var i = 0; i < values.Length; i += 2)
-            {
-                polyline.Vertexes.Add(new Polyline2DVertex(_pointConverter.ToVector2(values[i], values[i + 1])));
-            }
-
-            polyline.IsClosed = false;
-
-            DxfEntityStyle.ApplyRcGir(polyline, _document);
-            _document.Entities.Add(polyline);
+            _entityDrawer.AddLine(DxfStyleRole.Rebar, box.Left, box.Top, box.Right, box.Bottom);
         }
     }
 }

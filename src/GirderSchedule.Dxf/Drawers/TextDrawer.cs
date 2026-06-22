@@ -1,77 +1,84 @@
-﻿using netDxf;
+﻿using GirderSchedule.Dxf.Constants;
+using GirderSchedule.Dxf.Geometry;
+using GirderSchedule.Dxf.Styles;
+using netDxf;
 using netDxf.Entities;
-using GirderSchedule.Dxf.Common;
-using GirderSchedule.Dxf.Common.Overrides;
+using netDxf.Tables;
 
 namespace GirderSchedule.Dxf.Drawers
 {
     public sealed class TextDrawer
     {
-        private readonly DxfDocument _document;
-        private readonly DxfPointConverter _pointConverter;
-        private readonly DxfOverrideTemplateSet _overrides;
+        private const string TemplateTextStyleName = "맑은고딕";
+        private const short RebarTextColorIndex = 3;
 
-        public TextDrawer(DxfDocument document, DxfPointConverter pointConverter, DxfOverrideTemplateSet overrides)
+        private readonly DxfDocument _document;
+        private readonly DxfEntityStyler _styler;
+
+        public TextDrawer(DxfDocument document, DxfEntityStyler styler)
         {
             _document = document;
-            _pointConverter = pointConverter;
-            _overrides = overrides;
+            _styler = styler;
         }
 
         public void DrawFormText(string value, double x, double y, double height)
         {
-            Draw(value, x, y, height, DxfLayers.FormText);
+            Draw(value, x, y, height, DxfStyleRole.TitleText, TextAlignment.MiddleCenter, null, 0.0);
         }
 
         public void DrawValueText(string value, double x, double y, double height)
         {
-            Draw(value, x, y, height, DxfLayers.Text);
+            Draw(value, x, y, height, DxfStyleRole.ContentText, TextAlignment.MiddleCenter, null, 0.0);
         }
 
         public void DrawRebarValueText(string value, double x, double y, double height)
         {
-            Draw(value, x, y, height, DxfLayers.Text);
+            Draw(value, x, y, height, DxfStyleRole.ContentText, TextAlignment.MiddleCenter, new AciColor(RebarTextColorIndex), 0.0);
         }
 
         public void DrawDefPointText(string value, double x, double y, double height)
         {
-            Draw(value, x, y, height, DxfLayers.Defpoint);
+            Draw(value, x, y, height, DxfStyleRole.Defpoint, TextAlignment.MiddleCenter, null, 0.0);
         }
 
-        public void DrawDimText(string value, double x, double y, double height, double rotation)
+        public void DrawFormRawText(string value, double x, double y, double height)
         {
-            var text = CreateText(value, x, y, height, DxfLayers.Dim);
+            Draw(value, x, y, height, DxfStyleRole.TitleText, TextAlignment.BaselineLeft, null, 0.0);
+        }
+
+        public void DrawRebarValueRawText(string value, double x, double y, double height, TextAlignment textAlignment)
+        {
+            Draw(value, x, y, height, DxfStyleRole.ContentText, textAlignment, new AciColor(RebarTextColorIndex), 0.0);
+        }
+
+        private void Draw(string value, double x, double y, double height, DxfStyleRole role, TextAlignment alignment, AciColor color, double rotation)
+        {
+            var text = new Text(value ?? string.Empty, DxfPointConverter.ToVector3(x, y), height);
+            text.Alignment = alignment;
             text.Rotation = rotation;
+
+            ApplyTextStyle(text);
+            _styler.Apply(text, role);
+
+            if (color != null)
+            {
+                text.Color = color;
+            }
+
             _document.Entities.Add(text);
         }
 
-        private void Draw(string value, double x, double y, double height, string layerName)
+        private void ApplyTextStyle(Text text)
         {
-            var text = CreateText(value, x, y, height, layerName);
-            _document.Entities.Add(text);
-        }
-
-        private Text CreateText(string value, double x, double y, double height, string layerName)
-        {
-            var text = new Text(value ?? string.Empty, _pointConverter.ToVector3(x, y), height);
-            DxfEntityStyle.ApplyByLayer(text, _document.Layers[layerName]);
-            text.Alignment = TextAlignment.MiddleCenter;
+            if (_document.TextStyles.Contains(TemplateTextStyleName))
+            {
+                text.Style = _document.TextStyles[TemplateTextStyleName];
+                return;
+            }
 
             if (_document.TextStyles.Contains(DxfStyles.Text))
             {
                 text.Style = _document.TextStyles[DxfStyles.Text];
-            }
-
-            ApplyOverrides(text);
-
-            return text;
-        }
-
-        private void ApplyOverrides(EntityObject entity)
-        {
-            if (_overrides != null)
-            {
-                _overrides.Apply(entity);
             }
         }
     }
