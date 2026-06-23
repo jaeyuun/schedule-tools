@@ -133,7 +133,7 @@ namespace GirderSchedule.App.Preview.Formatting
 
             return null;
         }
-        
+
         private static int GetTopFirstCount(ScheduleItem item)
         {
             return item == null || item.TopRebar == null || item.TopRebar.FirstLayer == null ? 0 : item.TopRebar.FirstLayer.Count;

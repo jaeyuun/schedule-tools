@@ -1,12 +1,12 @@
+using GirderSchedule.App.Preview.Layouts;
+using GirderSchedule.App.Preview.Models;
+using GirderSchedule.Domain.Models;
 using System;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using GirderSchedule.App.Preview.Layouts;
-using GirderSchedule.App.Preview.Models;
-using GirderSchedule.Domain.Models;
 
 namespace GirderSchedule.App.Preview.Rendering
 {

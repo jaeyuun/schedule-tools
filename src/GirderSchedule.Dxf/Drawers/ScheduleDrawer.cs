@@ -2,7 +2,6 @@ using GirderSchedule.Domain.Models;
 using GirderSchedule.Dxf.Export;
 using GirderSchedule.Dxf.Geometry;
 using GirderSchedule.Dxf.Layouts;
-using netDxf.Entities;
 
 namespace GirderSchedule.Dxf.Drawers
 {
