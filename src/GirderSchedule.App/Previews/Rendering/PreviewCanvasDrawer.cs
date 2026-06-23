@@ -81,7 +81,7 @@ namespace GirderSchedule.App.Preview.Rendering
                 TextWrapping = TextWrapping.NoWrap,
                 Width = width,
                 LineStackingStrategy = LineStackingStrategy.BlockLineHeight,
-                LineHeight = fontSize + 2.0
+                LineHeight = fontSize
             };
 
             block.Measure(new Size(width, double.PositiveInfinity));

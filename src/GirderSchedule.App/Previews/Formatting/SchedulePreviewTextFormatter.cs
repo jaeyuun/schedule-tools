@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Windows.Controls;
 using GirderSchedule.Domain.Models;
 
 namespace GirderSchedule.App.Preview.Formatting
@@ -23,6 +24,17 @@ namespace GirderSchedule.App.Preview.Formatting
             }
 
             return "(" + FormatNumber(item.Section.Width) + " x " + FormatNumber(item.Section.Height) + ")";
+        }
+
+        public string FormatSectionNote(ScheduleItem item)
+        {
+            if (item == null || item.Section == null)
+            {
+                return string.Empty;
+            }
+
+            var value = item.Section.Note;
+            return string.IsNullOrWhiteSpace(value) ? string.Empty : value;
         }
 
         public string FormatMomentForce(ScheduleItem item)
@@ -106,7 +118,11 @@ namespace GirderSchedule.App.Preview.Formatting
                 return "-";
 			}
 
-            return "HD " + FormatNumber(item.SkinRebar.Diameter) + " @ " + FormatNumber(item.SkinRebar.Spacing);
+            var skinRebar = "HD " + FormatNumber(item.SkinRebar.Diameter) + " @ " + FormatNumber(item.SkinRebar.Spacing);
+            if (!string.IsNullOrWhiteSpace(item.SkinRebar.Note))
+                skinRebar += $"\n{item.SkinRebar.Note}";
+
+            return skinRebar;
         }
 
         private static ScheduleItem GetFirstEnabledItem(ScheduleSet set)

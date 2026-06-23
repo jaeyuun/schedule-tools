@@ -18,8 +18,35 @@ namespace GirderSchedule.App.Preview.Models
         public const int MaxSetCount = 9;
         public const int ColumnCount = 3;
 
-        public const double CellStartOffsetX = 20.0;
-        public const double CellStartOffsetY = 20.0;
+        public static int RowCount
+        {
+            get { return (MaxSetCount + ColumnCount - 1) / ColumnCount; }
+        }
+
+        public static double TableWidth
+        {
+            get { return CellWidth * ColumnCount; }
+        }
+
+        public static double TableHeight
+        {
+            get { return CellHeight * RowCount; }
+        }
+
+        public static double ContentHeight
+        {
+            get { return PageHeight - TitleHeight; }
+        }
+
+        public static double CellStartOffsetX
+        {
+            get { return (PageWidth - TableWidth) / 2.0; }
+        }
+
+        public static double CellStartOffsetY
+        {
+            get { return TitleHeight + (ContentHeight - TableHeight) / 2.0; }
+        }
 
         public static double GetCellX(int column)
         {
@@ -28,7 +55,7 @@ namespace GirderSchedule.App.Preview.Models
 
         public static double GetCellY(int row)
         {
-            return PageY + TitleHeight + CellStartOffsetY + row * CellHeight;
+            return PageY + CellStartOffsetY + row * CellHeight;
         }
     }
 }

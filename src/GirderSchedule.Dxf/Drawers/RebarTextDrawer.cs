@@ -90,13 +90,20 @@ namespace GirderSchedule.Dxf.Drawers
             }
             else
             {
-                skinRebarText = $"HD {skinRebar.Diameter:0} @ {skinRebar.Spacing:0}";
+                skinRebarText = "HD " + skinRebar.Diameter.ToString("0") + " @ " + skinRebar.Spacing.ToString("0");
             }
 
-            if (!string.IsNullOrWhiteSpace(skinRebar.Note))
-                skinRebarText += $"\n{skinRebar.Note}";
+            var x = box.Left + RebarTextLayout.SkinRebarTextOffsetX;
+            var y = RebarTextLayout.GetRowTextY(box);
 
-            _textDrawer.DrawRebarValueRawText(skinRebarText, box.Left + RebarTextLayout.SkinRebarTextOffsetX, RebarTextLayout.GetRowTextY(box), RebarTextLayout.TextHeight, TextAlignment.BaselineCenter);
+            if (string.IsNullOrWhiteSpace(skinRebar.Note))
+            {
+                _textDrawer.DrawRebarValueRawText(skinRebarText, x, y, RebarTextLayout.TextHeight, TextAlignment.BaselineCenter);
+                return;
+            }
+
+            _textDrawer.DrawRebarValueRawText(skinRebarText, x, y + 75.0, RebarTextLayout.TextHeight, TextAlignment.BaselineCenter);
+            _textDrawer.DrawRebarValueRawText(skinRebar.Note, x, y - 65.0, RebarTextLayout.TextHeight, TextAlignment.BaselineCenter);
         }
     }
 }

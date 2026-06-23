@@ -13,7 +13,7 @@ namespace GirderSchedule.Dxf.Layouts
         public const double MemberForceShearOffsetX = 1792.5;
         public const double MemberForceTextHeight = 90.0;
 
-        public const double SectionNoteBottomOffsetY = 140.0;
+        public const double SectionNoteBottomOffsetY = 200.0;
         public const double SectionNoteTextHeight = 90.0;
     }
 }

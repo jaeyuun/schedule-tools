@@ -173,15 +173,15 @@ namespace GirderSchedule.Dxf.Drawers
             }
         }
 
-        private void DrawSectionNote(ScheduleItem item, DxfBox sectionBox)
+        private void DrawSectionNote(ScheduleItem item, DxfBox box)
         {
-            if (item == null || sectionBox == null || string.IsNullOrWhiteSpace(item.Section.Note))
+            if (item == null || item.Section == null || box == null || string.IsNullOrWhiteSpace(item.Section.Note))
             {
                 return;
             }
 
-            var x = sectionBox.CenterX;
-            var y = sectionBox.Bottom + ScheduleTextLayout.SectionNoteBottomOffsetY;
+            var x = box.CenterX;
+            var y = box.Bottom + ScheduleTextLayout.SectionNoteBottomOffsetY;
 
             _textDrawer.DrawValueText(item.Section.Note, x, y, ScheduleTextLayout.SectionNoteTextHeight);
         }

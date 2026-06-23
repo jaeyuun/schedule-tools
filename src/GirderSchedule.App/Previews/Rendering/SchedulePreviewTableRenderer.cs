@@ -36,6 +36,7 @@ namespace GirderSchedule.App.Preview.Rendering
             {
                 DrawLabels(canvas, layout);
             }
+
             DrawMemberName(canvas, set, layout);
             DrawPartColumns(canvas, set, layout);
         }
@@ -88,12 +89,12 @@ namespace GirderSchedule.App.Preview.Rendering
 
         private void DrawLabel(Canvas canvas, string text, double x, double y, double width, double height)
         {
-            _drawer.DrawTextBox(canvas, text, x, y, width, height, 8.5, _brushes.Thin);
+            _drawer.DrawTextBox(canvas, text, x, y, width, height, 8.0, _brushes.Thin);
         }
 
         private void DrawMemberName(Canvas canvas, ScheduleSet set, SchedulePreviewCellLayout layout)
         {
-            _drawer.DrawTextBox(canvas, _formatter.FormatMemberName(set), layout.LabelEndX, layout.NameY, layout.ContentWidth, layout.NameHeight, 9.5, _brushes.Text);
+            _drawer.DrawTextBox(canvas, _formatter.FormatMemberName(set), layout.LabelEndX, layout.NameY, layout.ContentWidth, layout.NameHeight, 8.0, _brushes.Text);
         }
 
         private void DrawPartColumns(Canvas canvas, ScheduleSet set, SchedulePreviewCellLayout layout)
@@ -105,7 +106,7 @@ namespace GirderSchedule.App.Preview.Rendering
 
         private void DrawPartColumn(Canvas canvas, string title, ScheduleItem item, double x, SchedulePreviewCellLayout layout)
         {
-            _drawer.DrawTextBox(canvas, title, x, layout.SectionAreaY, layout.PartWidth, layout.PartHeaderHeight, 9.0, _brushes.Thin);
+            _drawer.DrawTextBox(canvas, title, x, layout.SectionAreaY, layout.PartWidth, layout.PartHeaderHeight, 8.0, _brushes.Thin);
 
             var isDisabled = item == null || !item.IsSectionEnabled || item.Section == null;
 
@@ -145,14 +146,20 @@ namespace GirderSchedule.App.Preview.Rendering
             var drawingHeight = layout.SectionHeight - 6.0;
 
             _sectionRenderer.Draw(canvas, item, drawingX, drawingY, drawingWidth, drawingHeight, false, false, PreviewSectionRenderOptions.Export);
+
+            var noteHeight = 8.0;
+            var noteBottomPadding = 4.0;
+            var noteY = layout.SectionY + layout.SectionHeight - noteHeight - noteBottomPadding;
+
+            _drawer.DrawTextBox(canvas, _formatter.FormatSectionNote(item), x, noteY, layout.PartWidth, noteHeight, 8.0, _brushes.Text);
         }
 
         private void DrawRebarTexts(Canvas canvas, ScheduleItem item, double x, SchedulePreviewCellLayout layout)
         {
-            _drawer.DrawTextBox(canvas, _formatter.FormatTop(item), x, layout.TopRebarY, layout.PartWidth, layout.TextRowHeight, 8.5, _brushes.Text);
-            _drawer.DrawTextBox(canvas, _formatter.FormatBottom(item), x, layout.BottomRebarY, layout.PartWidth, layout.TextRowHeight, 8.5, _brushes.Text);
-            _drawer.DrawTextBox(canvas, _formatter.FormatStirrup(item), x, layout.StirrupY, layout.PartWidth, layout.TextRowHeight, 8.5, _brushes.Text);
-            _drawer.DrawTextBox(canvas, _formatter.FormatSkinRebar(item), x, layout.SkinRebarY, layout.PartWidth, layout.TextRowHeight, 8.5, _brushes.Text);
+            _drawer.DrawTextBox(canvas, _formatter.FormatTop(item), x, layout.TopRebarY, layout.PartWidth, layout.TextRowHeight, 8.0, _brushes.Text);
+            _drawer.DrawTextBox(canvas, _formatter.FormatBottom(item), x, layout.BottomRebarY, layout.PartWidth, layout.TextRowHeight, 8.0, _brushes.Text);
+            _drawer.DrawTextBox(canvas, _formatter.FormatStirrup(item), x, layout.StirrupY, layout.PartWidth, layout.TextRowHeight, 8.0, _brushes.Text);
+            _drawer.DrawTextBox(canvas, _formatter.FormatSkinRebar(item), x, layout.SkinRebarY, layout.PartWidth, layout.TextRowHeight, 8.0, _brushes.Text);
         }
     }
 }

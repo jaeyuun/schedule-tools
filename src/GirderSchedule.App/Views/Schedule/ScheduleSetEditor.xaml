@@ -73,10 +73,10 @@
                 </Grid.RowDefinitions>
 
                 <TextBlock Grid.Row="0" Grid.Column="0" Margin="0,0,4,0" VerticalAlignment="Center" Text="2단"/>
-                <TextBox Grid.Row="1" Grid.Column="1" Style="{StaticResource SmallTextBoxStyle}" Text="{Binding BottomCount2, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox Grid.Row="0" Grid.Column="1" Style="{StaticResource SmallTextBoxStyle}" Text="{Binding BottomCount1, UpdateSourceTrigger=PropertyChanged}"/>
                 
                 <TextBlock Grid.Row="1" Grid.Column="0" Margin="0,0,4,0" VerticalAlignment="Center" Text="1단"/>
-                <TextBox Grid.Row="0" Grid.Column="1" Style="{StaticResource SmallTextBoxStyle}" Text="{Binding BottomCount1, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox Grid.Row="1" Grid.Column="1" Style="{StaticResource SmallTextBoxStyle}" Text="{Binding BottomCount2, UpdateSourceTrigger=PropertyChanged}"/>
 
                 <TextBlock Grid.Row="0" Grid.RowSpan="2" Grid.Column="2" Width="20" Margin="0,0,4,0" VerticalAlignment="Center" HorizontalAlignment="Right" TextAlignment="Right" Text="{Binding BottomTotalCount}"/>
                 <TextBlock Grid.Row="0" Grid.RowSpan="2" Grid.Column="3" Margin="0,0,4,0" VerticalAlignment="Center" Text="- HD"/>
