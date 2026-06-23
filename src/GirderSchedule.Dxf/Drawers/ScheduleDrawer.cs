@@ -175,7 +175,7 @@ namespace GirderSchedule.Dxf.Drawers
 
         private void DrawSectionNote(ScheduleItem item, DxfBox sectionBox)
         {
-            if (item == null || sectionBox == null || string.IsNullOrWhiteSpace(item.Note))
+            if (item == null || sectionBox == null || string.IsNullOrWhiteSpace(item.Section.Note))
             {
                 return;
             }
@@ -183,7 +183,7 @@ namespace GirderSchedule.Dxf.Drawers
             var x = sectionBox.CenterX;
             var y = sectionBox.Bottom + ScheduleTextLayout.SectionNoteBottomOffsetY;
 
-            _textDrawer.DrawValueText(item.Note, x, y, ScheduleTextLayout.SectionNoteTextHeight);
+            _textDrawer.DrawValueText(item.Section.Note, x, y, ScheduleTextLayout.SectionNoteTextHeight);
         }
     }
 }

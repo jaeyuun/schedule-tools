@@ -1,7 +1,6 @@
 ﻿using GirderSchedule.App.ViewModels.Export;
 using GirderSchedule.App.ViewModels.Schedule;
 using GirderSchedule.Domain.Models;
-using GirderSchedule.Domain.Models;
 using GirderSchedule.Dxf.Export;
 using System;
 using System.Collections.Generic;

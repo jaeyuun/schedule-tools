@@ -18,18 +18,18 @@ namespace GirderSchedule.App.ViewModels.Schedule
 
         public ObservableCollection<ScheduleSetNodeViewModel> Sets { get; private set; }
 
-        public int FloorNumber
+        public string FloorPrefix
         {
-            get { return _model.Setting.FloorNumber; }
+            get { return _model.Setting.FloorPrefix; }
             set
             {
-                if (_model.Setting.FloorNumber == value)
+                if (_model.Setting.FloorPrefix == value)
                 {
                     return;
                 }
 
-                _model.Setting.FloorNumber = value;
-                OnPropertyChanged(nameof(FloorNumber));
+                _model.Setting.FloorPrefix = value;
+                OnPropertyChanged(nameof(FloorPrefix));
                 OnPropertyChanged(nameof(DisplayName));
             }
         }
@@ -282,7 +282,7 @@ namespace GirderSchedule.App.ViewModels.Schedule
 
         public void RefreshAll()
         {
-            OnPropertyChanged(nameof(FloorNumber));
+            OnPropertyChanged(nameof(FloorPrefix));
             OnPropertyChanged(nameof(Name));
             OnPropertyChanged(nameof(DisplayName));
             OnPropertyChanged(nameof(MainRebarDiameter));

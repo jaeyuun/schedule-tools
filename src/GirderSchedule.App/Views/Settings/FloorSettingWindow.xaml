@@ -136,7 +136,7 @@
                 <TextBlock Grid.Row="0" Grid.Column="3" Text="스터럽 직경" VerticalAlignment="Center"/>
                 <TextBlock Grid.Row="0" Grid.Column="4" Text="표피철근 직경" VerticalAlignment="Center"/>
 
-                <TextBox Grid.Row="1" Grid.Column="0" Margin="0,3,12,3" Style="{StaticResource ExplorerTextBoxStyle}" Text="{Binding InputFloorNumber, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox Grid.Row="1" Grid.Column="0" Margin="0,3,12,3" Style="{StaticResource ExplorerTextBoxStyle}" Text="{Binding InputFloorPrefix, UpdateSourceTrigger=PropertyChanged}"/>
                 <TextBox Grid.Row="1" Grid.Column="1" Margin="0,3,12,3" Style="{StaticResource ExplorerTextBoxStyle}" Text="{Binding InputFloorName, UpdateSourceTrigger=PropertyChanged}"/>
                 <TextBox Grid.Row="1" Grid.Column="2" Margin="0,3,12,3" Style="{StaticResource ExplorerTextBoxStyle}" Text="{Binding InputMainRebarDiameter, UpdateSourceTrigger=PropertyChanged}"/>
                 <TextBox Grid.Row="1" Grid.Column="3" Margin="0,3,12,3" Style="{StaticResource ExplorerTextBoxStyle}" Text="{Binding InputStirrupDiameter, UpdateSourceTrigger=PropertyChanged}"/>
@@ -170,7 +170,7 @@
                 RowStyle="{StaticResource ExplorerDataGridRowStyle}"
                 CellStyle="{StaticResource ExplorerDataGridCellStyle}">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="층 번호" Binding="{Binding FloorNumber}" Width="70"/>
+                    <DataGridTextColumn Header="층 번호" Binding="{Binding FloorPrefix}" Width="70"/>
                     <DataGridTextColumn Header="층 이름" Binding="{Binding Name}" Width="200"/>
                     <DataGridTextColumn Header="주근" Binding="{Binding MainRebarText}" Width="*"/>
                     <DataGridTextColumn Header="스터럽" Binding="{Binding StirrupText}" Width="*"/>

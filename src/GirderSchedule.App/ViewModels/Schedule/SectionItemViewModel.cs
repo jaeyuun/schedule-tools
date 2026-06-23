@@ -73,18 +73,18 @@ namespace GirderSchedule.App.ViewModels.Schedule
             }
         }
 
-        public string Note
+        public string SectionNote
         {
-            get { return _model.Note; }
+            get { return _model.Section.Note; }
             set
             {
-                if (_model.Note == value)
+                if (_model.Section.Note == value)
                 {
                     return;
                 }
 
-                _model.Note = value ?? string.Empty;
-                OnPropertyChanged(nameof(Note));
+                _model.Section.Note = value ?? string.Empty;
+                OnPropertyChanged(nameof(SectionNote));
                 RaiseChanged();
             }
         }
@@ -281,7 +281,23 @@ namespace GirderSchedule.App.ViewModels.Schedule
             }
         }
 
-        public string MomentValue
+		public string SkinRebarNote
+		{
+			get { return _model.SkinRebar.Note; }
+			set
+			{
+				if (_model.SkinRebar.Note == value)
+				{
+					return;
+				}
+
+				_model.SkinRebar.Note = value ?? string.Empty;
+				OnPropertyChanged(nameof(SkinRebarNote));
+				RaiseChanged();
+			}
+		}
+
+		public string MomentValue
         {
             get
             {

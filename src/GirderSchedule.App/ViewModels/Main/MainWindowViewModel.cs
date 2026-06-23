@@ -418,7 +418,7 @@ namespace GirderSchedule.App.ViewModels.Main
                     continue;
                 }
 
-                var set = _setFactory.Create("G1", floor.Setting);
+                var set = _setFactory.Create("1G1", floor.Setting);
                 floor.AddSet(set);
             }
         }
@@ -445,7 +445,7 @@ namespace GirderSchedule.App.ViewModels.Main
                 return;
             }
 
-            var memberName = SelectedFloor.FloorNumber + "G" + (SelectedFloor.Sets.Count + 1);
+            var memberName = SelectedFloor.FloorPrefix + "G" + (SelectedFloor.Sets.Count + 1);
             var set = _setFactory.Create(memberName, SelectedFloor.Setting);
             var node = SelectedFloor.AddSet(set);
             SelectedSet = node;
@@ -1064,7 +1064,6 @@ namespace GirderSchedule.App.ViewModels.Main
             target.Name = source.Name;
             target.Position = source.Position;
             target.IsSectionEnabled = source.IsSectionEnabled;
-            target.Note = source.Note;
 
             CopySection(source.Section, target.Section);
             CopyRebarSet(source.TopRebar, target.TopRebar);
@@ -1140,7 +1139,7 @@ namespace GirderSchedule.App.ViewModels.Main
 
             target.Diameter = source.Diameter;
             target.Spacing = source.Spacing;
-            target.ExtraText = source.ExtraText;
+            target.Note = source.Note;
         }
     }
 }

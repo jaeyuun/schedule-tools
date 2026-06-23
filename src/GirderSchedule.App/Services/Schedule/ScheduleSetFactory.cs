@@ -32,7 +32,7 @@ namespace GirderSchedule.App.Services.Schedule
                 return;
             }
 
-            var name = string.IsNullOrWhiteSpace(memberName) ? "G1" : memberName;
+            var name = string.IsNullOrWhiteSpace(memberName) ? "1G1" : memberName;
             set.MemberName = name;
 
             if (set.Left != null)

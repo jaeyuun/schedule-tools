@@ -209,15 +209,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:GirderSchedule"
-        "ProductCode" = "8:{2DD58A8A-827C-46A1-82D3-7B306C036486}"
-        "PackageCode" = "8:{2DEEBEDD-3BAB-4CB4-A06E-5AB633A8D355}"
+        "ProductCode" = "8:{17DACD95-F7F4-40FC-92E6-6CB4DE9D14A8}"
+        "PackageCode" = "8:{4EBDD893-751C-4224-8977-0CC989B6C01E}"
         "UpgradeCode" = "8:{16F828BB-E75E-4858-B909-EB64ED512B57}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:0.0.2"
+        "ProductVersion" = "8:0.0.3"
         "Manufacturer" = "8:ScheduleTools"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
@@ -759,7 +759,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_51BCA62619D04666B7B5A2FE112BE231"
             {
-            "SourcePath" = "8:..\\GirderSchedule.App\\obj\\Release\\net8.0-windows\\apphost.exe"
+            "SourcePath" = "8:..\\GirderSchedule.App\\obj\\Debug\\net8.0-windows\\apphost.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_347A9A8BEC0B4B81BBD43867BD856F6C"

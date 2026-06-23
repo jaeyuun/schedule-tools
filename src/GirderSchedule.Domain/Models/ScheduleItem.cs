@@ -12,7 +12,6 @@
         public StirrupData Stirrup { get; set; }
         public MemberForceData MemberForce { get; set; }
         public SkinRebarData SkinRebar { get; set; }
-        public string Note { get; set; }
 
         public ScheduleItem()
         {
@@ -26,7 +25,6 @@
             Stirrup = new StirrupData();
             MemberForce = new MemberForceData();
             SkinRebar = new SkinRebarData();
-            Note = string.Empty;
         }
     }
 }

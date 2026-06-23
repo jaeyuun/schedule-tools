@@ -4,6 +4,6 @@
     {
         public int Diameter { get; set; }
         public int Spacing { get; set; }
-        public string ExtraText { get; set; } = string.Empty;
+        public string Note { get; set; } = string.Empty;
     }
 }

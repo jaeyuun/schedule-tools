@@ -102,18 +102,15 @@
         </DataTemplate>
 
         <DataTemplate x:Key="SkinRebarInputTemplate">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                <TextBlock Text="HD" VerticalAlignment="Center"/>
-                <TextBox Style="{StaticResource SmallTextBoxStyle}" Margin="2,0" Text="{Binding SkinRebarDiameter, UpdateSourceTrigger=PropertyChanged}"/>
-                <TextBlock Text="@" VerticalAlignment="Center"/>
-                <TextBox Width="44"
-                         Height="20"
-                         Margin="2,0"
-                         Padding="0"
-                         HorizontalContentAlignment="Center"
-                         VerticalContentAlignment="Center"
-                         FocusVisualStyle="{x:Null}"
-                         Text="{Binding SkinRebarSpacing, UpdateSourceTrigger=PropertyChanged}"/>
+            <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <TextBlock Text="HD" VerticalAlignment="Center"/>
+                    <TextBox Style="{StaticResource SmallTextBoxStyle}" Margin="2,0" Text="{Binding SkinRebarDiameter, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBlock Text="@" VerticalAlignment="Center"/>
+                    <TextBox Width="44" Height="20" Margin="2,0" Padding="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FocusVisualStyle="{x:Null}" Text="{Binding SkinRebarSpacing, UpdateSourceTrigger=PropertyChanged}"/>
+                </StackPanel>
+
+                <TextBox Width="150" Height="20" Margin="0,4,0,0" Padding="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FocusVisualStyle="{x:Null}" Text="{Binding SkinRebarNote, UpdateSourceTrigger=PropertyChanged}"/>
             </StackPanel>
         </DataTemplate>
 
@@ -173,7 +170,7 @@
                     <RowDefinition Height="56"/>
                     <RowDefinition Height="56"/>
                     <RowDefinition Height="28"/>
-                    <RowDefinition Height="28"/>
+                    <RowDefinition Height="56"/>
                 </Grid.RowDefinitions>
 
                 <Grid Grid.Row="0"/>
@@ -192,7 +189,7 @@
                         <RowDefinition Height="56"/>
                         <RowDefinition Height="56"/>
                         <RowDefinition Height="28"/>
-                        <RowDefinition Height="28"/>
+                        <RowDefinition Height="56"/>
                     </Grid.RowDefinitions>
 
                     <Border Grid.Row="0" Grid.Column="0" BorderBrush="#B8B8B8" BorderThickness="1">
@@ -259,7 +256,7 @@
                             <RowDefinition Height="56"/>
                             <RowDefinition Height="56"/>
                             <RowDefinition Height="28"/>
-                            <RowDefinition Height="28"/>
+                            <RowDefinition Height="56"/>
                         </Grid.RowDefinitions>
 
                         <Border Grid.Row="0" BorderBrush="#B8B8B8" BorderThickness="0,0,1,1">
@@ -285,7 +282,7 @@
 
                                 <Canvas x:Name="LeftCanvas" Grid.Row="2" Width="200" Height="240" HorizontalAlignment="Center" VerticalAlignment="Center"/>
 
-                                <TextBox Grid.Row="3" IsEnabled="{Binding Left.IsSectionEnabled}" Style="{StaticResource SectionNoteTextBoxStyle}" Text="{Binding Left.Note, UpdateSourceTrigger=PropertyChanged}"/>
+                                <TextBox Grid.Row="3" IsEnabled="{Binding Left.IsSectionEnabled}" Style="{StaticResource SectionNoteTextBoxStyle}" Text="{Binding Left.SectionNote, UpdateSourceTrigger=PropertyChanged}"/>
                             </Grid>
                         </Border>
 
@@ -312,7 +309,7 @@
                             <RowDefinition Height="56"/>
                             <RowDefinition Height="56"/>
                             <RowDefinition Height="28"/>
-                            <RowDefinition Height="28"/>
+                            <RowDefinition Height="56"/>
                         </Grid.RowDefinitions>
 
                         <Border Grid.Row="0" BorderBrush="#B8B8B8" BorderThickness="0,0,1,1">
@@ -334,7 +331,7 @@
 
                                 <Canvas x:Name="CenterCanvas" Grid.Row="2" Width="200" Height="240" HorizontalAlignment="Center" VerticalAlignment="Center"/>
 
-                                <TextBox Grid.Row="3" IsEnabled="{Binding Center.IsSectionEnabled}" Style="{StaticResource SectionNoteTextBoxStyle}" Text="{Binding Center.Note, UpdateSourceTrigger=PropertyChanged}"/>
+                                <TextBox Grid.Row="3" IsEnabled="{Binding Center.IsSectionEnabled}" Style="{StaticResource SectionNoteTextBoxStyle}" Text="{Binding Center.SectionNote, UpdateSourceTrigger=PropertyChanged}"/>
                             </Grid>
                         </Border>
 
@@ -361,7 +358,7 @@
                             <RowDefinition Height="56"/>
                             <RowDefinition Height="56"/>
                             <RowDefinition Height="28"/>
-                            <RowDefinition Height="28"/>
+                            <RowDefinition Height="56"/>
                         </Grid.RowDefinitions>
 
                         <Border Grid.Row="0" BorderBrush="#B8B8B8" BorderThickness="0,0,1,1">
@@ -387,7 +384,7 @@
 
                                 <Canvas x:Name="RightCanvas" Grid.Row="2" Width="200" Height="240" HorizontalAlignment="Center" VerticalAlignment="Center"/>
 
-                                <TextBox Grid.Row="3" IsEnabled="{Binding Right.IsSectionEnabled}" Style="{StaticResource SectionNoteTextBoxStyle}" Text="{Binding Right.Note, UpdateSourceTrigger=PropertyChanged}"/>
+                                <TextBox Grid.Row="3" IsEnabled="{Binding Right.IsSectionEnabled}" Style="{StaticResource SectionNoteTextBoxStyle}" Text="{Binding Right.SectionNote, UpdateSourceTrigger=PropertyChanged}"/>
                             </Grid>
                         </Border>
 

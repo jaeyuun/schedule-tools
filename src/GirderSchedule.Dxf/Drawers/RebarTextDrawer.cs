@@ -93,8 +93,8 @@ namespace GirderSchedule.Dxf.Drawers
                 skinRebarText = $"HD {skinRebar.Diameter:0} @ {skinRebar.Spacing:0}";
             }
 
-            if (!string.IsNullOrWhiteSpace(skinRebar.ExtraText))
-                skinRebarText += $"\n{skinRebar.ExtraText}";
+            if (!string.IsNullOrWhiteSpace(skinRebar.Note))
+                skinRebarText += $"\n{skinRebar.Note}";
 
             _textDrawer.DrawRebarValueRawText(skinRebarText, box.Left + RebarTextLayout.SkinRebarTextOffsetX, RebarTextLayout.GetRowTextY(box), RebarTextLayout.TextHeight, TextAlignment.BaselineCenter);
         }

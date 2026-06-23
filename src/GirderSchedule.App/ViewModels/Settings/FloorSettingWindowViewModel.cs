@@ -39,7 +39,7 @@ namespace GirderSchedule.App.ViewModels.Settings
             }
         }
 
-        public string InputFloorNumber
+        public string InputFloorPrefix
         {
             get { return _inputFloorNumber; }
             set
@@ -50,7 +50,7 @@ namespace GirderSchedule.App.ViewModels.Settings
                 }
 
                 _inputFloorNumber = value;
-                OnPropertyChanged(nameof(InputFloorNumber));
+                OnPropertyChanged(nameof(InputFloorPrefix));
             }
         }
 
@@ -136,14 +136,14 @@ namespace GirderSchedule.App.ViewModels.Settings
             }
 
             var floor = new ScheduleFloor();
-            floor.Setting.FloorNumber = ParseInt(InputFloorNumber);
+            floor.Setting.FloorPrefix = InputFloorPrefix.Trim();
             floor.Name = InputFloorName.Trim();
             floor.Setting.FloorName = floor.Name;
             floor.Setting.MainRebarDiameter = ParseInt(InputMainRebarDiameter);
             floor.Setting.StirrupDiameter = ParseInt(InputStirrupDiameter);
             floor.Setting.SkinRebarDiameter = ParseInt(InputSkinRebarDiameter);
 
-            var set = _setFactory.Create("G1", floor.Setting);
+            var set = _setFactory.Create("1G1", floor.Setting);
             floor.Sets.Add(set);
 
             var node = new FloorNodeViewModel(floor);
@@ -164,7 +164,7 @@ namespace GirderSchedule.App.ViewModels.Settings
                 return;
             }
 
-            SelectedFloor.FloorNumber = ParseInt(InputFloorNumber);
+            SelectedFloor.FloorPrefix = InputFloorPrefix.Trim();
             SelectedFloor.Name = InputFloorName.Trim();
             SelectedFloor.MainRebarDiameter = ParseInt(InputMainRebarDiameter);
             SelectedFloor.StirrupDiameter = ParseInt(InputStirrupDiameter);
@@ -217,7 +217,7 @@ namespace GirderSchedule.App.ViewModels.Settings
                 return;
             }
 
-            InputFloorNumber = SelectedFloor.FloorNumber.ToString();
+            InputFloorPrefix = SelectedFloor.FloorPrefix.ToString();
             InputFloorName = SelectedFloor.Name;
             InputMainRebarDiameter = ToInputText(SelectedFloor.MainRebarDiameter);
             InputStirrupDiameter = ToInputText(SelectedFloor.StirrupDiameter);
@@ -226,7 +226,7 @@ namespace GirderSchedule.App.ViewModels.Settings
 
         private void ClearInput()
         {
-            InputFloorNumber = string.Empty;
+            InputFloorPrefix = string.Empty;
             InputFloorName = string.Empty;
             InputMainRebarDiameter = string.Empty;
             InputStirrupDiameter = string.Empty;

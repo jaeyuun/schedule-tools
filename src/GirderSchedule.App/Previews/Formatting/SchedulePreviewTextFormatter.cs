@@ -7,7 +7,7 @@ namespace GirderSchedule.App.Preview.Formatting
     {
         public string FormatMemberName(ScheduleSet set)
         {
-            var memberName = set == null || string.IsNullOrWhiteSpace(set.MemberName) ? "부재명 없음" : set.MemberName;
+            var memberName = set == null || string.IsNullOrWhiteSpace(set.MemberName) ? "" : set.MemberName;
             var sizeText = FormatSetSectionSize(set);
 
             return string.IsNullOrWhiteSpace(sizeText) ? memberName : memberName + "\r\n" + sizeText;
@@ -51,7 +51,7 @@ namespace GirderSchedule.App.Preview.Formatting
         {
             if (item == null || item.TopRebar == null)
             {
-                return string.Empty;
+                return "- HD";
             }
 
             var count = GetTopFirstCount(item) + GetTopSecondCount(item);
@@ -62,8 +62,8 @@ namespace GirderSchedule.App.Preview.Formatting
         {
             if (item == null || item.BottomRebar == null)
             {
-                return string.Empty;
-            }
+                return "- HD";
+			}
 
             var count = GetBottomFirstCount(item) + GetBottomSecondCount(item);
             return FormatRebar(count, item.BottomRebar.Diameter);
@@ -73,8 +73,8 @@ namespace GirderSchedule.App.Preview.Formatting
         {
             if (count <= 0 || diameter <= 0)
             {
-                return string.Empty;
-            }
+                return "- HD";
+			}
 
             return count + " - HD " + FormatNumber(diameter);
         }
@@ -83,30 +83,30 @@ namespace GirderSchedule.App.Preview.Formatting
         {
             if (item == null || item.Stirrup == null)
             {
-                return string.Empty;
-            }
+                return "- HD   @";
+			}
 
             if (item.Stirrup.Legs <= 0 || item.Stirrup.Diameter <= 0 || item.Stirrup.Spacing <= 0)
             {
-                return string.Empty;
+                return "- HD   @";
             }
 
-            return item.Stirrup.Legs + "- HD" + FormatNumber(item.Stirrup.Diameter) + "@" + FormatNumber(item.Stirrup.Spacing);
+            return item.Stirrup.Legs + " - HD " + FormatNumber(item.Stirrup.Diameter) + " @ " + FormatNumber(item.Stirrup.Spacing);
         }
 
         public string FormatSkinRebar(ScheduleItem item)
         {
             if (item == null || item.SkinRebar == null)
             {
-                return string.Empty;
-            }
+                return "-";
+			}
 
             if (item.SkinRebar.Diameter <= 0 || item.SkinRebar.Spacing <= 0)
             {
-                return string.Empty;
-            }
+                return "-";
+			}
 
-            return "HD" + FormatNumber(item.SkinRebar.Diameter) + "@" + FormatNumber(item.SkinRebar.Spacing);
+            return "HD " + FormatNumber(item.SkinRebar.Diameter) + " @ " + FormatNumber(item.SkinRebar.Spacing);
         }
 
         private static ScheduleItem GetFirstEnabledItem(ScheduleSet set)
