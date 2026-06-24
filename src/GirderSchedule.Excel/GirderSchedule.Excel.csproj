@@ -1,17 +1,22 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0-windows</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net8.0-windows</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="ClosedXML" Version="0.105.0" />
-  </ItemGroup>
+	<PropertyGroup Condition="'$(Configuration)' == 'Release'">
+		<DebugType>none</DebugType>
+		<DebugSymbols>false</DebugSymbols>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\GirderSchedule.Domain\GirderSchedule.Domain.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="ClosedXML" Version="0.105.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\GirderSchedule.Domain\GirderSchedule.Domain.csproj" />
+    </ItemGroup>
 
 </Project>
