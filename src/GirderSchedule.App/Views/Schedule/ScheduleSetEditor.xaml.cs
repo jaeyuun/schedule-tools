@@ -1,8 +1,8 @@
 using System;
 using System.Windows;
 using System.Windows.Controls;
-using GirderSchedule.App.Preview.Models;
-using GirderSchedule.App.Preview.Rendering;
+using GirderSchedule.App.Previews.Models;
+using GirderSchedule.App.Previews.Rendering;
 using GirderSchedule.App.ViewModels.Schedule;
 
 namespace GirderSchedule.App.Views.Schedule

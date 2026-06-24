@@ -1,33 +1,18 @@
 ﻿using ClosedXML.Excel;
+using GirderSchedule.Domain.Formatting;
 using GirderSchedule.Domain.Models;
+using GirderSchedule.Domain.Services;
 
 namespace GirderSchedule.Excel
 {
     public sealed class ExcelValueMapper
     {
+        private readonly ScheduleItemQuery _query = new ScheduleItemQuery();
+        private readonly ScheduleValueFormatter _formatter = new ScheduleValueFormatter();
+
         public ScheduleItem? GetBaseItem(ScheduleSet? set)
         {
-            if (set == null)
-            {
-                return null;
-            }
-
-            if (set.Left != null && set.Left.Section != null)
-            {
-                return set.Left;
-            }
-
-            if (set.Center != null && set.Center.Section != null)
-            {
-                return set.Center;
-            }
-
-            if (set.Right != null && set.Right.Section != null)
-            {
-                return set.Right;
-            }
-
-            return null;
+            return _query.GetBaseItem(set);
         }
 
         public XLCellValue GetMemberId(ScheduleSet? set)
@@ -85,32 +70,27 @@ namespace GirderSchedule.Excel
 
         public XLCellValue GetTopFirstCount(ScheduleItem? item)
         {
-            var value = item == null || item.TopRebar == null || item.TopRebar.FirstLayer == null ? 0 : item.TopRebar.FirstLayer.Count;
-            return ToCellValue(value);
+            return ToCellValue(_query.GetTopFirstCount(item));
         }
 
         public XLCellValue GetTopSecondCount(ScheduleItem? item)
         {
-            var value = item == null || item.TopRebar == null || item.TopRebar.SecondLayer == null ? 0 : item.TopRebar.SecondLayer.Count;
-            return ToCellValue(value);
+            return ToCellValue(_query.GetTopSecondCount(item));
         }
 
         public XLCellValue GetBottomFirstCount(ScheduleItem? item)
         {
-            var value = item == null || item.BottomRebar == null || item.BottomRebar.FirstLayer == null ? 0 : item.BottomRebar.FirstLayer.Count;
-            return ToCellValue(value);
+            return ToCellValue(_query.GetBottomFirstCount(item));
         }
 
         public XLCellValue GetBottomSecondCount(ScheduleItem? item)
         {
-            var value = item == null || item.BottomRebar == null || item.BottomRebar.SecondLayer == null ? 0 : item.BottomRebar.SecondLayer.Count;
-            return ToCellValue(value);
+            return ToCellValue(_query.GetBottomSecondCount(item));
         }
 
         public XLCellValue GetStirrupLegs(ScheduleItem? item)
         {
-            var value = item == null || item.Stirrup == null ? 0 : item.Stirrup.Legs;
-            return ToCellValue(value);
+            return ToCellValue(_query.GetStirrupLegs(item));
         }
 
         public XLCellValue GetStirrupSpacing(ScheduleItem? item)
@@ -130,7 +110,7 @@ namespace GirderSchedule.Excel
 
         private string FormatNumber(double value)
         {
-            return value.ToString("0");
+            return _formatter.FormatNumber(value);
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace GirderSchedule.Domain.Layout
+﻿namespace GirderSchedule.Domain.Layouts
 {
     public sealed class ScheduleLayout
     {
@@ -33,47 +33,47 @@
             ItemColumnCount = 9;
         }
 
-        public CellBox GetRowBox(int rowIndex)
+        public LayoutBox GetRowBox(int rowIndex)
         {
-            return new CellBox(FormX, FirstRowY - RowHeight * rowIndex, FormWidth, RowHeight);
+            return new LayoutBox(FormX, FirstRowY - RowHeight * rowIndex, FormWidth, RowHeight);
         }
 
-        public CellBox GetItemBox(int rowIndex, int itemIndex)
+        public LayoutBox GetItemBox(int rowIndex, int itemIndex)
         {
             var row = GetRowBox(rowIndex);
             var x = row.X + LabelColumnWidth + ItemColumnWidth * itemIndex;
 
-            return new CellBox(x, row.Y, ItemColumnWidth, RowHeight);
+            return new LayoutBox(x, row.Y, ItemColumnWidth, RowHeight);
         }
 
-        public CellBox GetSectionBox(int rowIndex, int itemIndex)
+        public LayoutBox GetSectionBox(int rowIndex, int itemIndex)
         {
             var item = GetItemBox(rowIndex, itemIndex);
-            return new CellBox(item.X, item.Y + 1200.0, item.Width, 3200.0);
+            return new LayoutBox(item.X, item.Y + 1200.0, item.Width, 3200.0);
         }
 
-        public CellBox GetTopRebarTextBox(int rowIndex, int itemIndex)
+        public LayoutBox GetTopRebarTextBox(int rowIndex, int itemIndex)
         {
             var item = GetItemBox(rowIndex, itemIndex);
-            return new CellBox(item.X, item.Y + 900.0, item.Width, 300.0);
+            return new LayoutBox(item.X, item.Y + 900.0, item.Width, 300.0);
         }
 
-        public CellBox GetBottomRebarTextBox(int rowIndex, int itemIndex)
+        public LayoutBox GetBottomRebarTextBox(int rowIndex, int itemIndex)
         {
             var item = GetItemBox(rowIndex, itemIndex);
-            return new CellBox(item.X, item.Y + 600.0, item.Width, 300.0);
+            return new LayoutBox(item.X, item.Y + 600.0, item.Width, 300.0);
         }
 
-        public CellBox GetStirrupTextBox(int rowIndex, int itemIndex)
+        public LayoutBox GetStirrupTextBox(int rowIndex, int itemIndex)
         {
             var item = GetItemBox(rowIndex, itemIndex);
-            return new CellBox(item.X, item.Y + 300.0, item.Width, 300.0);
+            return new LayoutBox(item.X, item.Y + 300.0, item.Width, 300.0);
         }
 
-        public CellBox GetSkinRebarTextBox(int rowIndex, int itemIndex)
+        public LayoutBox GetSkinRebarTextBox(int rowIndex, int itemIndex)
         {
             var item = GetItemBox(rowIndex, itemIndex);
-            return new CellBox(item.X, item.Y, item.Width, 300.0);
+            return new LayoutBox(item.X, item.Y, item.Width, 300.0);
         }
     }
 }

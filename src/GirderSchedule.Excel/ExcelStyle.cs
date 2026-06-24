@@ -1,5 +1,5 @@
 using ClosedXML.Excel;
-using GirderSchedule.Excel.Layout;
+using GirderSchedule.Excel.Layouts;
 
 namespace GirderSchedule.Excel
 {

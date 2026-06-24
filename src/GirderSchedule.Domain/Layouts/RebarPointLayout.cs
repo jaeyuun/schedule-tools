@@ -1,4 +1,4 @@
-﻿namespace GirderSchedule.Domain.Layout
+﻿namespace GirderSchedule.Domain.Layouts
 {
     public sealed class RebarPointLayout
     {

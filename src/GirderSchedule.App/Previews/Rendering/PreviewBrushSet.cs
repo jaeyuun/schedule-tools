@@ -1,6 +1,6 @@
 using System.Windows.Media;
 
-namespace GirderSchedule.App.Preview.Rendering
+namespace GirderSchedule.App.Previews.Rendering
 {
     public sealed class PreviewBrushSet
     {

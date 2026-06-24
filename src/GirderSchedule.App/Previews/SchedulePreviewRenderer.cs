@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.Windows.Controls;
 using System.Windows.Media;
-using GirderSchedule.App.Preview.Models;
-using GirderSchedule.App.Preview.Formatting;
-using GirderSchedule.App.Preview.Rendering;
+using GirderSchedule.App.Previews.Models;
+using GirderSchedule.App.Previews.Formatting;
+using GirderSchedule.App.Previews.Rendering;
 using GirderSchedule.Domain.Models;
 
 namespace GirderSchedule.App.Preview

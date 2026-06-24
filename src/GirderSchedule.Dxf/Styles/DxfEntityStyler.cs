@@ -28,20 +28,36 @@ namespace GirderSchedule.Dxf.Styles
                 return;
             }
 
+            ApplyBaseStyle(entity, role);
+            ApplyTemplateOverride(entity, role);
+        }
+
+        private void ApplyBaseStyle(EntityObject entity, DxfStyleRole role)
+        {
             var layer = _layerResolver.GetLayer(role);
-            var templateLayerName = _layerNames.GetTemplateLayerName(role);
 
             entity.Layer = layer;
             entity.Color = AciColor.ByLayer;
             entity.Linetype = GetRoleLinetype(role);
             entity.Lineweight = Lineweight.ByLayer;
+        }
 
-            if (_overrides != null)
+        private void ApplyTemplateOverride(EntityObject entity, DxfStyleRole role)
+        {
+            if (_overrides == null)
             {
-                _overrides.Apply(entity, templateLayerName);
+                return;
             }
 
-            entity.Layer = layer;
+            var layer = entity.Layer;
+            var templateLayerName = _layerNames.GetTemplateLayerName(role);
+
+            _overrides.Apply(entity, templateLayerName);
+
+            if (layer != null)
+            {
+                entity.Layer = layer;
+            }
         }
 
         private Linetype GetRoleLinetype(DxfStyleRole role)

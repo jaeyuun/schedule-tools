@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace GirderSchedule.Domain.Layout
+namespace GirderSchedule.Domain.Layouts
 {
     public sealed class RebarPointLayoutService
     {
@@ -44,30 +44,55 @@ namespace GirderSchedule.Domain.Layout
                 return result;
             }
 
-            var spacing = (endX - startX) / (firstLayerCount - 1);
-            var leftCount = (secondLayerCount + 1) / 2;
-            var rightCount = secondLayerCount / 2;
-            var drawn = new bool[firstLayerCount];
+            var firstLayerXs = GetFirstLayerXs(startX, endX, firstLayerCount);
+            var drawn = GetSecondLayerIndexFlags(firstLayerCount, secondLayerCount);
 
-            for (var i = 0; i < leftCount && i < firstLayerCount; i++)
-            {
-                drawn[i] = true;
-            }
-
-            for (var i = 0; i < rightCount && i < firstLayerCount; i++)
-            {
-                drawn[firstLayerCount - 1 - i] = true;
-            }
-
-            for (var i = 0; i < firstLayerCount; i++)
+            for (var i = 0; i < firstLayerXs.Count; i++)
             {
                 if (drawn[i])
                 {
-                    result.Add(startX + spacing * i);
+                    result.Add(firstLayerXs[i]);
                 }
             }
 
             return result;
+        }
+
+        public bool[] GetSecondLayerIndexFlags(int firstLayerCount, int secondLayerCount)
+        {
+            var result = new bool[firstLayerCount <= 0 ? 0 : firstLayerCount];
+
+            if (firstLayerCount <= 0 || secondLayerCount <= 0)
+            {
+                return result;
+            }
+
+            secondLayerCount = ClampCount(secondLayerCount, firstLayerCount);
+
+            var leftCount = (secondLayerCount + 1) / 2;
+            var rightCount = secondLayerCount / 2;
+
+            for (var i = 0; i < leftCount && i < firstLayerCount; i++)
+            {
+                result[i] = true;
+            }
+
+            for (var i = 0; i < rightCount && i < firstLayerCount; i++)
+            {
+                result[firstLayerCount - 1 - i] = true;
+            }
+
+            return result;
+        }
+
+        public int ClampCount(int count, int max)
+        {
+            if (count <= 0 || max <= 0)
+            {
+                return 0;
+            }
+
+            return count > max ? max : count;
         }
     }
 }

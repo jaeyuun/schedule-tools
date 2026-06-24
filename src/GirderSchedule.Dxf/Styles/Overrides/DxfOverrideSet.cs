@@ -1,4 +1,4 @@
-﻿using GirderSchedule.Dxf.Constants;
+﻿using System.Collections.Generic;
 using netDxf;
 using netDxf.Entities;
 
@@ -6,14 +6,8 @@ namespace GirderSchedule.Dxf.Styles.Overrides
 {
     public sealed class DxfOverrideSet
     {
-        private readonly List<DxfEntityOverride> _entityTemplates;
-        private readonly List<DxfDimensionOverride> _dimensionTemplates;
-
-        private DxfOverrideSet()
-        {
-            _entityTemplates = new List<DxfEntityOverride>();
-            _dimensionTemplates = new List<DxfDimensionOverride>();
-        }
+        private readonly List<DxfEntityOverride> _entityOverrides = new List<DxfEntityOverride>();
+        private readonly List<DxfDimensionOverride> _dimensionOverrides = new List<DxfDimensionOverride>();
 
         public static DxfOverrideSet Create(DxfDocument document)
         {
@@ -24,12 +18,30 @@ namespace GirderSchedule.Dxf.Styles.Overrides
                 return set;
             }
 
-            var entities = document.Entities.All.ToList();
-
-            AddPreferredDimensionTemplates(set, entities);
-            AddEntityTemplates(set, entities);
+            foreach (var entity in document.Entities.All)
+            {
+                set.Add(entity);
+            }
 
             return set;
+        }
+
+        public void Add(EntityObject entity)
+        {
+            if (entity == null)
+            {
+                return;
+            }
+
+            var dimension = entity as Dimension;
+
+            if (dimension != null)
+            {
+                _dimensionOverrides.Add(new DxfDimensionOverride(dimension));
+                return;
+            }
+
+            _entityOverrides.Add(new DxfEntityOverride(entity));
         }
 
         public void Apply(EntityObject entity)
@@ -39,8 +51,14 @@ namespace GirderSchedule.Dxf.Styles.Overrides
                 return;
             }
 
-            var layerName = entity.Layer == null ? string.Empty : entity.Layer.Name;
-            Apply(entity, layerName);
+            var dimension = entity as Dimension;
+
+            if (dimension != null && ApplyDimensionOverride(dimension))
+            {
+                return;
+            }
+
+            ApplyEntityOverride(entity);
         }
 
         public void Apply(EntityObject entity, string templateLayerName)
@@ -52,166 +70,114 @@ namespace GirderSchedule.Dxf.Styles.Overrides
 
             var dimension = entity as Dimension;
 
-            if (dimension != null)
-            {
-                ApplyDimension(dimension, templateLayerName);
-                return;
-            }
-
-            ApplyEntity(entity, templateLayerName);
-        }
-
-        private static void AddPreferredDimensionTemplates(DxfOverrideSet set, List<EntityObject> entities)
-        {
-            for (var i = 0; i < entities.Count; i++)
-            {
-                var dimension = entities[i] as Dimension;
-
-                if (dimension == null)
-                {
-                    continue;
-                }
-
-                if (dimension.Layer == null || dimension.Style == null)
-                {
-                    continue;
-                }
-
-                if (dimension.Layer.Name != DxfLayers.Dim)
-                {
-                    continue;
-                }
-
-                if (dimension.Style.Name != DxfStyles.Dimension)
-                {
-                    continue;
-                }
-
-                set.AddDimensionTemplate(dimension);
-            }
-
-            if (set._dimensionTemplates.Count > 0)
+            if (dimension != null && ApplyDimensionOverride(dimension, templateLayerName))
             {
                 return;
             }
 
-            for (var i = 0; i < entities.Count; i++)
-            {
-                var dimension = entities[i] as Dimension;
-
-                if (dimension == null)
-                {
-                    continue;
-                }
-
-                if (dimension.Layer == null)
-                {
-                    continue;
-                }
-
-                if (dimension.Layer.Name != DxfLayers.Dim)
-                {
-                    continue;
-                }
-
-                set.AddDimensionTemplate(dimension);
-            }
+            ApplyEntityOverride(entity, templateLayerName);
         }
 
-        private static void AddEntityTemplates(DxfOverrideSet set, List<EntityObject> entities)
+        private bool ApplyDimensionOverride(Dimension dimension)
         {
-            for (var i = 0; i < entities.Count; i++)
+            var overrideItem = FindDimensionOverride(dimension);
+
+            if (overrideItem == null)
             {
-                var entity = entities[i];
-
-                if (entity == null || entity.Layer == null)
-                {
-                    continue;
-                }
-
-                var dimension = entity as Dimension;
-
-                if (dimension != null)
-                {
-                    continue;
-                }
-
-                set.AddEntityTemplate(entity);
+                return false;
             }
+
+            overrideItem.Apply(dimension);
+            return true;
         }
 
-        private void ApplyEntity(EntityObject entity, string templateLayerName)
+        private bool ApplyDimensionOverride(Dimension dimension, string templateLayerName)
         {
-            for (var i = 0; i < _entityTemplates.Count; i++)
-            {
-                if (!_entityTemplates[i].IsMatch(entity, templateLayerName))
-                {
-                    continue;
-                }
+            var overrideItem = FindDimensionOverride(dimension, templateLayerName);
 
-                _entityTemplates[i].Apply(entity);
-                return;
+            if (overrideItem == null)
+            {
+                return false;
             }
+
+            overrideItem.Apply(dimension);
+            return true;
         }
 
-        private void ApplyDimension(Dimension dimension, string templateLayerName)
+        private void ApplyEntityOverride(EntityObject entity)
         {
-            for (var i = 0; i < _dimensionTemplates.Count; i++)
-            {
-                if (!_dimensionTemplates[i].IsMatch(dimension, templateLayerName))
-                {
-                    continue;
-                }
+            var overrideItem = FindEntityOverride(entity);
 
-                _dimensionTemplates[i].Apply(dimension);
+            if (overrideItem == null)
+            {
                 return;
             }
 
-            for (var i = 0; i < _dimensionTemplates.Count; i++)
-            {
-                if (_dimensionTemplates[i].LayerName != DxfLayers.Dim)
-                {
-                    continue;
-                }
+            overrideItem.Apply(entity);
+        }
 
-                _dimensionTemplates[i].Apply(dimension);
+        private void ApplyEntityOverride(EntityObject entity, string templateLayerName)
+        {
+            var overrideItem = FindEntityOverride(entity, templateLayerName);
+
+            if (overrideItem == null)
+            {
                 return;
             }
 
-            if (_dimensionTemplates.Count > 0)
-            {
-                _dimensionTemplates[0].Apply(dimension);
-            }
+            overrideItem.Apply(entity);
         }
 
-        private void AddEntityTemplate(EntityObject entity)
+        private DxfDimensionOverride FindDimensionOverride(Dimension dimension)
         {
-            var template = new DxfEntityOverride(entity);
-
-            for (var i = 0; i < _entityTemplates.Count; i++)
+            for (var i = 0; i < _dimensionOverrides.Count; i++)
             {
-                if (_entityTemplates[i].LayerName == template.LayerName && _entityTemplates[i].EntityTypeName == template.EntityTypeName)
+                if (_dimensionOverrides[i].IsMatch(dimension))
                 {
-                    return;
+                    return _dimensionOverrides[i];
                 }
             }
 
-            _entityTemplates.Add(template);
+            return null;
         }
 
-        private void AddDimensionTemplate(Dimension dimension)
+        private DxfDimensionOverride FindDimensionOverride(Dimension dimension, string templateLayerName)
         {
-            var template = new DxfDimensionOverride(dimension);
-
-            for (var i = 0; i < _dimensionTemplates.Count; i++)
+            for (var i = 0; i < _dimensionOverrides.Count; i++)
             {
-                if (_dimensionTemplates[i].LayerName == template.LayerName && _dimensionTemplates[i].StyleName == template.StyleName)
+                if (_dimensionOverrides[i].IsMatch(dimension, templateLayerName))
                 {
-                    return;
+                    return _dimensionOverrides[i];
                 }
             }
 
-            _dimensionTemplates.Add(template);
+            return null;
+        }
+
+        private DxfEntityOverride FindEntityOverride(EntityObject entity)
+        {
+            for (var i = 0; i < _entityOverrides.Count; i++)
+            {
+                if (_entityOverrides[i].IsMatch(entity))
+                {
+                    return _entityOverrides[i];
+                }
+            }
+
+            return null;
+        }
+
+        private DxfEntityOverride FindEntityOverride(EntityObject entity, string templateLayerName)
+        {
+            for (var i = 0; i < _entityOverrides.Count; i++)
+            {
+                if (_entityOverrides[i].IsMatch(entity, templateLayerName))
+                {
+                    return _entityOverrides[i];
+                }
+            }
+
+            return null;
         }
     }
 }

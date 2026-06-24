@@ -1,4 +1,4 @@
-﻿namespace GirderSchedule.Domain.Models
+﻿namespace GirderSchedule.Domain.Enums
 {
     public enum ScheduleSlotType
     {

@@ -1,5 +1,8 @@
 using System;
+using System.Collections.Generic;
+using GirderSchedule.Domain.Layouts;
 using GirderSchedule.Domain.Models;
+using GirderSchedule.Domain.Services;
 using GirderSchedule.Dxf.Constants;
 using GirderSchedule.Dxf.Geometry;
 using GirderSchedule.Dxf.Layouts;
@@ -14,6 +17,8 @@ namespace GirderSchedule.Dxf.Drawers
     {
         private readonly DxfDocument _document;
         private readonly DxfEntityStyler _styler;
+        private readonly ScheduleItemQuery _query = new ScheduleItemQuery();
+        private readonly RebarPointLayoutService _rebarLayoutService = new RebarPointLayoutService();
 
         private BlockCircleInfo _rebarBlockCircleInfo;
 
@@ -60,8 +65,8 @@ namespace GirderSchedule.Dxf.Drawers
                 return;
             }
 
-            var topCount = GetFirstLayerCount(item.TopRebar);
-            var bottomCount = GetFirstLayerCount(item.BottomRebar);
+            var topCount = _query.GetTopFirstCount(item);
+            var bottomCount = _query.GetBottomFirstCount(item);
 
             if (topCount <= 2 || bottomCount <= 2)
             {
@@ -75,9 +80,9 @@ namespace GirderSchedule.Dxf.Drawers
                 return;
             }
 
-            var topXs = GetLayerRebarXs(layout.BarStartX, layout.BarEndX, topCount);
-            var bottomXs = GetLayerRebarXs(layout.BarStartX, layout.BarEndX, bottomCount);
-            var usedBottom = new bool[bottomXs.Length];
+            var topXs = _rebarLayoutService.GetFirstLayerXs(layout.BarStartX, layout.BarEndX, topCount);
+            var bottomXs = _rebarLayoutService.GetFirstLayerXs(layout.BarStartX, layout.BarEndX, bottomCount);
+            var usedBottom = new bool[bottomXs.Count];
             var stirrupTop = layout.OuterTop - SectionRebarLayout.StirrupCover;
             var stirrupBottom = layout.OuterBottom + SectionRebarLayout.StirrupCover;
 
@@ -101,10 +106,10 @@ namespace GirderSchedule.Dxf.Drawers
 
         private void DrawMainRebars(SectionLayout layout, ScheduleItem item)
         {
-            var top1 = GetFirstLayerCount(item.TopRebar);
-            var top2 = ClampCount(GetSecondLayerCount(item.TopRebar), top1);
-            var bottom1 = GetFirstLayerCount(item.BottomRebar);
-            var bottom2 = ClampCount(GetSecondLayerCount(item.BottomRebar), bottom1);
+            var top1 = _query.GetTopFirstCount(item);
+            var top2 = _rebarLayoutService.ClampCount(_query.GetTopSecondCount(item), top1);
+            var bottom1 = _query.GetBottomFirstCount(item);
+            var bottom2 = _rebarLayoutService.ClampCount(_query.GetBottomSecondCount(item), bottom1);
 
             DrawFirstLayerRebars(layout.BarStartX, layout.BarEndX, layout.TopBarY1, top1);
             DrawSecondLayerRebars(layout.BarStartX, layout.BarEndX, layout.TopBarY2, top1, top2);
@@ -114,9 +119,9 @@ namespace GirderSchedule.Dxf.Drawers
 
         private void DrawFirstLayerRebars(double startX, double endX, double y, int count)
         {
-            var xs = GetLayerRebarXs(startX, endX, count);
+            var xs = _rebarLayoutService.GetFirstLayerXs(startX, endX, count);
 
-            for (var i = 0; i < xs.Length; i++)
+            for (var i = 0; i < xs.Count; i++)
             {
                 AddBar(xs[i], y);
             }
@@ -124,48 +129,12 @@ namespace GirderSchedule.Dxf.Drawers
 
         private void DrawSecondLayerRebars(double startX, double endX, double y, int firstLayerCount, int secondLayerCount)
         {
-            if (firstLayerCount <= 0 || secondLayerCount <= 0)
+            var xs = _rebarLayoutService.GetSecondLayerXs(startX, endX, firstLayerCount, secondLayerCount);
+
+            for (var i = 0; i < xs.Count; i++)
             {
-                return;
+                AddBar(xs[i], y);
             }
-
-            if (firstLayerCount == 1)
-            {
-                AddBar(startX, y);
-                return;
-            }
-
-            secondLayerCount = ClampCount(secondLayerCount, firstLayerCount);
-
-            var xs = GetLayerRebarXs(startX, endX, firstLayerCount);
-            var drawn = GetSecondLayerIndexFlags(firstLayerCount, secondLayerCount);
-
-            for (var i = 0; i < xs.Length; i++)
-            {
-                if (drawn[i])
-                {
-                    AddBar(xs[i], y);
-                }
-            }
-        }
-
-        private bool[] GetSecondLayerIndexFlags(int firstLayerCount, int secondLayerCount)
-        {
-            var result = new bool[firstLayerCount];
-            var leftCount = (secondLayerCount + 1) / 2;
-            var rightCount = secondLayerCount / 2;
-
-            for (var i = 0; i < leftCount && i < firstLayerCount; i++)
-            {
-                result[i] = true;
-            }
-
-            for (var i = 0; i < rightCount && i < firstLayerCount; i++)
-            {
-                result[firstLayerCount - 1 - i] = true;
-            }
-
-            return result;
         }
 
         private void DrawSkinRebarMarks(SectionLayout layout, ScheduleItem item)
@@ -339,65 +308,12 @@ namespace GirderSchedule.Dxf.Drawers
             return index < count / 2.0 ? -SectionRebarLayout.RebarRadius : SectionRebarLayout.RebarRadius;
         }
 
-        private int GetFirstLayerCount(RebarSet rebar)
-        {
-            if (rebar == null || rebar.FirstLayer == null || rebar.FirstLayer.Count < 0)
-            {
-                return 0;
-            }
-
-            return rebar.FirstLayer.Count;
-        }
-
-        private int GetSecondLayerCount(RebarSet rebar)
-        {
-            if (rebar == null || rebar.SecondLayer == null || rebar.SecondLayer.Count < 0)
-            {
-                return 0;
-            }
-
-            return rebar.SecondLayer.Count;
-        }
-
-        private int ClampCount(int count, int max)
-        {
-            if (count < 0)
-            {
-                return 0;
-            }
-
-            return count > max ? max : count;
-        }
-
-        private double[] GetLayerRebarXs(double startX, double endX, int count)
-        {
-            if (count <= 0)
-            {
-                return new double[0];
-            }
-
-            if (count == 1)
-            {
-                return new[] { startX };
-            }
-
-            var result = new double[count];
-            var spacing = (endX - startX) / (count - 1);
-
-            for (var i = 0; i < count; i++)
-            {
-                result[i] = startX + spacing * i;
-            }
-
-            return result;
-        }
-
-        private int FindNearestIndex(double[] values, double targetX, bool[] used)
+        private int FindNearestIndex(IList<double> values, double targetX, bool[] used)
         {
             var index = -1;
             var distance = double.MaxValue;
 
-            for (var i = 0; i < values.Length; i++)
+            for (var i = 0; i < values.Count; i++)
             {
                 if (used != null && i < used.Length && used[i])
                 {

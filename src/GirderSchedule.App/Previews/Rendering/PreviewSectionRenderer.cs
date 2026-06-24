@@ -1,6 +1,8 @@
-using GirderSchedule.App.Preview.Layouts;
-using GirderSchedule.App.Preview.Models;
+using GirderSchedule.App.Previews.Layouts;
+using GirderSchedule.App.Previews.Models;
+using GirderSchedule.Domain.Layouts;
 using GirderSchedule.Domain.Models;
+using GirderSchedule.Domain.Services;
 using System;
 using System.Globalization;
 using System.Windows;
@@ -8,7 +10,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
-namespace GirderSchedule.App.Preview.Rendering
+namespace GirderSchedule.App.Previews.Rendering
 {
     public sealed class PreviewSectionRenderer
     {
@@ -20,6 +22,8 @@ namespace GirderSchedule.App.Preview.Rendering
         private readonly Brush _barBrush = new SolidColorBrush(Color.FromRgb(70, 70, 70));
         private readonly PreviewCanvasDrawer _drawer = new PreviewCanvasDrawer();
         private readonly PreviewSectionLayoutFactory _layoutFactory = new PreviewSectionLayoutFactory();
+        private readonly ScheduleItemQuery _query = new ScheduleItemQuery();
+        private readonly RebarPointLayoutService _rebarLayoutService = new RebarPointLayoutService();
 
         public void Draw(Canvas canvas, ScheduleItem item, double areaX, double areaY, double areaWidth, double areaHeight, bool isWidthOver, bool isHeightOver, PreviewSectionRenderOptions options)
         {
@@ -84,10 +88,10 @@ namespace GirderSchedule.App.Preview.Rendering
 
         private void DrawMainRebars(Canvas canvas, PreviewSectionLayout layout, ScheduleItem item, PreviewSectionRenderOptions options)
         {
-            var topFirstCount = GetTopFirstCount(item);
-            var topSecondCount = GetTopSecondCount(item);
-            var bottomFirstCount = GetBottomFirstCount(item);
-            var bottomSecondCount = GetBottomSecondCount(item);
+            var topFirstCount = _query.GetTopFirstCount(item);
+            var topSecondCount = _rebarLayoutService.ClampCount(_query.GetTopSecondCount(item), topFirstCount);
+            var bottomFirstCount = _query.GetBottomFirstCount(item);
+            var bottomSecondCount = _rebarLayoutService.ClampCount(_query.GetBottomSecondCount(item), bottomFirstCount);
 
             DrawFirstLayerRebars(canvas, layout.BarStartX, layout.BarEndX, layout.TopBarY1, topFirstCount, options.BarRadius);
             DrawSecondLayerRebars(canvas, layout.BarStartX, layout.BarEndX, layout.TopBarY2, topFirstCount, topSecondCount, options.BarRadius);
@@ -98,66 +102,21 @@ namespace GirderSchedule.App.Preview.Rendering
 
         private void DrawFirstLayerRebars(Canvas canvas, double startX, double endX, double y, int count, double radius)
         {
-            if (count <= 0)
-            {
-                return;
-            }
+            var xs = _rebarLayoutService.GetFirstLayerXs(startX, endX, count);
 
-            if (count == 1)
+            for (var i = 0; i < xs.Count; i++)
             {
-                AddBar(canvas, startX, y, radius);
-                return;
-            }
-
-            var spacing = (endX - startX) / (count - 1);
-
-            for (var i = 0; i < count; i++)
-            {
-                AddBar(canvas, startX + spacing * i, y, radius);
+                AddBar(canvas, xs[i], y, radius);
             }
         }
 
         private void DrawSecondLayerRebars(Canvas canvas, double startX, double endX, double y, int firstLayerCount, int secondLayerCount, double radius)
         {
-            if (firstLayerCount <= 0 || secondLayerCount <= 0)
+            var xs = _rebarLayoutService.GetSecondLayerXs(startX, endX, firstLayerCount, secondLayerCount);
+
+            for (var i = 0; i < xs.Count; i++)
             {
-                return;
-            }
-
-            if (firstLayerCount == 1)
-            {
-                AddBar(canvas, startX, y, radius);
-                return;
-            }
-
-            if (secondLayerCount > firstLayerCount)
-            {
-                secondLayerCount = firstLayerCount;
-            }
-
-            var spacing = (endX - startX) / (firstLayerCount - 1);
-            var leftCount = (secondLayerCount + 1) / 2;
-            var rightCount = secondLayerCount / 2;
-            var drawn = new bool[firstLayerCount];
-
-            for (var i = 0; i < leftCount && i < firstLayerCount; i++)
-            {
-                drawn[i] = true;
-            }
-
-            for (var i = 0; i < rightCount && i < firstLayerCount; i++)
-            {
-                drawn[firstLayerCount - 1 - i] = true;
-            }
-
-            for (var i = 0; i < firstLayerCount; i++)
-            {
-                if (!drawn[i])
-                {
-                    continue;
-                }
-
-                AddBar(canvas, startX + spacing * i, y, radius);
+                AddBar(canvas, xs[i], y, radius);
             }
         }
 
@@ -168,9 +127,9 @@ namespace GirderSchedule.App.Preview.Rendering
 
         private void DrawStirrups(Canvas canvas, PreviewSectionLayout layout, ScheduleItem item, PreviewSectionRenderOptions options)
         {
-            var topFirstLayerCount = GetTopFirstCount(item);
-            var bottomFirstLayerCount = GetBottomFirstCount(item);
-            var stirrupLegs = GetStirrupLegs(item);
+            var topFirstLayerCount = _query.GetTopFirstCount(item);
+            var bottomFirstLayerCount = _query.GetBottomFirstCount(item);
+            var stirrupLegs = _query.GetStirrupLegs(item);
 
             if (stirrupLegs <= 2)
             {
@@ -190,8 +149,8 @@ namespace GirderSchedule.App.Preview.Rendering
                 return;
             }
 
-            var topXs = GetLayerRebarXs(layout.BarStartX, layout.BarEndX, topFirstLayerCount);
-            var bottomXs = GetLayerRebarXs(layout.BarStartX, layout.BarEndX, bottomFirstLayerCount);
+            var topXs = _rebarLayoutService.GetFirstLayerXs(layout.BarStartX, layout.BarEndX, topFirstLayerCount);
+            var bottomXs = _rebarLayoutService.GetFirstLayerXs(layout.BarStartX, layout.BarEndX, bottomFirstLayerCount);
             var usedBottom = new bool[bottomFirstLayerCount];
 
             for (var i = 1; i <= innerCount; i++)
@@ -231,35 +190,12 @@ namespace GirderSchedule.App.Preview.Rendering
             }
         }
 
-        private static double[] GetLayerRebarXs(double startX, double endX, int count)
-        {
-            if (count <= 0)
-            {
-                return new double[0];
-            }
-
-            if (count == 1)
-            {
-                return new[] { startX };
-            }
-
-            var values = new double[count];
-            var spacing = (endX - startX) / (count - 1);
-
-            for (var i = 0; i < count; i++)
-            {
-                values[i] = startX + spacing * i;
-            }
-
-            return values;
-        }
-
-        private static int FindNearestIndex(double[] values, double targetX, bool[] used)
+        private static int FindNearestIndex(System.Collections.Generic.IList<double> values, double targetX, bool[] used)
         {
             var index = -1;
             var distance = double.MaxValue;
 
-            for (var i = 0; i < values.Length; i++)
+            for (var i = 0; i < values.Count; i++)
             {
                 if (used != null && i < used.Length && used[i])
                 {
@@ -383,31 +319,6 @@ namespace GirderSchedule.App.Preview.Rendering
             }
 
             return text + " 이상";
-        }
-
-        private static int GetTopFirstCount(ScheduleItem item)
-        {
-            return item == null || item.TopRebar == null || item.TopRebar.FirstLayer == null ? 0 : item.TopRebar.FirstLayer.Count;
-        }
-
-        private static int GetTopSecondCount(ScheduleItem item)
-        {
-            return item == null || item.TopRebar == null || item.TopRebar.SecondLayer == null ? 0 : item.TopRebar.SecondLayer.Count;
-        }
-
-        private static int GetBottomFirstCount(ScheduleItem item)
-        {
-            return item == null || item.BottomRebar == null || item.BottomRebar.FirstLayer == null ? 0 : item.BottomRebar.FirstLayer.Count;
-        }
-
-        private static int GetBottomSecondCount(ScheduleItem item)
-        {
-            return item == null || item.BottomRebar == null || item.BottomRebar.SecondLayer == null ? 0 : item.BottomRebar.SecondLayer.Count;
-        }
-
-        private static int GetStirrupLegs(ScheduleItem item)
-        {
-            return item == null || item.Stirrup == null ? 0 : item.Stirrup.Legs;
         }
 
         private static double Clamp(double value, double min, double max)

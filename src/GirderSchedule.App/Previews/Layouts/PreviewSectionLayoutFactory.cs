@@ -1,7 +1,7 @@
 using System;
-using GirderSchedule.App.Preview.Models;
+using GirderSchedule.App.Previews.Models;
 
-namespace GirderSchedule.App.Preview.Layouts
+namespace GirderSchedule.App.Previews.Layouts
 {
     public sealed class PreviewSectionLayoutFactory
     {

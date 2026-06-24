@@ -1,4 +1,4 @@
-namespace GirderSchedule.App.Preview.Models
+namespace GirderSchedule.App.Previews.Models
 {
     public sealed class PreviewSectionRenderOptions
     {

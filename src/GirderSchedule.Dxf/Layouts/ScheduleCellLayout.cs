@@ -1,4 +1,4 @@
-﻿using GirderSchedule.Domain.Models;
+﻿using GirderSchedule.Domain.Enums;
 using GirderSchedule.Dxf.Geometry;
 
 namespace GirderSchedule.Dxf.Layouts

@@ -4,7 +4,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
-namespace GirderSchedule.App.Preview.Rendering
+namespace GirderSchedule.App.Previews.Rendering
 {
     public sealed class PreviewCanvasDrawer
     {

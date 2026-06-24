@@ -1,7 +1,7 @@
 using ClosedXML.Excel;
 using GirderSchedule.Domain.Models;
 using GirderSchedule.Excel.Constants;
-using GirderSchedule.Excel.Layout;
+using GirderSchedule.Excel.Layouts;
 using GirderSchedule.Excel.Utils;
 
 namespace GirderSchedule.Excel

@@ -1,3 +1,4 @@
+using GirderSchedule.Domain.Enums;
 using GirderSchedule.Domain.Models;
 using GirderSchedule.Dxf.Export;
 using GirderSchedule.Dxf.Geometry;

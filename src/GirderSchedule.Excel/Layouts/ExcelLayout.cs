@@ -1,4 +1,4 @@
-namespace GirderSchedule.Excel.Layout
+namespace GirderSchedule.Excel.Layouts
 {
     public static class ExcelLayout
     {

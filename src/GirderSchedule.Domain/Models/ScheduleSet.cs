@@ -1,4 +1,6 @@
-﻿namespace GirderSchedule.Domain.Models
+﻿using GirderSchedule.Domain.Enums;
+
+namespace GirderSchedule.Domain.Models
 {
     public sealed class ScheduleSet
     {

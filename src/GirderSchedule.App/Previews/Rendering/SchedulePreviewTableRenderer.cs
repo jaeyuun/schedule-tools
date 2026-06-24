@@ -1,9 +1,9 @@
 using System.Windows.Controls;
-using GirderSchedule.App.Preview.Formatting;
-using GirderSchedule.App.Preview.Models;
+using GirderSchedule.App.Previews.Formatting;
+using GirderSchedule.App.Previews.Models;
 using GirderSchedule.Domain.Models;
 
-namespace GirderSchedule.App.Preview.Rendering
+namespace GirderSchedule.App.Previews.Rendering
 {
     public sealed class SchedulePreviewTableRenderer
     {
