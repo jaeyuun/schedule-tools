@@ -1,15 +1,15 @@
 using System;
 using System.Windows;
 using System.Windows.Controls;
-using GirderSchedule.App.Previews.Models;
-using GirderSchedule.App.Previews.Rendering;
+using GirderSchedule.App.Rendering.Models;
+using GirderSchedule.App.Rendering.Section;
 using GirderSchedule.App.ViewModels.Schedule;
 
 namespace GirderSchedule.App.Views.Schedule
 {
     public partial class ScheduleSetEditor : UserControl
     {
-        private readonly PreviewSectionRenderer _sectionRenderer = new PreviewSectionRenderer();
+        private readonly SectionRenderer _sectionRenderer = new SectionRenderer();
         private bool _isRedrawQueued;
 
         public ScheduleSetEditor()

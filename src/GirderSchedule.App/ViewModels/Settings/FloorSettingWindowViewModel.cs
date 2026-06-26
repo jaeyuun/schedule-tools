@@ -6,6 +6,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Input;
+using System.Xml.XPath;
 
 namespace GirderSchedule.App.ViewModels.Settings
 {
@@ -139,9 +140,9 @@ namespace GirderSchedule.App.ViewModels.Settings
             floor.Setting.FloorPrefix = InputFloorPrefix.Trim();
             floor.Name = InputFloorName.Trim();
             floor.Setting.FloorName = floor.Name;
-            floor.Setting.MainRebarDiameter = ParseInt(InputMainRebarDiameter);
-            floor.Setting.StirrupDiameter = ParseInt(InputStirrupDiameter);
-            floor.Setting.SkinRebarDiameter = ParseInt(InputSkinRebarDiameter);
+            floor.Setting.MainRebarDiameter = ParseDouble(InputMainRebarDiameter);
+            floor.Setting.StirrupDiameter = ParseDouble(InputStirrupDiameter);
+            floor.Setting.SkinRebarDiameter = ParseDouble(InputSkinRebarDiameter);
 
             var set = _setFactory.Create("1G1", floor.Setting);
             floor.Sets.Add(set);
@@ -166,9 +167,9 @@ namespace GirderSchedule.App.ViewModels.Settings
 
             SelectedFloor.FloorPrefix = InputFloorPrefix.Trim();
             SelectedFloor.Name = InputFloorName.Trim();
-            SelectedFloor.MainRebarDiameter = ParseInt(InputMainRebarDiameter);
-            SelectedFloor.StirrupDiameter = ParseInt(InputStirrupDiameter);
-            SelectedFloor.SkinRebarDiameter = ParseInt(InputSkinRebarDiameter);
+            SelectedFloor.MainRebarDiameter = ParseDouble(InputMainRebarDiameter);
+            SelectedFloor.StirrupDiameter = ParseDouble(InputStirrupDiameter);
+            SelectedFloor.SkinRebarDiameter = ParseDouble(InputSkinRebarDiameter);
             SelectedFloor.RefreshAll();
 
             RaiseFloorSettingChanged();
@@ -245,9 +246,31 @@ namespace GirderSchedule.App.ViewModels.Settings
             return 0;
         }
 
+        private double ParseDouble(string value)
+        {
+            double result;
+
+            if (double.TryParse(value, out result))
+            {
+                return result;
+            }
+
+            return 0.0;
+        }
+
         private string ToInputText(int value)
         {
             if (value <= 0)
+            {
+                return string.Empty;
+            }
+
+            return value.ToString();
+        }
+
+        private string ToInputText(double value)
+        {
+            if (value <= 0.0)
             {
                 return string.Empty;
             }

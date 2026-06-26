@@ -1,4 +1,4 @@
-namespace GirderSchedule.App.Previews.Models
+namespace GirderSchedule.App.Rendering.Models
 {
     public static class SchedulePreviewLayout
     {

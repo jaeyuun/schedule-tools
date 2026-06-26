@@ -1,6 +1,7 @@
 ﻿<UserControl x:Class="GirderSchedule.App.Views.Schedule.ScheduleSetEditor"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:behaviors="clr-namespace:GirderSchedule.App.Behaviors">
 
     <UserControl.Resources>
         <Style x:Key="CellTextBoxStyle" TargetType="TextBox">
@@ -47,13 +48,11 @@
 
                 <TextBlock Grid.Row="0" Grid.Column="0" Margin="0,0,4,0" VerticalAlignment="Center" Text="1단"/>
                 <TextBox Grid.Row="0" Grid.Column="1" Style="{StaticResource SmallTextBoxStyle}" Text="{Binding TopCount1, UpdateSourceTrigger=PropertyChanged}"/>
-
                 <TextBlock Grid.Row="1" Grid.Column="0" Margin="0,0,4,0" VerticalAlignment="Center" Text="2단"/>
                 <TextBox Grid.Row="1" Grid.Column="1" Style="{StaticResource SmallTextBoxStyle}" Text="{Binding TopCount2, UpdateSourceTrigger=PropertyChanged}"/>
-
                 <TextBlock Grid.Row="0" Grid.RowSpan="2" Grid.Column="2" Width="20" Margin="0,0,4,0" VerticalAlignment="Center" HorizontalAlignment="Right" TextAlignment="Right" Text="{Binding TopTotalCount}"/>
                 <TextBlock Grid.Row="0" Grid.RowSpan="2" Grid.Column="3" Margin="0,0,4,0" VerticalAlignment="Center" Text="- HD"/>
-                <TextBox Grid.Row="0" Grid.RowSpan="2" Grid.Column="4" Style="{StaticResource SmallTextBoxStyle}" Text="{Binding TopDiameter, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox Grid.Row="0" Grid.RowSpan="2" Grid.Column="4" Style="{StaticResource SmallTextBoxStyle}" behaviors:NumericTextBoxBehavior.PropertyName="TopDiameter" behaviors:NumericTextBoxBehavior.AllowNegative="False"/>
             </Grid>
         </DataTemplate>
 
@@ -73,14 +72,12 @@
                 </Grid.RowDefinitions>
 
                 <TextBlock Grid.Row="0" Grid.Column="0" Margin="0,0,4,0" VerticalAlignment="Center" Text="2단"/>
-                <TextBox Grid.Row="0" Grid.Column="1" Style="{StaticResource SmallTextBoxStyle}" Text="{Binding BottomCount1, UpdateSourceTrigger=PropertyChanged}"/>
-                
+                <TextBox Grid.Row="0" Grid.Column="1" Style="{StaticResource SmallTextBoxStyle}" Text="{Binding BottomCount2, UpdateSourceTrigger=PropertyChanged}"/>
                 <TextBlock Grid.Row="1" Grid.Column="0" Margin="0,0,4,0" VerticalAlignment="Center" Text="1단"/>
-                <TextBox Grid.Row="1" Grid.Column="1" Style="{StaticResource SmallTextBoxStyle}" Text="{Binding BottomCount2, UpdateSourceTrigger=PropertyChanged}"/>
-
+                <TextBox Grid.Row="1" Grid.Column="1" Style="{StaticResource SmallTextBoxStyle}" Text="{Binding BottomCount1, UpdateSourceTrigger=PropertyChanged}"/>
                 <TextBlock Grid.Row="0" Grid.RowSpan="2" Grid.Column="2" Width="20" Margin="0,0,4,0" VerticalAlignment="Center" HorizontalAlignment="Right" TextAlignment="Right" Text="{Binding BottomTotalCount}"/>
                 <TextBlock Grid.Row="0" Grid.RowSpan="2" Grid.Column="3" Margin="0,0,4,0" VerticalAlignment="Center" Text="- HD"/>
-                <TextBox Grid.Row="0" Grid.RowSpan="2" Grid.Column="4" Style="{StaticResource SmallTextBoxStyle}" Text="{Binding BottomDiameter, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox Grid.Row="0" Grid.RowSpan="2" Grid.Column="4" Style="{StaticResource SmallTextBoxStyle}" behaviors:NumericTextBoxBehavior.PropertyName="BottomDiameter" behaviors:NumericTextBoxBehavior.AllowNegative="False"/>
             </Grid>
         </DataTemplate>
 
@@ -88,16 +85,9 @@
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
                 <TextBox Style="{StaticResource SmallTextBoxStyle}" Margin="2,0" Text="{Binding StirrupLegs, UpdateSourceTrigger=PropertyChanged}"/>
                 <TextBlock Text="- HD" VerticalAlignment="Center"/>
-                <TextBox Style="{StaticResource SmallTextBoxStyle}" Margin="2,0" Text="{Binding StirrupDiameter, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox Style="{StaticResource SmallTextBoxStyle}" Margin="2,0" behaviors:NumericTextBoxBehavior.PropertyName="StirrupDiameter" behaviors:NumericTextBoxBehavior.AllowNegative="False"/>
                 <TextBlock Text="@" VerticalAlignment="Center"/>
-                <TextBox Width="44"
-                         Height="20"
-                         Margin="2,0"
-                         Padding="0"
-                         HorizontalContentAlignment="Center"
-                         VerticalContentAlignment="Center"
-                         FocusVisualStyle="{x:Null}"
-                         Text="{Binding StirrupSpacing, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox Width="44" Height="20" Margin="2,0" Padding="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FocusVisualStyle="{x:Null}" behaviors:NumericTextBoxBehavior.PropertyName="StirrupSpacing" behaviors:NumericTextBoxBehavior.AllowNegative="False"/>
             </StackPanel>
         </DataTemplate>
 
@@ -105,9 +95,9 @@
             <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
                     <TextBlock Text="HD" VerticalAlignment="Center"/>
-                    <TextBox Style="{StaticResource SmallTextBoxStyle}" Margin="2,0" Text="{Binding SkinRebarDiameter, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBox Style="{StaticResource SmallTextBoxStyle}" Margin="2,0" behaviors:NumericTextBoxBehavior.PropertyName="SkinRebarDiameter" behaviors:NumericTextBoxBehavior.AllowNegative="False"/>
                     <TextBlock Text="@" VerticalAlignment="Center"/>
-                    <TextBox Width="44" Height="20" Margin="2,0" Padding="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FocusVisualStyle="{x:Null}" Text="{Binding SkinRebarSpacing, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBox Width="44" Height="20" Margin="2,0" Padding="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FocusVisualStyle="{x:Null}" behaviors:NumericTextBoxBehavior.PropertyName="SkinRebarSpacing" behaviors:NumericTextBoxBehavior.AllowNegative="False"/>
                 </StackPanel>
 
                 <TextBox Width="150" Height="20" Margin="0,4,0,0" Padding="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FocusVisualStyle="{x:Null}" Text="{Binding SkinRebarNote, UpdateSourceTrigger=PropertyChanged}"/>
@@ -125,24 +115,9 @@
                 </Grid.ColumnDefinitions>
 
                 <TextBlock Grid.Column="0" Text="M =" VerticalAlignment="Center" Margin="0,0,4,0"/>
-                <TextBox Grid.Column="1"
-                         Width="54"
-                         Height="20"
-                         Padding="0"
-                         HorizontalContentAlignment="Center"
-                         VerticalContentAlignment="Center"
-                         FocusVisualStyle="{x:Null}"
-                         Text="{Binding MomentValue, UpdateSourceTrigger=PropertyChanged}"/>
-
+                <TextBox Grid.Column="1" Width="54" Height="20" Padding="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FocusVisualStyle="{x:Null}" behaviors:NumericTextBoxBehavior.PropertyName="MomentValue" behaviors:NumericTextBoxBehavior.AllowNegative="True"/>
                 <TextBlock Grid.Column="3" Text="V =" VerticalAlignment="Center" Margin="0,0,4,0"/>
-                <TextBox Grid.Column="4"
-                         Width="54"
-                         Height="20"
-                         Padding="0"
-                         HorizontalContentAlignment="Center"
-                         VerticalContentAlignment="Center"
-                         FocusVisualStyle="{x:Null}"
-                         Text="{Binding ShearValue, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox Grid.Column="4" Width="54" Height="20" Padding="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FocusVisualStyle="{x:Null}" behaviors:NumericTextBoxBehavior.PropertyName="ShearValue" behaviors:NumericTextBoxBehavior.AllowNegative="True"/>
             </Grid>
         </DataTemplate>
 
@@ -201,30 +176,16 @@
 
                     <Border Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="3" BorderBrush="#B8B8B8" BorderThickness="0,1,1,1">
                         <StackPanel VerticalAlignment="Center">
-                            <TextBox Width="240"
-                                     Height="24"
-                                     Text="{Binding MemberName, UpdateSourceTrigger=PropertyChanged}"/>
-
+                            <TextBox Width="240" Height="24" Text="{Binding MemberName, UpdateSourceTrigger=PropertyChanged}"/>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,6,0,0">
                                 <TextBlock VerticalAlignment="Center" Text="(" FontSize="16"/>
-
-                                <TextBox Width="60"
-                                         Height="22"
-                                         Margin="4,0"
-                                         Text="{Binding WidthValue, UpdateSourceTrigger=PropertyChanged}"/>
-
+                                <TextBox Width="60" Height="22" Margin="4,0" behaviors:NumericTextBoxBehavior.PropertyName="WidthValue" behaviors:NumericTextBoxBehavior.AllowNegative="False"/>
                                 <TextBlock VerticalAlignment="Center" Text="×" FontSize="15"/>
-
                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                                     <CheckBox IsChecked="{Binding IsHeightOver, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center"/>
                                     <TextBlock Text="이상" Margin="4,0,0,0" VerticalAlignment="Center"/>
                                 </StackPanel>
-
-                                <TextBox Width="60"
-                                         Height="22"
-                                         Margin="4,0"
-                                         Text="{Binding HeightValue, UpdateSourceTrigger=PropertyChanged}"/>
-
+                                <TextBox Width="60" Height="22" Margin="4,0" behaviors:NumericTextBoxBehavior.PropertyName="HeightValue" behaviors:NumericTextBoxBehavior.AllowNegative="False"/>
                                 <TextBlock VerticalAlignment="Center" Text=")" FontSize="16"/>
                             </StackPanel>
                         </StackPanel>
@@ -233,19 +194,15 @@
                     <Border Grid.Row="1" Grid.Column="0" BorderBrush="#B8B8B8" BorderThickness="1,0,1,1">
                         <TextBlock Text="단    면" Style="{StaticResource LabelCellTextBlockStyle}"/>
                     </Border>
-
                     <Border Grid.Row="2" Grid.Column="0" BorderBrush="#B8B8B8" BorderThickness="1,0,1,1">
                         <TextBlock Text="상 부 근" Style="{StaticResource LabelCellTextBlockStyle}"/>
                     </Border>
-
                     <Border Grid.Row="3" Grid.Column="0" BorderBrush="#B8B8B8" BorderThickness="1,0,1,1">
                         <TextBlock Text="하 부 근" Style="{StaticResource LabelCellTextBlockStyle}"/>
                     </Border>
-
                     <Border Grid.Row="4" Grid.Column="0" BorderBrush="#B8B8B8" BorderThickness="1,0,1,1">
                         <TextBlock Text="스 터 럽" Style="{StaticResource LabelCellTextBlockStyle}"/>
                     </Border>
-
                     <Border Grid.Row="5" Grid.Column="0" BorderBrush="#B8B8B8" BorderThickness="1,0,1,1">
                         <TextBlock Text="표피철근(X)" Style="{StaticResource LabelCellTextBlockStyle}"/>
                     </Border>
@@ -269,19 +226,12 @@
                                 </Grid.RowDefinitions>
 
                                 <StackPanel Grid.Row="0" Margin="18,6,18,2" Orientation="Horizontal" HorizontalAlignment="Center">
-                                    <CheckBox VerticalAlignment="Center"
-                                              IsChecked="{Binding Left.IsSectionEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                                    <TextBox Width="182"
-                                             Height="20"
-                                             Margin="4,0,0,0"
-                                             IsEnabled="{Binding Left.IsSectionEnabled}"
-                                             Text="{Binding Left.Position, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <CheckBox VerticalAlignment="Center" IsChecked="{Binding Left.IsSectionEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <TextBox Width="182" Height="20" Margin="4,0,0,0" IsEnabled="{Binding Left.IsSectionEnabled}" Text="{Binding Left.Position, UpdateSourceTrigger=PropertyChanged}"/>
                                 </StackPanel>
 
                                 <ContentControl Grid.Row="1" IsEnabled="{Binding Left.IsSectionEnabled}" Content="{Binding Left}" ContentTemplate="{StaticResource MemberForceInputTemplate}"/>
-
                                 <Canvas x:Name="LeftCanvas" Grid.Row="2" Width="200" Height="240" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-
                                 <TextBox Grid.Row="3" IsEnabled="{Binding Left.IsSectionEnabled}" Style="{StaticResource SectionNoteTextBoxStyle}" Text="{Binding Left.SectionNote, UpdateSourceTrigger=PropertyChanged}"/>
                             </Grid>
                         </Border>
@@ -289,15 +239,12 @@
                         <Border Grid.Row="1" BorderBrush="#B8B8B8" BorderThickness="0,0,1,1" IsEnabled="{Binding Left.IsSectionEnabled}">
                             <ContentControl Content="{Binding Left}" ContentTemplate="{StaticResource RebarInputTemplate}"/>
                         </Border>
-
                         <Border Grid.Row="2" BorderBrush="#B8B8B8" BorderThickness="0,0,1,1" IsEnabled="{Binding Left.IsSectionEnabled}">
                             <ContentControl Content="{Binding Left}" ContentTemplate="{StaticResource BottomRebarInputTemplate}"/>
                         </Border>
-
                         <Border Grid.Row="3" BorderBrush="#B8B8B8" BorderThickness="0,0,1,1" IsEnabled="{Binding Left.IsSectionEnabled}">
                             <ContentControl Content="{Binding Left}" ContentTemplate="{StaticResource StirrupInputTemplate}"/>
                         </Border>
-
                         <Border Grid.Row="4" BorderBrush="#B8B8B8" BorderThickness="0,0,1,1" IsEnabled="{Binding Left.IsSectionEnabled}">
                             <ContentControl Content="{Binding Left}" ContentTemplate="{StaticResource SkinRebarInputTemplate}"/>
                         </Border>
@@ -322,15 +269,11 @@
                                 </Grid.RowDefinitions>
 
                                 <StackPanel Grid.Row="0" Margin="18,6,18,2" Orientation="Horizontal" HorizontalAlignment="Center">
-                                    <TextBox Width="182"
-                                             Height="20"
-                                             Text="{Binding Center.Position, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <TextBox Width="182" Height="20" Text="{Binding Center.Position, UpdateSourceTrigger=PropertyChanged}"/>
                                 </StackPanel>
 
                                 <ContentControl Grid.Row="1" Content="{Binding Center}" ContentTemplate="{StaticResource MemberForceInputTemplate}"/>
-
                                 <Canvas x:Name="CenterCanvas" Grid.Row="2" Width="200" Height="240" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-
                                 <TextBox Grid.Row="3" IsEnabled="{Binding Center.IsSectionEnabled}" Style="{StaticResource SectionNoteTextBoxStyle}" Text="{Binding Center.SectionNote, UpdateSourceTrigger=PropertyChanged}"/>
                             </Grid>
                         </Border>
@@ -338,15 +281,12 @@
                         <Border Grid.Row="1" BorderBrush="#B8B8B8" BorderThickness="0,0,1,1">
                             <ContentControl Content="{Binding Center}" ContentTemplate="{StaticResource RebarInputTemplate}"/>
                         </Border>
-
                         <Border Grid.Row="2" BorderBrush="#B8B8B8" BorderThickness="0,0,1,1">
                             <ContentControl Content="{Binding Center}" ContentTemplate="{StaticResource BottomRebarInputTemplate}"/>
                         </Border>
-
                         <Border Grid.Row="3" BorderBrush="#B8B8B8" BorderThickness="0,0,1,1">
                             <ContentControl Content="{Binding Center}" ContentTemplate="{StaticResource StirrupInputTemplate}"/>
                         </Border>
-
                         <Border Grid.Row="4" BorderBrush="#B8B8B8" BorderThickness="0,0,1,1">
                             <ContentControl Content="{Binding Center}" ContentTemplate="{StaticResource SkinRebarInputTemplate}"/>
                         </Border>
@@ -371,19 +311,12 @@
                                 </Grid.RowDefinitions>
 
                                 <StackPanel Grid.Row="0" Margin="18,6,18,2" Orientation="Horizontal" HorizontalAlignment="Center">
-                                    <CheckBox VerticalAlignment="Center"
-                                              IsChecked="{Binding Right.IsSectionEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                                    <TextBox Width="182"
-                                             Height="20"
-                                             Margin="4,0,0,0"
-                                             IsEnabled="{Binding Right.IsSectionEnabled}"
-                                             Text="{Binding Right.Position, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <CheckBox VerticalAlignment="Center" IsChecked="{Binding Right.IsSectionEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <TextBox Width="182" Height="20" Margin="4,0,0,0" IsEnabled="{Binding Right.IsSectionEnabled}" Text="{Binding Right.Position, UpdateSourceTrigger=PropertyChanged}"/>
                                 </StackPanel>
 
                                 <ContentControl Grid.Row="1" IsEnabled="{Binding Right.IsSectionEnabled}" Content="{Binding Right}" ContentTemplate="{StaticResource MemberForceInputTemplate}"/>
-
                                 <Canvas x:Name="RightCanvas" Grid.Row="2" Width="200" Height="240" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-
                                 <TextBox Grid.Row="3" IsEnabled="{Binding Right.IsSectionEnabled}" Style="{StaticResource SectionNoteTextBoxStyle}" Text="{Binding Right.SectionNote, UpdateSourceTrigger=PropertyChanged}"/>
                             </Grid>
                         </Border>
@@ -391,15 +324,12 @@
                         <Border Grid.Row="1" BorderBrush="#B8B8B8" BorderThickness="0,0,1,1" IsEnabled="{Binding Right.IsSectionEnabled}">
                             <ContentControl Content="{Binding Right}" ContentTemplate="{StaticResource RebarInputTemplate}"/>
                         </Border>
-
                         <Border Grid.Row="2" BorderBrush="#B8B8B8" BorderThickness="0,0,1,1" IsEnabled="{Binding Right.IsSectionEnabled}">
                             <ContentControl Content="{Binding Right}" ContentTemplate="{StaticResource BottomRebarInputTemplate}"/>
                         </Border>
-
                         <Border Grid.Row="3" BorderBrush="#B8B8B8" BorderThickness="0,0,1,1" IsEnabled="{Binding Right.IsSectionEnabled}">
                             <ContentControl Content="{Binding Right}" ContentTemplate="{StaticResource StirrupInputTemplate}"/>
                         </Border>
-
                         <Border Grid.Row="4" BorderBrush="#B8B8B8" BorderThickness="0,0,1,1" IsEnabled="{Binding Right.IsSectionEnabled}">
                             <ContentControl Content="{Binding Right}" ContentTemplate="{StaticResource SkinRebarInputTemplate}"/>
                         </Border>

@@ -4,9 +4,9 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
-namespace GirderSchedule.App.Previews.Rendering
+namespace GirderSchedule.App.Rendering
 {
-    public sealed class PreviewCanvasDrawer
+    public sealed class CanvasDrawer
     {
         public void DrawLine(Canvas canvas, double x1, double y1, double x2, double y2, Brush stroke, double thickness)
         {

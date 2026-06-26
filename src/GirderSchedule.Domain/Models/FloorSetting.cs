@@ -4,8 +4,8 @@
     {
         public string FloorPrefix { get; set; } = string.Empty;
         public string FloorName { get; set; } = string.Empty;
-        public int MainRebarDiameter { get; set; }
-        public int StirrupDiameter { get; set; }
-        public int SkinRebarDiameter { get; set; }
+        public double MainRebarDiameter { get; set; }
+        public double StirrupDiameter { get; set; }
+        public double SkinRebarDiameter { get; set; }
     }
 }

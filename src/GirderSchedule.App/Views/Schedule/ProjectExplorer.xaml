@@ -41,20 +41,7 @@
                 <Button Grid.Column="2" Content="부재 삭제" Height="24" Command="{Binding RemoveSetCommand}"/>
             </Grid>
 
-            <TreeView x:Name="ProjectTreeView"
-                Focusable="True"
-                Grid.Row="3"
-                ItemsSource="{Binding Floors}"
-                Background="White"
-                BorderBrush="#C8C8C8"
-                BorderThickness="1"
-                AllowDrop="True"
-                PreviewMouseLeftButtonDown="ProjectTreeView_PreviewMouseLeftButtonDown"
-                PreviewMouseRightButtonDown="ProjectTreeView_PreviewMouseRightButtonDown"
-                MouseMove="ProjectTreeView_MouseMove"
-                DragOver="ProjectTreeView_DragOver"
-                Drop="ProjectTreeView_Drop">
-
+            <TreeView x:Name="ProjectTreeView" Focusable="True" Grid.Row="3" ItemsSource="{Binding Floors}" Background="White" BorderBrush="#C8C8C8" BorderThickness="1" AllowDrop="True">
                 <TreeView.InputBindings>
                     <KeyBinding Key="C" Modifiers="Control" Command="{Binding CopyScheduleSetCommand}"/>
                     <KeyBinding Key="V" Modifiers="Control" Command="{Binding PasteScheduleSetCommand}"/>
@@ -80,37 +67,18 @@
                                             <RowDefinition Height="Auto"/>
                                         </Grid.RowDefinitions>
 
-                                        <Border x:Name="Bd"
-                                            Grid.Row="0"
-                                            Background="Transparent"
-                                            BorderBrush="{TemplateBinding BorderBrush}"
-                                            BorderThickness="{TemplateBinding BorderThickness}"
-                                            MinHeight="{TemplateBinding MinHeight}"
-                                            Padding="0">
+                                        <Border x:Name="Bd" Grid.Row="0" Background="Transparent" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" MinHeight="{TemplateBinding MinHeight}" Padding="0">
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="18"/>
                                                     <ColumnDefinition Width="*"/>
                                                 </Grid.ColumnDefinitions>
 
-                                                <ToggleButton x:Name="Expander"
-                                                              Grid.Column="0"
-                                                              Width="18"
-                                                              Height="18"
-                                                              VerticalAlignment="Center"
-                                                              IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}}"
-                                                              ClickMode="Press"
-                                                              Focusable="False">
+                                                <ToggleButton x:Name="Expander" Grid.Column="0" Width="18" Height="18" VerticalAlignment="Center" IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}}" ClickMode="Press" Focusable="False">
                                                     <ToggleButton.Template>
                                                         <ControlTemplate TargetType="{x:Type ToggleButton}">
                                                             <Border Background="Transparent">
-                                                                <Path x:Name="Arrow"
-                                                                      Width="6"
-                                                                      Height="6"
-                                                                      HorizontalAlignment="Center"
-                                                                      VerticalAlignment="Center"
-                                                                      Fill="#555555"
-                                                                      Data="M 0 0 L 0 6 L 6 3 Z"/>
+                                                                <Path x:Name="Arrow" Width="6" Height="6" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="#555555" Data="M 0 0 L 0 6 L 6 3 Z"/>
                                                             </Border>
 
                                                             <ControlTemplate.Triggers>
@@ -126,18 +94,11 @@
                                                     </ToggleButton.Template>
                                                 </ToggleButton>
 
-                                                <ContentPresenter x:Name="PART_Header"
-                                                                  Grid.Column="1"
-                                                                  ContentSource="Header"
-                                                                  HorizontalAlignment="Stretch"
-                                                                  VerticalAlignment="Center"
-                                                                  Margin="2,0,4,0"/>
+                                                <ContentPresenter x:Name="PART_Header" Grid.Column="1" ContentSource="Header" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="2,0,4,0"/>
                                             </Grid>
                                         </Border>
 
-                                        <ItemsPresenter x:Name="ItemsHost"
-                                                        Grid.Row="1"
-                                                        Margin="18,0,0,0"/>
+                                        <ItemsPresenter x:Name="ItemsHost" Grid.Row="1" Margin="18,0,0,0"/>
                                     </Grid>
 
                                     <ControlTemplate.Triggers>
@@ -183,19 +144,9 @@
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
 
-                            <CheckBox Grid.Column="0"
-                                      IsChecked="{Binding IsChecked}"
-                                      VerticalAlignment="Center"
-                                      Margin="0,0,4,0"/>
-
-                            <TextBlock Grid.Column="1"
-                                       Text="{Binding DisplayName}"
-                                       VerticalAlignment="Center"/>
-
-                            <StackPanel Grid.Column="2"
-                                        Orientation="Horizontal"
-                                        VerticalAlignment="Center"
-                                        Margin="8,0,0,0">
+                            <CheckBox Grid.Column="0" IsChecked="{Binding IsChecked}" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                            <TextBlock Grid.Column="1" Text="{Binding DisplayName}" VerticalAlignment="Center"/>
+                            <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="8,0,0,0">
                                 <TextBlock Text="[" Foreground="#777777"/>
                                 <TextBlock Text="{Binding MainRebarText}" Foreground="#777777"/>
                                 <TextBlock Text="/" Foreground="#777777"/>
@@ -212,10 +163,7 @@
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
 
-                            <CheckBox Grid.Column="0"
-                                IsChecked="{Binding IsChecked}"
-                                VerticalAlignment="Center"
-                                Margin="0,0,4,0"/>
+                            <CheckBox Grid.Column="0" IsChecked="{Binding IsChecked}" VerticalAlignment="Center" Margin="0,0,4,0"/>
 
                             <TextBlock Grid.Column="1" Text="{Binding DisplayName}" VerticalAlignment="Center" Tag="{Binding DataContext, RelativeSource={RelativeSource AncestorType=TreeView}}">
                                 <TextBlock.ContextMenu>

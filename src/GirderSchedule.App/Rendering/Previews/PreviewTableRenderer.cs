@@ -1,28 +1,30 @@
 using System.Windows.Controls;
-using GirderSchedule.App.Previews.Formatting;
-using GirderSchedule.App.Previews.Models;
+using DocumentFormat.OpenXml.Vml.Spreadsheet;
+using GirderSchedule.App.Rendering.Formatting;
+using GirderSchedule.App.Rendering.Models;
+using GirderSchedule.App.Rendering.Section;
 using GirderSchedule.Domain.Models;
 
-namespace GirderSchedule.App.Previews.Rendering
+namespace GirderSchedule.App.Rendering.Previews
 {
-    public sealed class SchedulePreviewTableRenderer
+    public sealed class PreviewTableRenderer
     {
-        private readonly PreviewCanvasDrawer _drawer;
-        private readonly PreviewBrushSet _brushes;
-        private readonly PreviewSectionRenderer _sectionRenderer;
-        private readonly SchedulePreviewTextFormatter _formatter;
+        private readonly CanvasDrawer _drawer;
+        private readonly RenderBrushSet _brushes;
+        private readonly SectionRenderer _sectionRenderer;
+        private readonly PreviewTextFormatter _formatter;
 
-        public SchedulePreviewTableRenderer()
-            : this(new PreviewCanvasDrawer(), new PreviewBrushSet(), new PreviewSectionRenderer(), new SchedulePreviewTextFormatter())
+        public PreviewTableRenderer()
+            : this(new CanvasDrawer(), new RenderBrushSet())
         {
         }
 
-        public SchedulePreviewTableRenderer(PreviewCanvasDrawer drawer, PreviewBrushSet brushes, PreviewSectionRenderer sectionRenderer, SchedulePreviewTextFormatter formatter)
+        public PreviewTableRenderer(CanvasDrawer drawer, RenderBrushSet brushes)
         {
             _drawer = drawer;
             _brushes = brushes;
-            _sectionRenderer = sectionRenderer;
-            _formatter = formatter;
+            _sectionRenderer = new SectionRenderer(drawer, brushes);
+            _formatter = new PreviewTextFormatter();
         }
 
         public void DrawSetCell(Canvas canvas, ScheduleSet set, double x, double y, double width, double height, int row, int column, bool showLabels)

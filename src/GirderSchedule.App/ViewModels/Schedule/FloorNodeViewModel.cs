@@ -74,7 +74,7 @@ namespace GirderSchedule.App.ViewModels.Schedule
             get { return _model.Setting; }
         }
 
-        public int MainRebarDiameter
+        public double MainRebarDiameter
         {
             get { return _model.Setting.MainRebarDiameter; }
             set
@@ -90,7 +90,7 @@ namespace GirderSchedule.App.ViewModels.Schedule
             }
         }
 
-        public int StirrupDiameter
+        public double StirrupDiameter
         {
             get { return _model.Setting.StirrupDiameter; }
             set
@@ -106,7 +106,7 @@ namespace GirderSchedule.App.ViewModels.Schedule
             }
         }
 
-        public int SkinRebarDiameter
+        public double SkinRebarDiameter
         {
             get { return _model.Setting.SkinRebarDiameter; }
             set
@@ -301,7 +301,7 @@ namespace GirderSchedule.App.ViewModels.Schedule
             }
         }
 
-        private string FormatDiameter(int diameter)
+        private string FormatDiameter(double diameter)
         {
             if (diameter <= 0)
             {

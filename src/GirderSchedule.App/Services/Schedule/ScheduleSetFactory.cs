@@ -6,6 +6,8 @@ namespace GirderSchedule.App.Services.Schedule
 {
     public sealed class ScheduleSetFactory
     {
+        private readonly FloorSettingApplyService _floorSettingApplyService = new FloorSettingApplyService();
+
         public ScheduleSet Create(string memberName, FloorSetting setting)
         {
             var service = new ScheduleBuildService();
@@ -17,10 +19,9 @@ namespace GirderSchedule.App.Services.Schedule
             }
 
             var set = sheet.Rows[0].Sets[0];
+
             ApplyMemberName(set, memberName);
-            ApplySetting(set.Left, setting);
-            ApplySetting(set.Center, setting);
-            ApplySetting(set.Right, setting);
+            _floorSettingApplyService.Apply(set, setting);
 
             return set;
         }
@@ -51,30 +52,6 @@ namespace GirderSchedule.App.Services.Schedule
             {
                 set.Right.Name = name;
                 set.Right.IsSectionEnabled = true;
-            }
-        }
-
-        private void ApplySetting(ScheduleItem item, FloorSetting setting)
-        {
-            if (item == null || setting == null)
-            {
-                return;
-            }
-
-            if (setting.MainRebarDiameter > 0)
-            {
-                item.TopRebar.Diameter = setting.MainRebarDiameter;
-                item.BottomRebar.Diameter = setting.MainRebarDiameter;
-            }
-
-            if (setting.StirrupDiameter > 0)
-            {
-                item.Stirrup.Diameter = setting.StirrupDiameter;
-            }
-
-            if (setting.SkinRebarDiameter > 0)
-            {
-                item.SkinRebar.Diameter = 0;
             }
         }
     }

@@ -185,21 +185,7 @@ namespace GirderSchedule.App.ViewModels.Schedule
             RefreshItems();
         }
 
-        public void ApplyFloorSetting(FloorSetting setting)
-        {
-            if (setting == null || Left == null || Center == null || Right == null)
-            {
-                return;
-            }
-
-            ApplyFloorSettingToItem(Left, setting);
-            ApplyFloorSettingToItem(Center, setting);
-            ApplyFloorSettingToItem(Right, setting);
-
-            RefreshItems();
-        }
-
-        public void RefreshItems()
+        private void RefreshItems()
         {
             if (Left == null || Center == null || Right == null)
             {
@@ -230,25 +216,6 @@ namespace GirderSchedule.App.ViewModels.Schedule
             ApplySectionEnabledPositions();
             RefreshItems();
             RaiseCurrentSetChanged();
-        }
-
-        private void ApplyFloorSettingToItem(SectionItemViewModel item, FloorSetting setting)
-        {
-            if (setting.MainRebarDiameter > 0)
-            {
-                item.TopDiameter = setting.MainRebarDiameter;
-                item.BottomDiameter = setting.MainRebarDiameter;
-            }
-
-            if (setting.StirrupDiameter > 0)
-            {
-                item.StirrupDiameter = setting.StirrupDiameter;
-            }
-
-            if (setting.SkinRebarDiameter > 0)
-            {
-                item.SkinRebarDiameter = setting.SkinRebarDiameter;
-            }
         }
 
         private void EnsureSheetForCurrentSet()

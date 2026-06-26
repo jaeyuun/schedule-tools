@@ -18,24 +18,10 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0"
-                   Text="새 프로젝트 만들기"
-                   FontSize="26"
-                   FontWeight="Bold"/>
-
-        <TextBlock Grid.Row="2"
-                   Text="프로젝트 이름"
-                   FontSize="20"/>
-
-        <TextBox Grid.Row="3"
-                 Width="520"
-                 Height="28"
-                 HorizontalAlignment="Left"
-                 Text="{Binding ProjectName, UpdateSourceTrigger=PropertyChanged}"/>
-
-        <TextBlock Grid.Row="5"
-                   Text="위치"
-                   FontSize="20"/>
+        <TextBlock Grid.Row="0" Text="새 프로젝트 만들기" FontSize="26" FontWeight="Bold"/>
+        <TextBlock Grid.Row="2" Text="프로젝트 이름" FontSize="20"/>
+        <TextBox Grid.Row="3" Width="520" Height="28" HorizontalAlignment="Left" Text="{Binding ProjectName, UpdateSourceTrigger=PropertyChanged}"/>
+        <TextBlock Grid.Row="5" Text="위치" FontSize="20"/>
 
         <Grid Grid.Row="6" Margin="0,8,0,0" VerticalAlignment="Top">
             <Grid.ColumnDefinitions>
@@ -44,29 +30,13 @@
                 <ColumnDefinition Width="44"/>
             </Grid.ColumnDefinitions>
 
-            <TextBox Grid.Column="0"
-                     Height="28"
-                     Text="{Binding FolderPath, UpdateSourceTrigger=PropertyChanged}"/>
-
-            <Button Grid.Column="2"
-                    Height="28"
-                    Content="..."
-                    Command="{Binding BrowseCommand}"/>
+            <TextBox Grid.Column="0" Height="28" Text="{Binding FolderPath, UpdateSourceTrigger=PropertyChanged}"/>
+            <Button Grid.Column="2" Height="28" Content="..." Command="{Binding BrowseCommand}"/>
         </Grid>
 
-        <StackPanel Grid.Row="7"
-                    Orientation="Horizontal"
-                    HorizontalAlignment="Right">
-            <Button Width="80"
-                    Height="32"
-                    Margin="0,0,8,0"
-                    Content="뒤로"
-                    Command="{Binding BackCommand}"/>
-
-            <Button Width="80"
-                    Height="32"
-                    Content="만들기"
-                    Command="{Binding CreateCommand}"/>
+        <StackPanel Grid.Row="7" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Width="80" Height="32" Margin="0,0,8,0" Content="뒤로" Command="{Binding BackCommand}"/>
+            <Button Width="80" Height="32" Content="만들기" Command="{Binding CreateCommand}"/>
         </StackPanel>
     </Grid>
 </Window>

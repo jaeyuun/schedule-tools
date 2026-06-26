@@ -1,4 +1,5 @@
-﻿using GirderSchedule.Domain.Models;
+﻿using GirderSchedule.App.Services.Schedule;
+using GirderSchedule.Domain.Models;
 using System;
 
 namespace GirderSchedule.App.ViewModels.Schedule
@@ -6,6 +7,8 @@ namespace GirderSchedule.App.ViewModels.Schedule
     public sealed class SectionItemViewModel : ViewModelBase
     {
         private readonly ScheduleItem _model;
+        private readonly SectionItemTextService _textService = new SectionItemTextService();
+
         public event EventHandler Changed;
 
         public ScheduleItem Model
@@ -106,7 +109,7 @@ namespace GirderSchedule.App.ViewModels.Schedule
             }
         }
 
-        public int TopDiameter
+        public double TopDiameter
         {
             get { return _model.TopRebar.Diameter; }
             set
@@ -162,7 +165,7 @@ namespace GirderSchedule.App.ViewModels.Schedule
             }
         }
 
-        public int BottomDiameter
+        public double BottomDiameter
         {
             get { return _model.BottomRebar.Diameter; }
             set
@@ -217,7 +220,7 @@ namespace GirderSchedule.App.ViewModels.Schedule
             }
         }
 
-        public int StirrupDiameter
+        public double StirrupDiameter
         {
             get { return _model.Stirrup.Diameter; }
             set
@@ -249,7 +252,7 @@ namespace GirderSchedule.App.ViewModels.Schedule
             }
         }
 
-        public int SkinRebarDiameter
+        public double SkinRebarDiameter
         {
             get { return _model.SkinRebar.Diameter; }
             set
@@ -297,112 +300,74 @@ namespace GirderSchedule.App.ViewModels.Schedule
 			}
 		}
 
-		public string MomentValue
+        public double? MomentValue
         {
-            get
-            {
-                if (!_model.MemberForce.Moment.HasValue)
-                {
-                    return string.Empty;
-                }
-
-                return _model.MemberForce.Moment.Value.ToString("0");
-            }
+            get { return _model.MemberForce.Moment; }
             set
             {
-                var number = ParseNullableDouble(value);
-
-                if (_model.MemberForce.Moment == number)
+                if (_model.MemberForce.Moment == value)
                 {
                     return;
                 }
 
-                _model.MemberForce.Moment = number;
-                OnPropertyChanged(nameof(MomentValue));
+                _model.MemberForce.Moment = value;
                 OnPropertyChanged(nameof(MomentText));
             }
         }
 
-        public string ShearValue
+        public double? ShearValue
         {
-            get
-            {
-                if (!_model.MemberForce.Shear.HasValue)
-                {
-                    return string.Empty;
-                }
-
-                return _model.MemberForce.Shear.Value.ToString("0");
-            }
+            get { return _model.MemberForce.Shear; }
             set
             {
-                var number = ParseNullableDouble(value);
-
-                if (_model.MemberForce.Shear == number)
+                if (_model.MemberForce.Shear == value)
                 {
                     return;
                 }
 
-                _model.MemberForce.Shear = number;
-                OnPropertyChanged(nameof(ShearValue));
+                _model.MemberForce.Shear = value;
                 OnPropertyChanged(nameof(ShearText));
             }
         }
 
         public string MomentText
         {
-            get
-            {
-                if (!_model.MemberForce.Moment.HasValue)
-                {
-                    return string.Empty;
-                }
-
-                return "M = " + _model.MemberForce.Moment.Value.ToString("0");
-            }
+            get { return _textService.FormatMomentText(_model.MemberForce.Moment); }
         }
 
         public string ShearText
         {
-            get
-            {
-                if (!_model.MemberForce.Shear.HasValue)
-                {
-                    return string.Empty;
-                }
-
-                return "V = " + _model.MemberForce.Shear.Value.ToString("0");
-            }
+            get { return _textService.FormatShearText(_model.MemberForce.Shear); }
         }
 
         public string TopText1
         {
-            get { return FormatLayerText(_model.TopRebar.FirstLayer.Count, _model.TopRebar.Diameter); }
+            get { return _textService.FormatLayerText(_model.TopRebar.FirstLayer.Count, _model.TopRebar.Diameter); }
         }
 
         public string TopText2
         {
-            get { return FormatLayerText(_model.TopRebar.SecondLayer.Count, _model.TopRebar.Diameter); }
+            get { return _textService.FormatLayerText(_model.TopRebar.SecondLayer.Count, _model.TopRebar.Diameter); }
         }
 
         public string BottomText1
         {
-            get { return FormatLayerText(_model.BottomRebar.FirstLayer.Count, _model.BottomRebar.Diameter); }
+            get { return _textService.FormatLayerText(_model.BottomRebar.FirstLayer.Count, _model.BottomRebar.Diameter); }
         }
 
         public string BottomText2
         {
-            get { return FormatLayerText(_model.BottomRebar.SecondLayer.Count, _model.BottomRebar.Diameter); }
+            get { return _textService.FormatLayerText(_model.BottomRebar.SecondLayer.Count, _model.BottomRebar.Diameter); }
         }
 
         public string StirrupText
         {
-            get { return FormatStirrupText(); }
+            get { return _textService.FormatStirrupText(_model.Stirrup); }
         }
 
         public string SkinRebarText
         {
-            get { return FormatSkinRebarText(); }
+            get { return _textService.FormatSkinRebarText(_model.SkinRebar); }
         }
 
         public bool IsSectionEnabled
@@ -456,53 +421,6 @@ namespace GirderSchedule.App.ViewModels.Schedule
             OnPropertyChanged(nameof(StirrupText));
             OnPropertyChanged(nameof(SkinRebarText));
             OnPropertyChanged(nameof(IsSectionEnabled));
-        }
-
-        private double? ParseNullableDouble(string value)
-        {
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                return null;
-            }
-
-            double result;
-
-            if (!double.TryParse(value, out result))
-            {
-                return null;
-            }
-
-            return result;
-        }
-
-        private string FormatLayerText(int count, int diameter)
-        {
-            if (count <= 0 || diameter <= 0)
-            {
-                return "-";
-            }
-
-            return count + " - HD " + diameter;
-        }
-
-        private string FormatStirrupText()
-        {
-            if (_model.Stirrup.Legs <= 0 || _model.Stirrup.Diameter <= 0 || _model.Stirrup.Spacing <= 0)
-            {
-                return "-";
-            }
-
-            return _model.Stirrup.Legs + " - HD " + _model.Stirrup.Diameter + " @ " + _model.Stirrup.Spacing;
-        }
-
-        private string FormatSkinRebarText()
-        {
-            if (_model.SkinRebar.Diameter <= 0 || _model.SkinRebar.Spacing <= 0)
-            {
-                return "-";
-            }
-
-            return "HD " + _model.SkinRebar.Diameter + " @ " + _model.SkinRebar.Spacing;
         }
 
         private void RaiseChanged()

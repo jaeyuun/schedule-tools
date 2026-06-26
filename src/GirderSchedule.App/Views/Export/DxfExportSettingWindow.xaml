@@ -48,76 +48,36 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <TextBlock Grid.Row="0"
-                       Text="DXF 내보내기 설정"
-                       FontSize="17"
-                       FontWeight="SemiBold"
-                       Margin="0,0,0,18"/>
+            <TextBlock Grid.Row="0" Text="DXF 내보내기 설정" FontSize="17" FontWeight="SemiBold" Margin="0,0,0,18"/>
 
             <StackPanel Grid.Row="1">
                 <Border Style="{StaticResource SectionBorderStyle}">
                     <StackPanel>
-                        <TextBlock Text="층 출력 방식"
-                                   FontWeight="SemiBold"
-                                   Margin="0,0,0,10"/>
-
-                        <CheckBox Content="층 구분 없이 이어서 출력"
-                                   IsChecked="{Binding ContinueAcrossFloors, Mode=TwoWay}"
-                                   Margin="0,0,0,8"/>
-
-                        <TextBlock Text="체크하면 층이 바뀌어도 이어서 출력하고, 체크 해제하면 층이 바뀔 때 다음 줄부터 출력합니다."
-                                   Foreground="#666666"
-                                   FontSize="12"
-                                   Margin="0,12,0,0"/>
+                        <TextBlock Text="층 출력 방식" FontWeight="SemiBold" Margin="0,0,0,10"/>
+                        <CheckBox Content="층 구분 없이 이어서 출력" IsChecked="{Binding ContinueAcrossFloors, Mode=TwoWay}" Margin="0,0,0,8"/>
+                        <TextBlock Text="체크하면 층이 바뀌어도 이어서 출력하고, 체크 해제하면 층이 바뀔 때 다음 줄부터 출력합니다." Foreground="#666666" FontSize="12" Margin="0,12,0,0"/>
                     </StackPanel>
                 </Border>
 
                 <Border Style="{StaticResource SectionBorderStyle}">
                     <StackPanel>
-                        <TextBlock Text="폼 배치"
-                                   FontWeight="SemiBold"
-                                   Margin="0,0,0,10"/>
+                        <TextBlock Text="폼 배치" FontWeight="SemiBold" Margin="0,0,0,10"/>
 
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="폼 가로 개수"
-                                       Width="100"
-                                       VerticalAlignment="Center"/>
-
-                            <TextBox Width="80"
-                                     Style="{StaticResource SettingTextBoxStyle}"
-                                     Text="{Binding FormColumnCountText, UpdateSourceTrigger=PropertyChanged}"/>
-
-                            <TextBlock Text="개"
-                                       VerticalAlignment="Center"
-                                       Margin="8,0,0,0"/>
-
-                            <TextBlock Text="기본값: 3"
-                                       VerticalAlignment="Center"
-                                       Foreground="#666666"
-                                       Margin="24,0,0,0"/>
+                            <TextBlock Text="폼 가로 개수" Width="100" VerticalAlignment="Center"/>
+                            <TextBox Width="80" Style="{StaticResource SettingTextBoxStyle}" Text="{Binding FormColumnCountText, UpdateSourceTrigger=PropertyChanged}"/>
+                            <TextBlock Text="개" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                            <TextBlock Text="기본값: 3" VerticalAlignment="Center" Foreground="#666666" Margin="24,0,0,0"/>
                         </StackPanel>
 
-                        <TextBlock Text="폼 1개는 부재 9세트 기준입니다. 예: 4 입력 시 폼1 폼2 폼3 폼4 / 폼5 폼6 ..."
-                                   Foreground="#666666"
-                                   FontSize="12"
-                                   Margin="0,12,0,0"/>
+                        <TextBlock Text="폼 1개는 부재 9세트 기준입니다. 예: 4 입력 시 폼1 폼2 폼3 폼4 / 폼5 폼6 ..." Foreground="#666666" FontSize="12" Margin="0,12,0,0"/>
                     </StackPanel>
                 </Border>
             </StackPanel>
 
-            <StackPanel Grid.Row="2"
-                        Orientation="Horizontal"
-                        HorizontalAlignment="Right">
-                <Button Content="확인"
-                        Width="80"
-                        Margin="0,0,8,0"
-                        Style="{StaticResource SettingButtonStyle}"
-                        Command="{Binding OkCommand}"/>
-
-                <Button Content="취소"
-                        Width="80"
-                        Style="{StaticResource SettingButtonStyle}"
-                        Command="{Binding CancelCommand}"/>
+            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="확인" Width="80" Margin="0,0,8,0" Style="{StaticResource SettingButtonStyle}" Command="{Binding OkCommand}"/>
+                <Button Content="취소" Width="80" Style="{StaticResource SettingButtonStyle}" Command="{Binding CancelCommand}"/>
             </StackPanel>
         </Grid>
     </Border>

@@ -1,4 +1,5 @@
 ﻿using GirderSchedule.App.Commands;
+using GirderSchedule.App.Services.Export;
 using GirderSchedule.App.Services.Project;
 using GirderSchedule.App.Services.Schedule;
 using GirderSchedule.App.Utils;
@@ -26,8 +27,9 @@ namespace GirderSchedule.App.ViewModels.Main
         private readonly RecentProjectService _recentProjectService = new RecentProjectService();
         private readonly ScheduleProjectFactory _projectFactory = new ScheduleProjectFactory();
         private readonly ScheduleSetFactory _setFactory = new ScheduleSetFactory();
-        private readonly ScheduleExportPageBuilder _exportPageBuilder = new ScheduleExportPageBuilder();
-        private readonly ScheduleExcelProjectBuilder _excelProjectBuilder = new ScheduleExcelProjectBuilder();
+        private readonly FloorSettingApplyService _floorSettingApplyService = new FloorSettingApplyService();
+        private readonly ScheduleSetCopyService _scheduleSetCopyService = new ScheduleSetCopyService();
+        private readonly ScheduleExportService _exportService = new ScheduleExportService();
 
         private ScheduleProject _project;
         private FloorNodeViewModel _selectedFloor;
@@ -522,129 +524,12 @@ namespace GirderSchedule.App.ViewModels.Main
                 return;
             }
 
-            var setting = ShowDxfExportSettingWindow();
-
-            if (setting == null)
-            {
-                return;
-            }
-
-            var pages = _exportPageBuilder.Build(ScheduleTitle, Floors, setting);
-
-            if (pages.Count == 0)
-            {
-                MessageBox.Show("내보낼 층 또는 부재가 선택되지 않았습니다.", "DXF 내보내기", MessageBoxButton.OK, MessageBoxImage.Information);
-                return;
-            }
-
-            var dialog = new SaveFileDialog();
-            dialog.Title = "DXF 저장";
-            dialog.Filter = "DXF 파일 (*.dxf)|*.dxf";
-            dialog.FileName = BuildDxfFileName();
-            dialog.DefaultExt = ".dxf";
-            dialog.AddExtension = true;
-
-            if (dialog.ShowDialog() != true)
-            {
-                return;
-            }
-
-            ExportPages(dialog.FileName, pages, setting);
-        }
-
-        private DxfExportSetting ShowDxfExportSettingWindow()
-        {
-            var viewModel = new DxfExportSettingWindowViewModel();
-
-            var window = new DxfExportSettingWindow();
-            window.Owner = Application.Current.MainWindow;
-            window.DataContext = viewModel;
-
-            if (window.ShowDialog() != true)
-            {
-                return null;
-            }
-
-            return viewModel.CreateSetting();
-        }
-
-        private void ExportPages(string filePath, List<ScheduleExportPage> pages, DxfExportSetting setting)
-        {
-            try
-            {
-                var exporter = new DxfExporter();
-
-                var options = new DxfExportOptions();
-                options.IncludeLeft = true;
-                options.IncludeCenter = true;
-                options.IncludeRight = true;
-                options.FormColumnCount = setting == null ? 3 : setting.FormColumnCount;
-                options.TemplatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "GirderTemplate.dxf");
-
-                exporter.Export(pages, filePath, options);
-                MessageBox.Show("DXF 파일을 저장했습니다.", "DXF 저장 완료", MessageBoxButton.OK, MessageBoxImage.Information);
-            }
-            catch (IOException)
-            {
-                MessageBox.Show("DXF 파일을 저장할 수 없습니다.\r\n\r\n저장하려는 파일이 AutoCAD, GstarCAD, 뷰어 또는 다른 프로그램에서 열려 있을 수 있습니다.\r\n파일을 닫은 뒤 다시 저장해 주세요.\r\n\r\n파일 경로: " + filePath, "DXF 저장 실패", MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
-            catch (UnauthorizedAccessException)
-            {
-                MessageBox.Show("DXF 파일을 저장할 권한이 없습니다.\r\n\r\n쓰기 권한이 있는 폴더인지 확인하거나 다른 위치에 저장해 주세요.\r\n\r\n파일 경로: " + filePath, "DXF 저장 실패", MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("DXF 저장 중 오류가 발생했습니다.\r\n\r\n" + ex.Message, "DXF 저장 실패", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            _exportService.ExportDxf(ProjectName, ScheduleTitle, Floors);
         }
 
         private void ExportProjectExcel()
         {
-            var exportProject = _excelProjectBuilder.Build(Project, Floors);
-
-            if (exportProject == null || exportProject.Floors.Count == 0)
-            {
-                MessageBox.Show("내보낼 층 또는 부재가 선택되지 않았습니다.", "Excel 내보내기", MessageBoxButton.OK, MessageBoxImage.Information);
-                return;
-            }
-
-            var dialog = new SaveFileDialog();
-            dialog.Title = "Excel 저장";
-            dialog.Filter = "Excel 파일 (*.xlsx)|*.xlsx";
-            dialog.InitialDirectory = PathUtil.GetDownloadsDirectory();
-            dialog.FileName = PathUtil.GetDefaultExcelFileName(exportProject.ProjectName);
-            dialog.DefaultExt = ".xlsx";
-            dialog.AddExtension = true;
-
-            if (dialog.ShowDialog() != true)
-            {
-                return;
-            }
-
-            try
-            {
-                var exporter = new ExcelExporter();
-
-                var options = new ExcelExportOptions();
-                options.SheetName = "보 일람표";
-                options.DefaultCover = 40;
-                options.ContinueAcrossFloors = false;
-
-                exporter.Export(exportProject, dialog.FileName, options);
-                MessageBox.Show("Excel 파일을 저장했습니다.", "Excel 저장 완료", MessageBoxButton.OK, MessageBoxImage.Information);
-            }
-            catch (IOException)
-            {
-                MessageBox.Show("Excel 파일을 저장할 수 없습니다.\r\n\r\n저장하려는 파일이 Excel 또는 다른 프로그램에서 열려 있을 수 있습니다.\r\n파일을 닫은 뒤 다시 저장해 주세요.\r\n\r\n파일 경로: " + dialog.FileName, "Excel 저장 실패", MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
-            catch (UnauthorizedAccessException)
-            {
-                MessageBox.Show("Excel 파일을 저장할 권한이 없습니다.\r\n\r\n쓰기 권한이 있는 폴더인지 확인하거나 다른 위치에 저장해 주세요.\r\n\r\n파일 경로: " + dialog.FileName, "Excel 저장 실패", MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Excel 저장 중 오류가 발생했습니다.\r\n\r\n" + ex.Message, "Excel 저장 실패", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            _exportService.ExportExcel(Project, Floors);
         }
 
         private bool SaveProjectBeforeExport()
@@ -662,24 +547,6 @@ namespace GirderSchedule.App.ViewModels.Main
             }
 
             return SaveProject();
-        }
-
-        private string BuildDxfFileName()
-        {
-            var projectName = FileNameUtil.Sanitize(ProjectName);
-            var scheduleTitle = FileNameUtil.Sanitize(ScheduleTitle);
-
-            if (string.IsNullOrWhiteSpace(projectName))
-            {
-                projectName = "프로젝트";
-            }
-
-            if (string.IsNullOrWhiteSpace(scheduleTitle))
-            {
-                scheduleTitle = "보일람표";
-            }
-
-            return projectName + "_" + scheduleTitle + ".dxf";
         }
 
         public void MoveFloor(FloorNodeViewModel source, FloorNodeViewModel target, bool isAfter)
@@ -891,70 +758,7 @@ namespace GirderSchedule.App.ViewModels.Main
 
         private void ApplyFloorSettingToSet(ScheduleSet set, FloorSetting setting)
         {
-            if (set == null || setting == null)
-            {
-                return;
-            }
-
-            ApplyFloorSettingToItem(set.Left, setting);
-            ApplyFloorSettingToItem(set.Center, setting);
-            ApplyFloorSettingToItem(set.Right, setting);
-        }
-
-        private void ApplyFloorSettingToItem(ScheduleItem item, FloorSetting setting)
-        {
-            if (item == null || setting == null)
-            {
-                return;
-            }
-
-            ApplyMainRebarDiameter(item, setting.MainRebarDiameter);
-            ApplyStirrupDiameter(item, setting.StirrupDiameter);
-            ApplySkinRebarDiameter(item, setting.SkinRebarDiameter);
-        }
-
-        private void ApplyMainRebarDiameter(ScheduleItem item, int diameter)
-        {
-            if (diameter <= 0)
-            {
-                return;
-            }
-
-            if (item.TopRebar != null)
-            {
-                item.TopRebar.Diameter = diameter;
-            }
-
-            if (item.BottomRebar != null)
-            {
-                item.BottomRebar.Diameter = diameter;
-            }
-        }
-
-        private void ApplyStirrupDiameter(ScheduleItem item, int diameter)
-        {
-            if (diameter <= 0)
-            {
-                return;
-            }
-
-            if (item.Stirrup != null)
-            {
-                item.Stirrup.Diameter = diameter;
-            }
-        }
-
-        private void ApplySkinRebarDiameter(ScheduleItem item, int diameter)
-        {
-            if (diameter <= 0)
-            {
-                return;
-            }
-
-            if (item.SkinRebar != null)
-            {
-                item.SkinRebar.Diameter = diameter;
-            }
+            _floorSettingApplyService.Apply(set, setting);
         }
 
         private void FloorSettingWindow_FloorSettingChanged(object sender, EventArgs e)
@@ -995,7 +799,7 @@ namespace GirderSchedule.App.ViewModels.Main
                 return;
             }
 
-            _copiedScheduleSet = CloneScheduleSet(SelectedSet.Model);
+            _copiedScheduleSet = _scheduleSetCopyService.Clone(SelectedSet.Model);
         }
 
         private void PasteScheduleSet()
@@ -1005,141 +809,12 @@ namespace GirderSchedule.App.ViewModels.Main
                 return;
             }
 
-            ApplyScheduleSetSettings(_copiedScheduleSet, SelectedSet.Model);
+            _scheduleSetCopyService.CopyTo(_copiedScheduleSet, SelectedSet.Model);
 
             SelectedSet.RefreshAll();
             Editor.LoadSet(SelectedSet.Model);
 
             IsDirty = true;
-        }
-
-        private ScheduleSet CloneScheduleSet(ScheduleSet source)
-        {
-            if (source == null)
-            {
-                return null;
-            }
-
-            var clone = new ScheduleSet();
-            clone.MemberName = source.MemberName;
-            clone.Left = CloneScheduleItem(source.Left);
-            clone.Center = CloneScheduleItem(source.Center);
-            clone.Right = CloneScheduleItem(source.Right);
-
-            return clone;
-        }
-
-        private void ApplyScheduleSetSettings(ScheduleSet source, ScheduleSet target)
-        {
-            if (source == null || target == null)
-            {
-                return;
-            }
-
-            CopyScheduleItem(source.Left, target.Left);
-            CopyScheduleItem(source.Center, target.Center);
-            CopyScheduleItem(source.Right, target.Right);
-        }
-
-        private ScheduleItem CloneScheduleItem(ScheduleItem source)
-        {
-            if (source == null)
-            {
-                return null;
-            }
-
-            var target = new ScheduleItem();
-            CopyScheduleItem(source, target);
-
-            return target;
-        }
-
-        private void CopyScheduleItem(ScheduleItem source, ScheduleItem target)
-        {
-            if (source == null || target == null)
-            {
-                return;
-            }
-
-            target.Name = source.Name;
-            target.Position = source.Position;
-            target.IsSectionEnabled = source.IsSectionEnabled;
-
-            CopySection(source.Section, target.Section);
-            CopyRebarSet(source.TopRebar, target.TopRebar);
-            CopyRebarSet(source.BottomRebar, target.BottomRebar);
-            CopyStirrup(source.Stirrup, target.Stirrup);
-            CopyMemberForce(source.MemberForce, target.MemberForce);
-            CopySkinRebar(source.SkinRebar, target.SkinRebar);
-        }
-
-        private void CopySection(SectionData source, SectionData target)
-        {
-            if (source == null || target == null)
-            {
-                return;
-            }
-
-            target.Width = source.Width;
-            target.Height = source.Height;
-        }
-
-        private void CopyRebarSet(RebarSet source, RebarSet target)
-        {
-            if (source == null || target == null)
-            {
-                return;
-            }
-
-            target.Diameter = source.Diameter;
-            CopyRebarLayer(source.FirstLayer, target.FirstLayer);
-            CopyRebarLayer(source.SecondLayer, target.SecondLayer);
-        }
-
-        private void CopyRebarLayer(RebarLayer source, RebarLayer target)
-        {
-            if (source == null || target == null)
-            {
-                return;
-            }
-
-            target.Count = source.Count;
-        }
-
-        private void CopyStirrup(StirrupData source, StirrupData target)
-        {
-            if (source == null || target == null)
-            {
-                return;
-            }
-
-            target.Legs = source.Legs;
-            target.Diameter = source.Diameter;
-            target.Spacing = source.Spacing;
-            target.ExtraText = source.ExtraText;
-        }
-
-        private void CopyMemberForce(MemberForceData source, MemberForceData target)
-        {
-            if (source == null || target == null)
-            {
-                return;
-            }
-
-            target.Moment = source.Moment;
-            target.Shear = source.Shear;
-        }
-
-        private void CopySkinRebar(SkinRebarData source, SkinRebarData target)
-        {
-            if (source == null || target == null)
-            {
-                return;
-            }
-
-            target.Diameter = source.Diameter;
-            target.Spacing = source.Spacing;
-            target.Note = source.Note;
         }
     }
 }

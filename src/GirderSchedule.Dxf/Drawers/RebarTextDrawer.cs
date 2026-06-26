@@ -51,7 +51,7 @@ namespace GirderSchedule.Dxf.Drawers
             DrawMainRebar(_query.GetBottomTotalCount(item), item.BottomRebar.Diameter, box);
         }
 
-        private void DrawMainRebar(int totalCount, int diameter, DxfBox box)
+        private void DrawMainRebar(int totalCount, double diameter, DxfBox box)
         {
             if (totalCount <= 0 || diameter <= 0 || box == null)
             {

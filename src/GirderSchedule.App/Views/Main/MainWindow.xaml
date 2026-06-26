@@ -37,7 +37,6 @@
                     <TabItem Header="부재 편집">
                         <views:ScheduleSetEditor DataContext="{Binding Editor}"/>
                     </TabItem>
-
                     <TabItem Header="미리보기">
                         <views:ScheduleExportPreview Floors="{Binding Floors}"/>
                     </TabItem>

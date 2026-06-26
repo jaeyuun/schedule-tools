@@ -2,7 +2,7 @@
 {
     public sealed class RebarSet
     {
-        public int Diameter { get; set; }
+        public double Diameter { get; set; }
         public RebarLayer FirstLayer { get; set; }
         public RebarLayer SecondLayer { get; set; }
 

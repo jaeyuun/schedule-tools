@@ -1,9 +1,9 @@
 using GirderSchedule.Domain.Formatting;
 using GirderSchedule.Domain.Models;
 
-namespace GirderSchedule.App.Previews.Formatting
+namespace GirderSchedule.App.Rendering.Formatting
 {
-    public sealed class SchedulePreviewTextFormatter
+    public sealed class PreviewTextFormatter
     {
         private readonly ScheduleValueFormatter _formatter = new ScheduleValueFormatter();
 

@@ -2,7 +2,7 @@
 {
     public sealed class SkinRebarData
     {
-        public int Diameter { get; set; }
+        public double Diameter { get; set; }
         public int Spacing { get; set; }
         public string Note { get; set; } = string.Empty;
     }
