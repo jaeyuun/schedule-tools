@@ -23,7 +23,7 @@ namespace GirderSchedule.App.Services.Schedule
             project.ScheduleTitle = "보 일람표";
 
             var floor = CreateDefaultFloor();
-            floor.Sets.Add(_setFactory.Create("1G1", floor.Setting));
+            floor.Sets.Add(_setFactory.Create("G1", floor.Setting));
             project.Floors.Add(floor);
 
             return project;
@@ -32,9 +32,8 @@ namespace GirderSchedule.App.Services.Schedule
         private ScheduleFloor CreateDefaultFloor()
         {
             var floor = new ScheduleFloor();
-            floor.Setting.FloorPrefix = "1";
-            floor.Name = "지상 1층";
-            floor.Setting.FloorName = floor.Name;
+            floor.Setting.Prefix = "1";
+            floor.Setting.Name = "지상 1층";
             floor.Setting.MainRebarDiameter = 19;
             floor.Setting.StirrupDiameter = 10;
             floor.Setting.SkinRebarDiameter = 10;

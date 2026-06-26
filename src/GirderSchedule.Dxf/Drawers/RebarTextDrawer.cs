@@ -33,22 +33,22 @@ namespace GirderSchedule.Dxf.Drawers
 
         private void DrawTopRebar(ScheduleItem item, DxfBox box)
         {
-            if (item == null || item.TopRebar == null || box == null)
+            if (item == null || item.MainRebar == null || box == null)
             {
                 return;
             }
 
-            DrawMainRebar(_query.GetTopTotalCount(item), item.TopRebar.Diameter, box);
+            DrawMainRebar(_query.GetTopTotalCount(item), item.MainRebar.Diameter, box);
         }
 
         private void DrawBottomRebar(ScheduleItem item, DxfBox box)
         {
-            if (item == null || item.BottomRebar == null || box == null)
+            if (item == null || item.MainRebar == null || box == null)
             {
                 return;
             }
 
-            DrawMainRebar(_query.GetBottomTotalCount(item), item.BottomRebar.Diameter, box);
+            DrawMainRebar(_query.GetBottomTotalCount(item), item.MainRebar.Diameter, box);
         }
 
         private void DrawMainRebar(int totalCount, double diameter, DxfBox box)
@@ -78,7 +78,7 @@ namespace GirderSchedule.Dxf.Drawers
 
         private void DrawSkinRebar(ScheduleItem item, DxfBox box)
         {
-            if (item == null || item.SkinRebar == null || box == null)
+            if (item == null || item.Section == null || item.SkinRebar == null || box == null)
             {
                 return;
             }
@@ -93,7 +93,13 @@ namespace GirderSchedule.Dxf.Drawers
                 return;
             }
 
-            var firstLine = "HD " + _formatter.FormatNumber(item.SkinRebar.Diameter) + " @ " + _formatter.FormatNumber(item.SkinRebar.Spacing);
+            var firstLine = "HD " + _formatter.FormatNumber(item.SkinRebar.Diameter);
+
+            if (item.SkinRebar.Spacing > 0)
+            {
+                firstLine += " @ " + _formatter.FormatNumber(item.SkinRebar.Spacing);
+            }
+
             _textDrawer.DrawRebarValueRawText(firstLine, x, y + 75.0, RebarTextLayout.TextHeight, TextAlignment.BaselineCenter);
             _textDrawer.DrawRebarValueRawText(item.SkinRebar.Note, x, y - 65.0, RebarTextLayout.TextHeight, TextAlignment.BaselineCenter);
         }

@@ -67,22 +67,22 @@ namespace GirderSchedule.Domain.Formatting
 
         public string FormatTopRebar(ScheduleItem item)
         {
-            if (item == null || item.TopRebar == null)
+            if (item == null || item.MainRebar == null)
             {
                 return "- HD";
             }
 
-            return FormatMainRebar(_query.GetTopTotalCount(item), item.TopRebar.Diameter);
+            return FormatMainRebar(_query.GetTopTotalCount(item), item.MainRebar.Diameter);
         }
 
         public string FormatBottomRebar(ScheduleItem item)
         {
-            if (item == null || item.BottomRebar == null)
+            if (item == null || item.MainRebar == null)
             {
                 return "- HD";
             }
 
-            return FormatMainRebar(_query.GetBottomTotalCount(item), item.BottomRebar.Diameter);
+            return FormatMainRebar(_query.GetBottomTotalCount(item), item.MainRebar.Diameter);
         }
 
         public string FormatMainRebar(int count, double diameter)
@@ -112,17 +112,22 @@ namespace GirderSchedule.Domain.Formatting
 
         public string FormatSkinRebar(ScheduleItem item)
         {
-            if (item == null || item.SkinRebar == null)
+            if (item == null || item.Section == null || item.SkinRebar == null)
             {
                 return "-";
             }
 
-            if (item.SkinRebar.Diameter <= 0 || item.SkinRebar.Spacing <= 0)
+            if (item.Section.Height <= 900.0)
             {
                 return "-";
             }
 
-            var skinRebar = "HD " + FormatNumber(item.SkinRebar.Diameter) + " @ " + FormatNumber(item.SkinRebar.Spacing);
+            var skinRebar = "HD " + FormatNumber(item.SkinRebar.Diameter);
+
+            if (item.SkinRebar.Spacing > 0)
+            {
+                skinRebar += " @ " + FormatNumber(item.SkinRebar.Spacing);
+            }
 
             if (!string.IsNullOrWhiteSpace(item.SkinRebar.Note))
             {

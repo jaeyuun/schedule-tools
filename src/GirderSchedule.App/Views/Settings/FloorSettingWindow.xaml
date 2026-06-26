@@ -126,7 +126,7 @@
                     <RowDefinition Height="30"/>
                 </Grid.RowDefinitions>
 
-                <TextBlock Grid.Row="0" Grid.Column="0" Text="층 번호" VerticalAlignment="Center"/>
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="층 표현" VerticalAlignment="Center"/>
                 <TextBlock Grid.Row="0" Grid.Column="1" Text="층 이름" VerticalAlignment="Center"/>
                 <TextBlock Grid.Row="0" Grid.Column="2" Text="주근 직경" VerticalAlignment="Center"/>
                 <TextBlock Grid.Row="0" Grid.Column="3" Text="스터럽 직경" VerticalAlignment="Center"/>
@@ -166,8 +166,8 @@
                       RowStyle="{StaticResource ExplorerDataGridRowStyle}"
                       CellStyle="{StaticResource ExplorerDataGridCellStyle}">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="층 번호" Binding="{Binding FloorPrefix}" Width="70"/>
-                    <DataGridTextColumn Header="층 이름" Binding="{Binding Name}" Width="200"/>
+                    <DataGridTextColumn Header="층 표현" Binding="{Binding FloorPrefix}" Width="70"/>
+                    <DataGridTextColumn Header="층 이름" Binding="{Binding FloorName}" Width="200"/>
                     <DataGridTextColumn Header="주근" Binding="{Binding MainRebarText}" Width="*"/>
                     <DataGridTextColumn Header="스터럽" Binding="{Binding StirrupText}" Width="*"/>
                     <DataGridTextColumn Header="표피철근" Binding="{Binding SkinRebarText}" Width="*"/>

@@ -4,6 +4,7 @@ using GirderSchedule.App.ViewModels.Export;
 using GirderSchedule.App.ViewModels.Schedule;
 using GirderSchedule.App.Views.Export;
 using GirderSchedule.Domain.Models;
+using GirderSchedule.Domain.Models.Export;
 using GirderSchedule.Dxf.Export;
 using GirderSchedule.Excel;
 using Microsoft.Win32;
@@ -20,6 +21,16 @@ namespace GirderSchedule.App.Services.Export
         private readonly ScheduleExportPageBuilder _exportPageBuilder = new ScheduleExportPageBuilder();
         private readonly ScheduleExcelProjectBuilder _excelProjectBuilder = new ScheduleExcelProjectBuilder();
 
+        public List<ScheduleExportPage> BuildExportPages(string scheduleTitle, ObservableCollection<FloorNodeViewModel> floors, DxfExportSetting setting)
+        {
+            if (setting == null)
+            {
+                setting = new DxfExportSetting();
+            }
+
+            return _exportPageBuilder.Build(scheduleTitle, floors, setting);
+        }
+
         public void ExportDxf(string projectName, string scheduleTitle, ObservableCollection<FloorNodeViewModel> floors)
         {
             var setting = ShowDxfExportSettingWindow();
@@ -29,7 +40,7 @@ namespace GirderSchedule.App.Services.Export
                 return;
             }
 
-            var pages = _exportPageBuilder.Build(scheduleTitle, floors, setting);
+            var pages = BuildExportPages(scheduleTitle, floors, setting);
 
             if (pages.Count == 0)
             {
@@ -132,8 +143,6 @@ namespace GirderSchedule.App.Services.Export
 
                 var options = new ExcelExportOptions();
                 options.SheetName = "보 일람표";
-                options.DefaultCover = 40;
-                options.ContinueAcrossFloors = false;
 
                 exporter.Export(exportProject, filePath, options);
                 MessageBox.Show("Excel 파일을 저장했습니다.", "Excel 저장 완료", MessageBoxButton.OK, MessageBoxImage.Information);

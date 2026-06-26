@@ -1,6 +1,7 @@
 using GirderSchedule.App.Rendering.Formatting;
 using GirderSchedule.App.Rendering.Models;
 using GirderSchedule.Domain.Models;
+using GirderSchedule.Domain.Models.Export;
 using System.Collections.Generic;
 using System.Windows.Controls;
 
@@ -26,7 +27,7 @@ namespace GirderSchedule.App.Rendering.Previews
             _tableRenderer = new PreviewTableRenderer(_drawer, _brushes);
         }
 
-        public void Draw(Canvas canvas, IList<ScheduleSet> sets, int pageNumber, int pageCount)
+        public void Draw(Canvas canvas, ScheduleExportPage page, int pageNumber, int pageCount)
         {
             if (canvas == null)
             {
@@ -35,16 +36,17 @@ namespace GirderSchedule.App.Rendering.Previews
 
             canvas.Width = SchedulePreviewLayout.CanvasWidth;
             canvas.Height = SchedulePreviewLayout.CanvasHeight;
+            canvas.Children.Clear();
 
-            _pageRenderer.Draw(canvas, pageNumber, pageCount);
+            _pageRenderer.Draw(canvas, page, pageNumber, pageCount);
 
-            if (sets == null || sets.Count == 0)
+            if (page == null || page.Sets == null || page.Sets.Count == 0)
             {
                 DrawEmptyMessage(canvas);
                 return;
             }
 
-            DrawSets(canvas, sets);
+            DrawSets(canvas, page.Sets);
         }
 
         private void DrawEmptyMessage(Canvas canvas)

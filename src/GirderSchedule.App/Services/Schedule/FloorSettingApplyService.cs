@@ -60,14 +60,9 @@ namespace GirderSchedule.App.Services.Schedule
                 return;
             }
 
-            if (item.TopRebar != null)
+            if (item.MainRebar != null)
             {
-                item.TopRebar.Diameter = diameter;
-            }
-
-            if (item.BottomRebar != null)
-            {
-                item.BottomRebar.Diameter = diameter;
+                item.MainRebar.Diameter = diameter;
             }
         }
 

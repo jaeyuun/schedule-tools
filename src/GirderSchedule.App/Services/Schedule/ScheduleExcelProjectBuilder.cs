@@ -6,6 +6,9 @@ namespace GirderSchedule.App.Services.Schedule
 {
     public sealed class ScheduleExcelProjectBuilder
     {
+        private readonly ScheduleMemberNameDisplayService _displayService = new ScheduleMemberNameDisplayService();
+        private readonly ScheduleSetCopyService _copyService = new ScheduleSetCopyService();
+
         public ScheduleProject Build(ScheduleProject sourceProject, ObservableCollection<FloorNodeViewModel> floors)
         {
             if (sourceProject == null)
@@ -31,10 +34,8 @@ namespace GirderSchedule.App.Services.Schedule
                     continue;
                 }
 
-                var sourceFloor = floorNode.Model;
                 var exportFloor = new ScheduleFloor();
-                exportFloor.Name = sourceFloor.Name;
-                exportFloor.Setting = sourceFloor.Setting;
+                exportFloor.Setting = CloneFloorSetting(floorNode.Setting);
 
                 for (var j = 0; j < floorNode.Sets.Count; j++)
                 {
@@ -45,7 +46,10 @@ namespace GirderSchedule.App.Services.Schedule
                         continue;
                     }
 
-                    exportFloor.Sets.Add(setNode.Model);
+                    var exportSet = _copyService.Clone(setNode.Model);
+                    exportSet.MemberName = _displayService.Format(floorNode.FloorPrefix, setNode.Model.MemberName);
+
+                    exportFloor.Sets.Add(exportSet);
                 }
 
                 if (exportFloor.Sets.Count == 0)
@@ -57,6 +61,23 @@ namespace GirderSchedule.App.Services.Schedule
             }
 
             return exportProject;
+        }
+
+        private FloorSetting CloneFloorSetting(FloorSetting source)
+        {
+            if (source == null)
+            {
+                return new FloorSetting();
+            }
+
+            var setting = new FloorSetting();
+            setting.Prefix = source.Prefix;
+            setting.Name = source.Name;
+            setting.MainRebarDiameter = source.MainRebarDiameter;
+            setting.StirrupDiameter = source.StirrupDiameter;
+            setting.SkinRebarDiameter = source.SkinRebarDiameter;
+
+            return setting;
         }
     }
 }

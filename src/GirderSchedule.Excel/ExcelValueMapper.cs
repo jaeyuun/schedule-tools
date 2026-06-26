@@ -7,6 +7,7 @@ namespace GirderSchedule.Excel
 {
     public sealed class ExcelValueMapper
     {
+        private const double DefaultCover = 40.0;
         private readonly ScheduleItemQuery _query = new ScheduleItemQuery();
         private readonly ScheduleValueFormatter _formatter = new ScheduleValueFormatter();
 
@@ -17,7 +18,7 @@ namespace GirderSchedule.Excel
 
         public XLCellValue GetMemberId(ScheduleSet? set)
         {
-            return EmptyCell();
+            return string.Empty;
         }
 
         public XLCellValue GetMemberName(ScheduleSet? set)
@@ -40,19 +41,63 @@ namespace GirderSchedule.Excel
             return item == null || item.Section == null || item.Section.Height <= 0 ? EmptyCell() : item.Section.Height;
         }
 
-        public XLCellValue GetMainDiameter(ScheduleItem? item)
+        public XLCellValue GetRebarSectionText(ScheduleSet set)
         {
-            var top = item == null ? null : item.TopRebar;
-            var bottom = item == null ? null : item.BottomRebar;
-
-            if (top != null && top.Diameter > 0)
+            if (set == null)
             {
-                return "D" + FormatNumber(top.Diameter);
+                return string.Empty;
             }
 
-            if (bottom != null && bottom.Diameter > 0)
+            if (IsEnabled(set.Left) && IsEnabled(set.Center) && IsEnabled(set.Right))
             {
-                return "D" + FormatNumber(bottom.Diameter);
+                return "EACH";
+            }
+
+            if (IsEnabled(set.Left) || IsEnabled(set.Right))
+            {
+                return "BOTH";
+            }
+
+            if (IsEnabled(set.Center))
+            {
+                return "ALL";
+            }
+
+            return string.Empty;
+        }
+
+        private bool IsEnabled(ScheduleItem? item)
+        {
+            return item != null && item.IsSectionEnabled;
+        }
+
+        public XLCellValue GetCoverValue(ScheduleItem? item)
+        {
+            var cover = DefaultCover;
+            var mainRebar = item == null ? null : item.MainRebar;
+            var stirrup = item == null ? null : item.Stirrup;
+
+            // 40 + STR직경 + MAIN BAR(주근)직경 / 2
+            if (stirrup != null && stirrup.Diameter > 0)
+            {
+                cover += stirrup.Diameter;
+            }
+
+            if (mainRebar != null && mainRebar.Diameter > 0)
+            {
+                cover += mainRebar.Diameter / 2;
+            }
+
+            return Math.Round(cover, 1);
+        }
+
+        public XLCellValue GetMainDiameter(ScheduleItem? item)
+        {
+            var mainRebar = item == null ? null : item.MainRebar;
+
+            if (mainRebar != null && mainRebar.Diameter > 0)
+            {
+                return "D" + FormatNumber(mainRebar.Diameter);
             }
 
             return EmptyCell();
@@ -105,7 +150,7 @@ namespace GirderSchedule.Excel
 
         private XLCellValue EmptyCell()
         {
-            return string.Empty;
+            return 0;
         }
 
         private string FormatNumber(double value)

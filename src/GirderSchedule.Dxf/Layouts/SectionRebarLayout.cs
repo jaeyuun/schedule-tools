@@ -4,7 +4,7 @@ namespace GirderSchedule.Dxf.Layouts
     {
         public const double StirrupCover = 40.0;
         public const double RebarRadius = 12.5;
-        public const double LayerGap = 80.0;
+        public const double LayerGap = 50.0;
 
         public const double SkinMarkSize = 25.0;
         public const double SkinMarkWidth = 5.0;

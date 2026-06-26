@@ -66,7 +66,7 @@ namespace GirderSchedule.Excel
             range.Style.Border.LeftBorderColor = BorderColor;
             range.Style.Border.RightBorderColor = BorderColor;
         }
-
+        
         private static void ApplyDefaultFont(IXLWorksheet sheet)
         {
             sheet.Style.Font.FontName = FontName;

@@ -1,4 +1,4 @@
-using GirderSchedule.Domain.Models;
+using GirderSchedule.Domain.Models.Export;
 using GirderSchedule.Dxf.Constants;
 using GirderSchedule.Dxf.Drawers.Common;
 using GirderSchedule.Dxf.Layouts;
@@ -49,7 +49,7 @@ namespace GirderSchedule.Dxf.Drawers
 
             _textDrawer.DrawFormText("1", pageBaseX + TitleBlockLayout.TitleNumberX, pageBaseY + TitleBlockLayout.TitleNumberY, TitleBlockLayout.TitleNumberHeight);
 
-            var title = string.IsNullOrWhiteSpace(page.SheetTitle) ? "보 일람표-1" : page.SheetTitle;
+            var title = string.IsNullOrWhiteSpace(page.Title) ? "보 일람표-1" : page.Title;
             _textDrawer.DrawFormText(title, pageBaseX + TitleBlockLayout.TitleTextX, pageBaseY + TitleBlockLayout.TitleTextY, TitleBlockLayout.TitleTextHeight);
         }
 
@@ -70,7 +70,7 @@ namespace GirderSchedule.Dxf.Drawers
                 return;
             }
 
-            var drawingName = string.IsNullOrWhiteSpace(page.SheetTitleName) ? "보 일람표-1" : page.SheetTitleName;
+            var drawingName = string.IsNullOrWhiteSpace(page.Title) ? "보 일람표-1" : page.Title;
             _textDrawer.DrawValueText(drawingName, pageBaseX + TitleBlockLayout.DrawingNameTextX, pageBaseY + TitleBlockLayout.DrawingNameTextY, TitleBlockLayout.DrawingNameTextHeight);
         }
     }

@@ -56,22 +56,22 @@ namespace GirderSchedule.Domain.Services
 
         public int GetTopFirstCount(ScheduleItem item)
         {
-            return item == null || item.TopRebar == null || item.TopRebar.FirstLayer == null || item.TopRebar.FirstLayer.Count < 0 ? 0 : item.TopRebar.FirstLayer.Count;
+            return item == null || item.MainRebar == null || item.MainRebar.Top == null || item.MainRebar.Top.FirstCount < 0 ? 0 : item.MainRebar.Top.FirstCount;
         }
 
         public int GetTopSecondCount(ScheduleItem item)
         {
-            return item == null || item.TopRebar == null || item.TopRebar.SecondLayer == null || item.TopRebar.SecondLayer.Count < 0 ? 0 : item.TopRebar.SecondLayer.Count;
+            return item == null || item.MainRebar == null || item.MainRebar.Top == null || item.MainRebar.Top.SecondCount < 0 ? 0 : item.MainRebar.Top.SecondCount;
         }
 
         public int GetBottomFirstCount(ScheduleItem item)
         {
-            return item == null || item.BottomRebar == null || item.BottomRebar.FirstLayer == null || item.BottomRebar.FirstLayer.Count < 0 ? 0 : item.BottomRebar.FirstLayer.Count;
+            return item == null || item.MainRebar == null || item.MainRebar.Bottom == null || item.MainRebar.Bottom.FirstCount < 0 ? 0 : item.MainRebar.Bottom.FirstCount;
         }
 
         public int GetBottomSecondCount(ScheduleItem item)
         {
-            return item == null || item.BottomRebar == null || item.BottomRebar.SecondLayer == null || item.BottomRebar.SecondLayer.Count < 0 ? 0 : item.BottomRebar.SecondLayer.Count;
+            return item == null || item.MainRebar == null || item.MainRebar.Bottom == null || item.MainRebar.Bottom.SecondCount < 0 ? 0 : item.MainRebar.Bottom.SecondCount;
         }
 
         public int GetTopTotalCount(ScheduleItem item)

@@ -93,14 +93,14 @@
 
         <DataTemplate x:Key="SkinRebarInputTemplate">
             <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" IsEnabled="{Binding IsSkinRebarInputEnabled}">
                     <TextBlock Text="HD" VerticalAlignment="Center"/>
                     <TextBox Style="{StaticResource SmallTextBoxStyle}" Margin="2,0" behaviors:NumericTextBoxBehavior.PropertyName="SkinRebarDiameter" behaviors:NumericTextBoxBehavior.AllowNegative="False"/>
                     <TextBlock Text="@" VerticalAlignment="Center"/>
                     <TextBox Width="44" Height="20" Margin="2,0" Padding="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FocusVisualStyle="{x:Null}" behaviors:NumericTextBoxBehavior.PropertyName="SkinRebarSpacing" behaviors:NumericTextBoxBehavior.AllowNegative="False"/>
                 </StackPanel>
 
-                <TextBox Width="150" Height="20" Margin="0,4,0,0" Padding="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FocusVisualStyle="{x:Null}" Text="{Binding SkinRebarNote, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox Width="150" Height="20" Margin="0,4,0,0" Padding="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FocusVisualStyle="{x:Null}" Text="{Binding SkinRebarNote, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding IsSkinRebarInputEnabled}"/>
             </StackPanel>
         </DataTemplate>
 
@@ -175,9 +175,24 @@
                     </Border>
 
                     <Border Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="3" BorderBrush="#B8B8B8" BorderThickness="0,1,1,1">
-                        <StackPanel VerticalAlignment="Center">
-                            <TextBox Width="240" Height="24" Text="{Binding MemberName, UpdateSourceTrigger=PropertyChanged}"/>
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,6,0,0">
+                        <Grid VerticalAlignment="Center">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="24"/>
+                                <RowDefinition Height="28"/>
+                            </Grid.RowDefinitions>
+
+                            <Grid Grid.Row="0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="240"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Grid.Column="0" Width="54" Margin="0,0,8,0" HorizontalAlignment="Right" VerticalAlignment="Center" TextAlignment="Center" Text="{Binding FloorPrefix}"/>
+                                <TextBox Grid.Column="1" Width="240" Height="24" Text="{Binding MemberName, UpdateSourceTrigger=PropertyChanged}"/>
+                            </Grid>
+
+                            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,6,0,0">
                                 <TextBlock VerticalAlignment="Center" Text="(" FontSize="16"/>
                                 <TextBox Width="60" Height="22" Margin="4,0" behaviors:NumericTextBoxBehavior.PropertyName="WidthValue" behaviors:NumericTextBoxBehavior.AllowNegative="False"/>
                                 <TextBlock VerticalAlignment="Center" Text="×" FontSize="15"/>
@@ -188,7 +203,7 @@
                                 <TextBox Width="60" Height="22" Margin="4,0" behaviors:NumericTextBoxBehavior.PropertyName="HeightValue" behaviors:NumericTextBoxBehavior.AllowNegative="False"/>
                                 <TextBlock VerticalAlignment="Center" Text=")" FontSize="16"/>
                             </StackPanel>
-                        </StackPanel>
+                        </Grid>
                     </Border>
 
                     <Border Grid.Row="1" Grid.Column="0" BorderBrush="#B8B8B8" BorderThickness="1,0,1,1">

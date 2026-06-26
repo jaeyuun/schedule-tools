@@ -137,14 +137,13 @@ namespace GirderSchedule.App.ViewModels.Settings
             }
 
             var floor = new ScheduleFloor();
-            floor.Setting.FloorPrefix = InputFloorPrefix.Trim();
-            floor.Name = InputFloorName.Trim();
-            floor.Setting.FloorName = floor.Name;
+            floor.Setting.Prefix = InputFloorPrefix.Trim();
+            floor.Setting.Name = InputFloorName.Trim();
             floor.Setting.MainRebarDiameter = ParseDouble(InputMainRebarDiameter);
             floor.Setting.StirrupDiameter = ParseDouble(InputStirrupDiameter);
             floor.Setting.SkinRebarDiameter = ParseDouble(InputSkinRebarDiameter);
 
-            var set = _setFactory.Create("1G1", floor.Setting);
+            var set = _setFactory.Create("G1", floor.Setting);
             floor.Sets.Add(set);
 
             var node = new FloorNodeViewModel(floor);
@@ -166,7 +165,7 @@ namespace GirderSchedule.App.ViewModels.Settings
             }
 
             SelectedFloor.FloorPrefix = InputFloorPrefix.Trim();
-            SelectedFloor.Name = InputFloorName.Trim();
+            SelectedFloor.FloorName = InputFloorName.Trim();
             SelectedFloor.MainRebarDiameter = ParseDouble(InputMainRebarDiameter);
             SelectedFloor.StirrupDiameter = ParseDouble(InputStirrupDiameter);
             SelectedFloor.SkinRebarDiameter = ParseDouble(InputSkinRebarDiameter);
@@ -219,7 +218,7 @@ namespace GirderSchedule.App.ViewModels.Settings
             }
 
             InputFloorPrefix = SelectedFloor.FloorPrefix.ToString();
-            InputFloorName = SelectedFloor.Name;
+            InputFloorName = SelectedFloor.FloorName;
             InputMainRebarDiameter = ToInputText(SelectedFloor.MainRebarDiameter);
             InputStirrupDiameter = ToInputText(SelectedFloor.StirrupDiameter);
             InputSkinRebarDiameter = ToInputText(SelectedFloor.SkinRebarDiameter);

@@ -1,6 +1,5 @@
 ﻿using GirderSchedule.App.Commands;
 using GirderSchedule.Domain.Models;
-using GirderSchedule.Domain.Services;
 using System;
 using System.Windows.Input;
 
@@ -8,7 +7,7 @@ namespace GirderSchedule.App.ViewModels.Schedule
 {
     public sealed class ScheduleViewModel : ViewModelBase
     {
-        private ScheduleSheet _sheet;
+        private ScheduleFloor _floor;
         private ScheduleSet _set;
         private bool _isWidthOver;
         private bool _isHeightOver;
@@ -21,14 +20,22 @@ namespace GirderSchedule.App.ViewModels.Schedule
 
         public event EventHandler CurrentSetChanged;
 
-        public ScheduleSheet Sheet
-        {
-            get { return _sheet; }
-        }
-
         public ScheduleSet CurrentSet
         {
             get { return _set; }
+        }
+
+        public string FloorPrefix
+        {
+            get
+            {
+                if (_floor == null || _floor.Setting == null)
+                {
+                    return string.Empty;
+                }
+
+                return _floor.Setting.Prefix;
+            }
         }
 
         public string MemberName
@@ -49,22 +56,7 @@ namespace GirderSchedule.App.ViewModels.Schedule
                     return;
                 }
 
-                _set.MemberName = value;
-
-                if (Left != null)
-                {
-                    Left.Name = value;
-                }
-
-                if (Center != null)
-                {
-                    Center.Name = value;
-                }
-
-                if (Right != null)
-                {
-                    Right.Name = value;
-                }
+                _set.MemberName = value ?? string.Empty;
 
                 OnPropertyChanged(nameof(MemberName));
                 RefreshItems();
@@ -77,7 +69,7 @@ namespace GirderSchedule.App.ViewModels.Schedule
             get { return Left == null ? 0.0 : Left.WidthValue; }
             set
             {
-                if (Left == null || Left.WidthValue == value)
+                if (Left == null || Center == null || Right == null || Left.WidthValue == value)
                 {
                     return;
                 }
@@ -88,6 +80,7 @@ namespace GirderSchedule.App.ViewModels.Schedule
 
                 OnPropertyChanged(nameof(WidthValue));
                 RefreshItems();
+                RaiseCurrentSetChanged();
             }
         }
 
@@ -96,7 +89,7 @@ namespace GirderSchedule.App.ViewModels.Schedule
             get { return Left == null ? 0.0 : Left.HeightValue; }
             set
             {
-                if (Left == null || Left.HeightValue == value)
+                if (Left == null || Center == null || Right == null || Left.HeightValue == value)
                 {
                     return;
                 }
@@ -107,6 +100,7 @@ namespace GirderSchedule.App.ViewModels.Schedule
 
                 OnPropertyChanged(nameof(HeightValue));
                 RefreshItems();
+                RaiseCurrentSetChanged();
             }
         }
 
@@ -123,6 +117,7 @@ namespace GirderSchedule.App.ViewModels.Schedule
                 _isWidthOver = value;
                 OnPropertyChanged(nameof(IsWidthOver));
                 RefreshItems();
+                RaiseCurrentSetChanged();
             }
         }
 
@@ -139,26 +134,23 @@ namespace GirderSchedule.App.ViewModels.Schedule
                 _isHeightOver = value;
                 OnPropertyChanged(nameof(IsHeightOver));
                 RefreshItems();
+                RaiseCurrentSetChanged();
             }
         }
 
         public ScheduleViewModel()
         {
-            var service = new ScheduleBuildService();
-            _sheet = service.CreateSample();
-
             RedrawCommand = new RelayCommand(p => RefreshItems());
-
-            LoadSet(_sheet.Rows[0].Sets[0]);
         }
 
-        public void LoadSet(ScheduleSet set)
+        public void LoadSet(ScheduleFloor floor, ScheduleSet set)
         {
-            if (set == null)
+            if (floor == null || set == null)
             {
                 return;
             }
 
+            _floor = floor;
             _set = set;
 
             Left = new SectionItemViewModel(_set.Left);
@@ -171,10 +163,8 @@ namespace GirderSchedule.App.ViewModels.Schedule
 
             ApplySectionEnabledPositions();
 
-            EnsureSheetForCurrentSet();
-
             OnPropertyChanged(nameof(CurrentSet));
-            OnPropertyChanged(nameof(Sheet));
+            OnPropertyChanged(nameof(FloorPrefix));
             OnPropertyChanged(nameof(MemberName));
             OnPropertyChanged(nameof(WidthValue));
             OnPropertyChanged(nameof(HeightValue));
@@ -183,6 +173,7 @@ namespace GirderSchedule.App.ViewModels.Schedule
             OnPropertyChanged(nameof(Right));
 
             RefreshItems();
+            RaiseCurrentSetChanged();
         }
 
         private void RefreshItems()
@@ -216,19 +207,6 @@ namespace GirderSchedule.App.ViewModels.Schedule
             ApplySectionEnabledPositions();
             RefreshItems();
             RaiseCurrentSetChanged();
-        }
-
-        private void EnsureSheetForCurrentSet()
-        {
-            var service = new ScheduleBuildService();
-            _sheet = service.CreateSample();
-
-            if (_sheet.Rows.Count == 0 || _sheet.Rows[0].Sets.Count == 0)
-            {
-                return;
-            }
-
-            _sheet.Rows[0].Sets[0] = _set;
         }
 
         private void ApplySectionEnabledPositions()

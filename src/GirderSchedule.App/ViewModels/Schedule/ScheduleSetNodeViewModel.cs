@@ -1,9 +1,11 @@
-﻿using GirderSchedule.Domain.Models;
+﻿using GirderSchedule.App.Services.Schedule;
+using GirderSchedule.Domain.Models;
 
 namespace GirderSchedule.App.ViewModels.Schedule
 {
     public sealed class ScheduleSetNodeViewModel : ViewModelBase
     {
+        private readonly ScheduleMemberNameDisplayService _displayService = new ScheduleMemberNameDisplayService();
         private readonly ScheduleSet _model;
         private FloorNodeViewModel _parent;
         private bool _isChecked = true;
@@ -18,7 +20,17 @@ namespace GirderSchedule.App.ViewModels.Schedule
         public FloorNodeViewModel Parent
         {
             get { return _parent; }
-            set { _parent = value; }
+            set
+            {
+                if (_parent == value)
+                {
+                    return;
+                }
+
+                _parent = value;
+                OnPropertyChanged(nameof(Parent));
+                OnPropertyChanged(nameof(DisplayMemberName));
+            }
         }
 
         public string MemberName
@@ -33,20 +45,20 @@ namespace GirderSchedule.App.ViewModels.Schedule
 
                 _model.MemberName = value;
                 OnPropertyChanged(nameof(MemberName));
-                OnPropertyChanged(nameof(DisplayName));
+                OnPropertyChanged(nameof(DisplayMemberName));
             }
         }
 
-        public string DisplayName
+        public string DisplayMemberName
         {
             get
             {
-                if (string.IsNullOrWhiteSpace(MemberName))
+                if (Parent == null)
                 {
-                    return "(부재명 없음)";
+                    return MemberName;
                 }
 
-                return MemberName;
+                return _displayService.Format(Parent.FloorPrefix, MemberName);
             }
         }
 
@@ -55,7 +67,20 @@ namespace GirderSchedule.App.ViewModels.Schedule
             get { return _isChecked; }
             set
             {
-                SetChecked(value, true);
+                if (_isChecked == value)
+                {
+                    return;
+                }
+
+                _isChecked = value;
+                OnPropertyChanged(nameof(IsChecked));
+
+                if (_isInternalChanging || Parent == null)
+                {
+                    return;
+                }
+
+                Parent.UpdateCheckedFromChildren();
             }
         }
 
@@ -81,33 +106,21 @@ namespace GirderSchedule.App.ViewModels.Schedule
 
         public void SetCheckedFromParent(bool value)
         {
-            SetChecked(value, false);
-        }
-
-        private void SetChecked(bool value, bool updateParent)
-        {
             if (_isChecked == value)
             {
                 return;
             }
 
+            _isInternalChanging = true;
             _isChecked = value;
             OnPropertyChanged(nameof(IsChecked));
-
-            if (!updateParent || _isInternalChanging || Parent == null)
-            {
-                return;
-            }
-
-            _isInternalChanging = true;
-            Parent.UpdateCheckedFromChildren();
             _isInternalChanging = false;
         }
 
         public void RefreshAll()
         {
             OnPropertyChanged(nameof(MemberName));
-            OnPropertyChanged(nameof(DisplayName));
+            OnPropertyChanged(nameof(DisplayMemberName));
             OnPropertyChanged(nameof(IsChecked));
             OnPropertyChanged(nameof(IsSelected));
         }

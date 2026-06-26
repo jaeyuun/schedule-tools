@@ -145,7 +145,7 @@
                             </Grid.ColumnDefinitions>
 
                             <CheckBox Grid.Column="0" IsChecked="{Binding IsChecked}" VerticalAlignment="Center" Margin="0,0,4,0"/>
-                            <TextBlock Grid.Column="1" Text="{Binding DisplayName}" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" Text="{Binding FloorName}" VerticalAlignment="Center"/>
                             <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="8,0,0,0">
                                 <TextBlock Text="[" Foreground="#777777"/>
                                 <TextBlock Text="{Binding MainRebarText}" Foreground="#777777"/>
@@ -165,7 +165,7 @@
 
                             <CheckBox Grid.Column="0" IsChecked="{Binding IsChecked}" VerticalAlignment="Center" Margin="0,0,4,0"/>
 
-                            <TextBlock Grid.Column="1" Text="{Binding DisplayName}" VerticalAlignment="Center" Tag="{Binding DataContext, RelativeSource={RelativeSource AncestorType=TreeView}}">
+                            <TextBlock Grid.Column="1" Text="{Binding DisplayMemberName}" VerticalAlignment="Center" Tag="{Binding DataContext, RelativeSource={RelativeSource AncestorType=TreeView}}">
                                 <TextBlock.ContextMenu>
                                     <ContextMenu DataContext="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource Self}}">
                                         <MenuItem Header="부재 설정 복사" Command="{Binding CopyScheduleSetCommand}"/>

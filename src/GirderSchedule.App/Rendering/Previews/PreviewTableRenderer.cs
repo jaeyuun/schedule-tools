@@ -1,9 +1,8 @@
-using System.Windows.Controls;
-using DocumentFormat.OpenXml.Vml.Spreadsheet;
 using GirderSchedule.App.Rendering.Formatting;
 using GirderSchedule.App.Rendering.Models;
 using GirderSchedule.App.Rendering.Section;
 using GirderSchedule.Domain.Models;
+using System.Windows.Controls;
 
 namespace GirderSchedule.App.Rendering.Previews
 {
@@ -37,6 +36,11 @@ namespace GirderSchedule.App.Rendering.Previews
             if (layout.ShowLabels)
             {
                 DrawLabels(canvas, layout);
+            }
+
+            if (set == null)
+            {
+                return;
             }
 
             DrawMemberName(canvas, set, layout);
@@ -101,9 +105,24 @@ namespace GirderSchedule.App.Rendering.Previews
 
         private void DrawPartColumns(Canvas canvas, ScheduleSet set, SchedulePreviewCellLayout layout)
         {
-            DrawPartColumn(canvas, set.Left.Position, set.Left, layout.LeftX, layout);
-            DrawPartColumn(canvas, set.Center.Position, set.Center, layout.CenterX, layout);
-            DrawPartColumn(canvas, set.Right.Position, set.Right, layout.RightX, layout);
+            if (set == null)
+            {
+                return;
+            }
+
+            DrawPartColumn(canvas, GetPosition(set.Left), set.Left, layout.LeftX, layout);
+            DrawPartColumn(canvas, GetPosition(set.Center), set.Center, layout.CenterX, layout);
+            DrawPartColumn(canvas, GetPosition(set.Right), set.Right, layout.RightX, layout);
+        }
+
+        private string GetPosition(ScheduleItem item)
+        {
+            if (item == null)
+            {
+                return string.Empty;
+            }
+
+            return item.Position;
         }
 
         private void DrawPartColumn(Canvas canvas, string title, ScheduleItem item, double x, SchedulePreviewCellLayout layout)

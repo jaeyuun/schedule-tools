@@ -1,7 +1,7 @@
 ﻿using GirderSchedule.App.ViewModels.Export;
 using GirderSchedule.App.ViewModels.Schedule;
 using GirderSchedule.Domain.Models;
-using GirderSchedule.Dxf.Export;
+using GirderSchedule.Domain.Models.Export;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -12,6 +12,9 @@ namespace GirderSchedule.App.Services.Schedule
     {
         private const int SetsPerPage = 9;
         private const int SetsPerRow = 3;
+
+        private readonly ScheduleMemberNameDisplayService _displayService = new ScheduleMemberNameDisplayService();
+        private readonly ScheduleSetCopyService _copyService = new ScheduleSetCopyService();
 
         public List<ScheduleExportPage> Build(string scheduleTitle, ObservableCollection<FloorNodeViewModel> floors, DxfExportSetting setting)
         {
@@ -83,12 +86,15 @@ namespace GirderSchedule.App.Services.Schedule
             {
                 var setNode = floor.Sets[i];
 
-                if (setNode == null || !setNode.IsChecked)
+                if (setNode == null || !setNode.IsChecked || setNode.Model == null)
                 {
                     continue;
                 }
 
-                sets.Add(setNode.Model);
+                var exportSet = _copyService.Clone(setNode.Model);
+                exportSet.MemberName = _displayService.Format(floor.FloorPrefix, setNode.Model.MemberName);
+
+                sets.Add(exportSet);
             }
         }
 
@@ -132,9 +138,7 @@ namespace GirderSchedule.App.Services.Schedule
             for (var start = 0; start < sets.Count; start += SetsPerPage)
             {
                 var page = new ScheduleExportPage();
-                page.SheetTitle = title + "-" + pageNumber;
-                page.FloorName = string.Empty;
-                page.SheetTitleName = title + "-" + pageNumber;
+                page.Title = title + "-" + pageNumber;
 
                 var count = Math.Min(SetsPerPage, sets.Count - start);
 

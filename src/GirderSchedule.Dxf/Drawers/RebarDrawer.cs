@@ -53,7 +53,7 @@ namespace GirderSchedule.Dxf.Drawers
 
         private void DrawInternalStirrups(SectionLayout layout, ScheduleItem item)
         {
-            if (item.Stirrup == null || item.TopRebar == null || item.BottomRebar == null)
+            if (item.Stirrup == null || item.MainRebar == null)
             {
                 return;
             }

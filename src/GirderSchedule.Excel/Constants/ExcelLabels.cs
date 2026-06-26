@@ -18,11 +18,6 @@
         public const string Center = "CENTER";
         public const string EndJ = "END(J)";
 
-        public const string Type = "TYPE";
-        public const string Diameter = "DIA";
-        public const string Layer = "LAYER";
-        public const string No = "NO";
-
         public const string RebarSection = "ALL";
         public const string MainRebarType = "MAIN";
         public const string StirrupRebarType = "STR";

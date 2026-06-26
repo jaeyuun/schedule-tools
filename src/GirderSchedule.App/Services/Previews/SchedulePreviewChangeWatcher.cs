@@ -158,7 +158,7 @@ namespace GirderSchedule.App.Services.Previews
 
         private void Floor_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(FloorNodeViewModel.IsChecked) || e.PropertyName == nameof(FloorNodeViewModel.DisplayName) || e.PropertyName == nameof(FloorNodeViewModel.Name))
+            if (e.PropertyName == nameof(FloorNodeViewModel.IsChecked) || e.PropertyName == nameof(FloorNodeViewModel.FloorPrefix) || e.PropertyName == nameof(FloorNodeViewModel.FloorName))
             {
                 RaiseChanged();
             }
@@ -166,7 +166,7 @@ namespace GirderSchedule.App.Services.Previews
 
         private void Set_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(ScheduleSetNodeViewModel.IsChecked) || e.PropertyName == nameof(ScheduleSetNodeViewModel.DisplayName) || e.PropertyName == nameof(ScheduleSetNodeViewModel.MemberName))
+            if (e.PropertyName == nameof(ScheduleSetNodeViewModel.IsChecked) || e.PropertyName == nameof(ScheduleSetNodeViewModel.MemberName))
             {
                 RaiseChanged();
             }

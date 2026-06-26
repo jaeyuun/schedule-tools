@@ -1,8 +1,10 @@
 ﻿using GirderSchedule.App.Rendering.Previews;
 using GirderSchedule.App.Services.Previews;
+using GirderSchedule.App.Services.Schedule;
+using GirderSchedule.App.ViewModels.Export;
 using GirderSchedule.App.ViewModels.Schedule;
 using GirderSchedule.App.Views.Schedule.Behaviors;
-using GirderSchedule.Domain.Models;
+using GirderSchedule.Domain.Models.Export;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -14,12 +16,13 @@ namespace GirderSchedule.App.Views.Schedule
     public partial class ScheduleExportPreview : UserControl
     {
         public static readonly DependencyProperty FloorsProperty = DependencyProperty.Register(nameof(Floors), typeof(ObservableCollection<FloorNodeViewModel>), typeof(ScheduleExportPreview), new PropertyMetadata(null, OnFloorsChanged));
-
-        private const int PageSize = 9;
+        public static readonly DependencyProperty ScheduleTitleProperty = DependencyProperty.Register(nameof(ScheduleTitle), typeof(string), typeof(ScheduleExportPreview), new PropertyMetadata("보 일람표", OnScheduleTitleChanged));
 
         private readonly PreviewRenderer _renderer = new PreviewRenderer();
-        private readonly SchedulePreviewPageService _pageService = new SchedulePreviewPageService();
+        private readonly ScheduleExportPageBuilder _pageBuilder = new ScheduleExportPageBuilder();
         private readonly SchedulePreviewChangeWatcher _changeWatcher = new SchedulePreviewChangeWatcher();
+
+        private readonly List<ScheduleExportPage> _pages = new List<ScheduleExportPage>();
 
         private PreviewPanZoomController _panZoomController;
         private bool _isRefreshQueued;
@@ -29,6 +32,12 @@ namespace GirderSchedule.App.Views.Schedule
         {
             get { return (ObservableCollection<FloorNodeViewModel>)GetValue(FloorsProperty); }
             set { SetValue(FloorsProperty, value); }
+        }
+
+        public string ScheduleTitle
+        {
+            get { return (string)GetValue(ScheduleTitleProperty); }
+            set { SetValue(ScheduleTitleProperty, value); }
         }
 
         public ScheduleExportPreview()
@@ -49,11 +58,22 @@ namespace GirderSchedule.App.Views.Schedule
                 return;
             }
 
-            var oldFloors = e.OldValue as ObservableCollection<FloorNodeViewModel>;
             var newFloors = e.NewValue as ObservableCollection<FloorNodeViewModel>;
 
             control._changeWatcher.Attach(newFloors, control.QueueRefreshByWatcher);
             control.QueueRefresh(true);
+        }
+
+        private static void OnScheduleTitleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var control = d as ScheduleExportPreview;
+
+            if (control == null)
+            {
+                return;
+            }
+
+            control.QueueRefresh(control.IsFitMode());
         }
 
         private void QueueRefreshByWatcher()
@@ -194,10 +214,41 @@ namespace GirderSchedule.App.Views.Schedule
 
         private void RebuildPages()
         {
-            _pageService.Rebuild(Floors);
-            _currentPageIndex = _pageService.NormalizePageIndex(_currentPageIndex, PageSize);
+            _pages.Clear();
 
+            var setting = new DxfExportSetting();
+            setting.ContinueAcrossFloors = true;
+
+            var pages = _pageBuilder.Build(ScheduleTitle, Floors, setting);
+
+            for (var i = 0; i < pages.Count; i++)
+            {
+                _pages.Add(pages[i]);
+            }
+
+            NormalizePageIndex();
             UpdatePageState();
+        }
+
+        private void NormalizePageIndex()
+        {
+            var pageCount = GetPageCount();
+
+            if (pageCount <= 0)
+            {
+                _currentPageIndex = 0;
+                return;
+            }
+
+            if (_currentPageIndex < 0)
+            {
+                _currentPageIndex = 0;
+            }
+
+            if (_currentPageIndex >= pageCount)
+            {
+                _currentPageIndex = pageCount - 1;
+            }
         }
 
         private void Redraw()
@@ -209,20 +260,35 @@ namespace GirderSchedule.App.Views.Schedule
 
             PreviewCanvas.Children.Clear();
 
-            var pageSets = GetCurrentPageSets();
-            _renderer.Draw(PreviewCanvas, pageSets, _currentPageIndex + 1, GetPageCount());
+            var page = GetCurrentPage();
+            _renderer.Draw(PreviewCanvas, page, _currentPageIndex + 1, GetPageCount());
 
             UpdatePageState();
         }
 
-        private List<ScheduleSet> GetCurrentPageSets()
+        private ScheduleExportPage GetCurrentPage()
         {
-            return _pageService.GetPageSets(_currentPageIndex, PageSize);
+            if (_pages.Count == 0)
+            {
+                return null;
+            }
+
+            if (_currentPageIndex < 0 || _currentPageIndex >= _pages.Count)
+            {
+                return null;
+            }
+
+            return _pages[_currentPageIndex];
         }
 
         private int GetPageCount()
         {
-            return _pageService.GetPageCount(PageSize);
+            if (_pages.Count == 0)
+            {
+                return 1;
+            }
+
+            return _pages.Count;
         }
 
         private void UpdatePageState()
@@ -236,12 +302,12 @@ namespace GirderSchedule.App.Views.Schedule
 
             if (PrevPageButton != null)
             {
-                PrevPageButton.IsEnabled = _currentPageIndex > 0;
+                PrevPageButton.IsEnabled = _pages.Count > 0 && _currentPageIndex > 0;
             }
 
             if (NextPageButton != null)
             {
-                NextPageButton.IsEnabled = _currentPageIndex < pageCount - 1;
+                NextPageButton.IsEnabled = _pages.Count > 0 && _currentPageIndex < pageCount - 1;
             }
         }
     }

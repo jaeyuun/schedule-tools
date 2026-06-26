@@ -52,13 +52,11 @@ namespace GirderSchedule.App.Services.Schedule
                 return;
             }
 
-            target.Name = source.Name;
             target.Position = source.Position;
             target.IsSectionEnabled = source.IsSectionEnabled;
 
             CopySection(source.Section, target.Section);
-            CopyRebarSet(source.TopRebar, target.TopRebar);
-            CopyRebarSet(source.BottomRebar, target.BottomRebar);
+            CopyMainRebar(source.MainRebar, target.MainRebar);
             CopyStirrup(source.Stirrup, target.Stirrup);
             CopyMemberForce(source.MemberForce, target.MemberForce);
             CopySkinRebar(source.SkinRebar, target.SkinRebar);
@@ -75,7 +73,7 @@ namespace GirderSchedule.App.Services.Schedule
             target.Height = source.Height;
         }
 
-        private void CopyRebarSet(RebarSet source, RebarSet target)
+        private void CopyMainRebar(MainRebarData source, MainRebarData target)
         {
             if (source == null || target == null)
             {
@@ -83,18 +81,19 @@ namespace GirderSchedule.App.Services.Schedule
             }
 
             target.Diameter = source.Diameter;
-            CopyRebarLayer(source.FirstLayer, target.FirstLayer);
-            CopyRebarLayer(source.SecondLayer, target.SecondLayer);
+            CopyRebarSet(source.Top, target.Top);
+            CopyRebarSet(source.Bottom, target.Bottom);
         }
 
-        private void CopyRebarLayer(RebarLayer source, RebarLayer target)
+        private void CopyRebarSet(RebarSet source, RebarSet target)
         {
             if (source == null || target == null)
             {
                 return;
             }
 
-            target.Count = source.Count;
+            target.FirstCount = source.FirstCount;
+            target.SecondCount = source.SecondCount;
         }
 
         private void CopyStirrup(StirrupData source, StirrupData target)
@@ -107,7 +106,6 @@ namespace GirderSchedule.App.Services.Schedule
             target.Legs = source.Legs;
             target.Diameter = source.Diameter;
             target.Spacing = source.Spacing;
-            target.ExtraText = source.ExtraText;
         }
 
         private void CopyMemberForce(MemberForceData source, MemberForceData target)

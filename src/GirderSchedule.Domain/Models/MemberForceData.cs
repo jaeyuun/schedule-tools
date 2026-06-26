@@ -2,13 +2,7 @@
 {
     public sealed class MemberForceData
     {
-        public double? Moment { get; set; }
-        public double? Shear { get; set; }
-
-        public MemberForceData()
-        {
-            Moment = null;
-            Shear = null;
-        }
+        public double? Moment { get; set; } = null;
+        public double? Shear { get; set; } = null;
     }
 }

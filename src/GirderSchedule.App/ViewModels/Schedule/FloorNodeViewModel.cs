@@ -20,52 +20,36 @@ namespace GirderSchedule.App.ViewModels.Schedule
 
         public string FloorPrefix
         {
-            get { return _model.Setting.FloorPrefix; }
+            get { return _model.Setting.Prefix; }
             set
             {
-                if (_model.Setting.FloorPrefix == value)
+                if (_model.Setting.Prefix == value)
                 {
                     return;
                 }
 
-                _model.Setting.FloorPrefix = value;
+                _model.Setting.Prefix = value ?? string.Empty;
                 OnPropertyChanged(nameof(FloorPrefix));
-                OnPropertyChanged(nameof(DisplayName));
+
+                for (var i = 0; i < Sets.Count; i++)
+                {
+                    Sets[i].RefreshAll();
+                }
             }
         }
 
-        public string Name
+        public string FloorName
         {
-            get { return _model.Name; }
+            get { return _model.Setting.Name; }
             set
             {
-                if (_model.Name == value)
+                if (_model.Setting.Name == value)
                 {
                     return;
                 }
 
-                _model.Name = value;
-
-                if (_model.Setting != null)
-                {
-                    _model.Setting.FloorName = value;
-                }
-
-                OnPropertyChanged(nameof(Name));
-                OnPropertyChanged(nameof(DisplayName));
-            }
-        }
-
-        public string DisplayName
-        {
-            get
-            {
-                if (string.IsNullOrWhiteSpace(Name))
-                {
-                    return "(층 이름 없음)";
-                }
-
-                return Name;
+                _model.Setting.Name = value ?? string.Empty;
+                OnPropertyChanged(nameof(FloorName));
             }
         }
 
@@ -205,11 +189,6 @@ namespace GirderSchedule.App.ViewModels.Schedule
                 _model.Setting = new FloorSetting();
             }
 
-            if (string.IsNullOrWhiteSpace(_model.Setting.FloorName))
-            {
-                _model.Setting.FloorName = _model.Name;
-            }
-
             if (_model.Sets == null)
             {
                 _model.Sets = new System.Collections.Generic.List<ScheduleSet>();
@@ -283,8 +262,7 @@ namespace GirderSchedule.App.ViewModels.Schedule
         public void RefreshAll()
         {
             OnPropertyChanged(nameof(FloorPrefix));
-            OnPropertyChanged(nameof(Name));
-            OnPropertyChanged(nameof(DisplayName));
+            OnPropertyChanged(nameof(FloorName));
             OnPropertyChanged(nameof(MainRebarDiameter));
             OnPropertyChanged(nameof(StirrupDiameter));
             OnPropertyChanged(nameof(SkinRebarDiameter));

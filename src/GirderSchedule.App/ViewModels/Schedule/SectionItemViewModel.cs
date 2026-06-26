@@ -16,21 +16,6 @@ namespace GirderSchedule.App.ViewModels.Schedule
             get { return _model; }
         }
 
-        public string Name
-        {
-            get { return _model.Name; }
-            set
-            {
-                if (_model.Name == value)
-                {
-                    return;
-                }
-
-                _model.Name = value;
-                OnPropertyChanged(nameof(Name));
-            }
-        }
-
         public string Position
         {
             get { return _model.Position; }
@@ -73,7 +58,13 @@ namespace GirderSchedule.App.ViewModels.Schedule
 
                 _model.Section.Height = value;
                 OnPropertyChanged(nameof(HeightValue));
+                OnPropertyChanged(nameof(IsSkinRebarInputEnabled));
             }
+        }
+
+        public bool IsSkinRebarInputEnabled
+        {
+            get { return _model.Section.Height > 900.0; }
         }
 
         public string SectionNote
@@ -94,15 +85,15 @@ namespace GirderSchedule.App.ViewModels.Schedule
 
         public int TopCount1
         {
-            get { return _model.TopRebar.FirstLayer.Count; }
+            get { return _model.MainRebar.Top.FirstCount; }
             set
             {
-                if (_model.TopRebar.FirstLayer.Count == value)
+                if (_model.MainRebar.Top.FirstCount == value)
                 {
                     return;
                 }
 
-                _model.TopRebar.FirstLayer.Count = value;
+                _model.MainRebar.Top.FirstCount = value;
                 OnPropertyChanged(nameof(TopCount1));
                 OnPropertyChanged(nameof(TopTotalCount));
                 OnPropertyChanged(nameof(TopText1));
@@ -111,15 +102,15 @@ namespace GirderSchedule.App.ViewModels.Schedule
 
         public double TopDiameter
         {
-            get { return _model.TopRebar.Diameter; }
+            get { return _model.MainRebar.Diameter; }
             set
             {
-                if (_model.TopRebar.Diameter == value)
+                if (_model.MainRebar.Diameter == value)
                 {
                     return;
                 }
 
-                _model.TopRebar.Diameter = value;
+                _model.MainRebar.Diameter = value;
                 OnPropertyChanged(nameof(TopDiameter));
                 OnPropertyChanged(nameof(TopText1));
                 OnPropertyChanged(nameof(TopText2));
@@ -128,15 +119,15 @@ namespace GirderSchedule.App.ViewModels.Schedule
 
         public int TopCount2
         {
-            get { return _model.TopRebar.SecondLayer.Count; }
+            get { return _model.MainRebar.Top.SecondCount; }
             set
             {
-                if (_model.TopRebar.SecondLayer.Count == value)
+                if (_model.MainRebar.Top.SecondCount == value)
                 {
                     return;
                 }
 
-                _model.TopRebar.SecondLayer.Count = value;
+                _model.MainRebar.Top.SecondCount = value;
                 OnPropertyChanged(nameof(TopCount2));
                 OnPropertyChanged(nameof(TopTotalCount));
                 OnPropertyChanged(nameof(TopText2));
@@ -145,20 +136,20 @@ namespace GirderSchedule.App.ViewModels.Schedule
 
         public int TopTotalCount
         {
-            get { return _model.TopRebar.FirstLayer.Count + _model.TopRebar.SecondLayer.Count; }
+            get { return _model.MainRebar.Top.FirstCount + _model.MainRebar.Top.SecondCount; }
         }
 
         public int BottomCount1
         {
-            get { return _model.BottomRebar.FirstLayer.Count; }
+            get { return _model.MainRebar.Bottom.FirstCount; }
             set
             {
-                if (_model.BottomRebar.FirstLayer.Count == value)
+                if (_model.MainRebar.Bottom.FirstCount == value)
                 {
                     return;
                 }
 
-                _model.BottomRebar.FirstLayer.Count = value;
+                _model.MainRebar.Bottom.FirstCount = value;
                 OnPropertyChanged(nameof(BottomCount1));
                 OnPropertyChanged(nameof(BottomTotalCount));
                 OnPropertyChanged(nameof(BottomText1));
@@ -167,15 +158,15 @@ namespace GirderSchedule.App.ViewModels.Schedule
 
         public double BottomDiameter
         {
-            get { return _model.BottomRebar.Diameter; }
+            get { return _model.MainRebar.Diameter; }
             set
             {
-                if (_model.BottomRebar.Diameter == value)
+                if (_model.MainRebar.Diameter == value)
                 {
                     return;
                 }
 
-                _model.BottomRebar.Diameter = value;
+                _model.MainRebar.Diameter = value;
                 OnPropertyChanged(nameof(BottomDiameter));
                 OnPropertyChanged(nameof(BottomText1));
                 OnPropertyChanged(nameof(BottomText2));
@@ -184,15 +175,15 @@ namespace GirderSchedule.App.ViewModels.Schedule
 
         public int BottomCount2
         {
-            get { return _model.BottomRebar.SecondLayer.Count; }
+            get { return _model.MainRebar.Bottom.SecondCount; }
             set
             {
-                if (_model.BottomRebar.SecondLayer.Count == value)
+                if (_model.MainRebar.Bottom.SecondCount == value)
                 {
                     return;
                 }
 
-                _model.BottomRebar.SecondLayer.Count = value;
+                _model.MainRebar.Bottom.SecondCount = value;
                 OnPropertyChanged(nameof(BottomCount2));
                 OnPropertyChanged(nameof(BottomTotalCount));
                 OnPropertyChanged(nameof(BottomText2));
@@ -201,7 +192,7 @@ namespace GirderSchedule.App.ViewModels.Schedule
 
         public int BottomTotalCount
         {
-            get { return _model.BottomRebar.FirstLayer.Count + _model.BottomRebar.SecondLayer.Count; }
+            get { return _model.MainRebar.Bottom.FirstCount + _model.MainRebar.Bottom.SecondCount; }
         }
 
         public int StirrupLegs
@@ -342,22 +333,22 @@ namespace GirderSchedule.App.ViewModels.Schedule
 
         public string TopText1
         {
-            get { return _textService.FormatLayerText(_model.TopRebar.FirstLayer.Count, _model.TopRebar.Diameter); }
+            get { return _textService.FormatLayerText(_model.MainRebar.Top.FirstCount, _model.MainRebar.Diameter); }
         }
 
         public string TopText2
         {
-            get { return _textService.FormatLayerText(_model.TopRebar.SecondLayer.Count, _model.TopRebar.Diameter); }
+            get { return _textService.FormatLayerText(_model.MainRebar.Top.SecondCount, _model.MainRebar.Diameter); }
         }
 
         public string BottomText1
         {
-            get { return _textService.FormatLayerText(_model.BottomRebar.FirstLayer.Count, _model.BottomRebar.Diameter); }
+            get { return _textService.FormatLayerText(_model.MainRebar.Bottom.FirstCount, _model.MainRebar.Diameter); }
         }
 
         public string BottomText2
         {
-            get { return _textService.FormatLayerText(_model.BottomRebar.SecondLayer.Count, _model.BottomRebar.Diameter); }
+            get { return _textService.FormatLayerText(_model.MainRebar.Bottom.SecondCount, _model.MainRebar.Diameter); }
         }
 
         public string StirrupText
@@ -393,10 +384,10 @@ namespace GirderSchedule.App.ViewModels.Schedule
 
         public void RefreshAll()
         {
-            OnPropertyChanged(nameof(Name));
             OnPropertyChanged(nameof(Position));
             OnPropertyChanged(nameof(WidthValue));
             OnPropertyChanged(nameof(HeightValue));
+            OnPropertyChanged(nameof(IsSkinRebarInputEnabled));
             OnPropertyChanged(nameof(TopCount1));
             OnPropertyChanged(nameof(TopCount2));
             OnPropertyChanged(nameof(TopDiameter));

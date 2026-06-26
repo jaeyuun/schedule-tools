@@ -1,6 +1,4 @@
 ﻿using GirderSchedule.Domain.Models;
-using GirderSchedule.Domain.Services;
-using System;
 
 namespace GirderSchedule.App.Services.Schedule
 {
@@ -10,20 +8,51 @@ namespace GirderSchedule.App.Services.Schedule
 
         public ScheduleSet Create(string memberName, FloorSetting setting)
         {
-            var service = new ScheduleBuildService();
-            var sheet = service.CreateSample();
-
-            if (sheet == null || sheet.Rows == null || sheet.Rows.Count == 0 || sheet.Rows[0].Sets == null || sheet.Rows[0].Sets.Count == 0)
-            {
-                throw new InvalidOperationException("기본 보 일람표 샘플을 생성할 수 없습니다.");
-            }
-
-            var set = sheet.Rows[0].Sets[0];
-
+            var set = CreateDefaultSet();
             ApplyMemberName(set, memberName);
             _floorSettingApplyService.Apply(set, setting);
 
             return set;
+        }
+
+        private ScheduleSet CreateDefaultSet()
+        {
+            var set = new ScheduleSet();
+
+            set.MemberName = "G1";
+            set.Left = CreateItem("END");
+            set.Center = CreateItem("CEN");
+            set.Right = CreateItem("END");
+
+            return set;
+        }
+
+        private ScheduleItem CreateItem(string position)
+        {
+            var item = new ScheduleItem();
+
+            item.Position = position;
+            item.IsSectionEnabled = true;
+
+            item.Section.Width = 400.0;
+            item.Section.Height = 600.0;
+
+            item.MainRebar.Diameter = 0.0;
+            item.MainRebar.Top.FirstCount = 0;
+            item.MainRebar.Top.SecondCount = 0;
+
+            item.MainRebar.Diameter = 0.0;
+            item.MainRebar.Bottom.FirstCount = 0;
+            item.MainRebar.Bottom.SecondCount = 0;
+
+            item.Stirrup.Legs = 2;
+            item.Stirrup.Diameter = 0.0;
+            item.Stirrup.Spacing = 0;
+
+            item.SkinRebar.Diameter = 0.0;
+            item.SkinRebar.Spacing = 0;
+
+            return item;
         }
 
         private void ApplyMemberName(ScheduleSet set, string memberName)
@@ -33,26 +62,7 @@ namespace GirderSchedule.App.Services.Schedule
                 return;
             }
 
-            var name = string.IsNullOrWhiteSpace(memberName) ? "1G1" : memberName;
-            set.MemberName = name;
-
-            if (set.Left != null)
-            {
-                set.Left.Name = name;
-                set.Left.IsSectionEnabled = true;
-            }
-
-            if (set.Center != null)
-            {
-                set.Center.Name = name;
-                set.Center.IsSectionEnabled = true;
-            }
-
-            if (set.Right != null)
-            {
-                set.Right.Name = name;
-                set.Right.IsSectionEnabled = true;
-            }
+            set.MemberName = string.IsNullOrWhiteSpace(memberName) ? "G1" : memberName;
         }
     }
 }

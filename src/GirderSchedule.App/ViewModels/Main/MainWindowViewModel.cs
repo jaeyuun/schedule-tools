@@ -2,20 +2,13 @@
 using GirderSchedule.App.Services.Export;
 using GirderSchedule.App.Services.Project;
 using GirderSchedule.App.Services.Schedule;
-using GirderSchedule.App.Utils;
-using GirderSchedule.App.ViewModels.Export;
 using GirderSchedule.App.ViewModels.Schedule;
 using GirderSchedule.App.ViewModels.Settings;
-using GirderSchedule.App.Views.Export;
 using GirderSchedule.App.Views.Settings;
 using GirderSchedule.Domain.Models;
-using GirderSchedule.Dxf.Export;
-using GirderSchedule.Excel;
 using Microsoft.Win32;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Windows;
 using System.Windows.Input;
 
@@ -185,7 +178,11 @@ namespace GirderSchedule.App.ViewModels.Main
                 }
 
                 _selectedSet.IsSelected = true;
-                Editor.LoadSet(_selectedSet.Model);
+
+                if (parentFloor != null)
+                {
+                    Editor.LoadSet(parentFloor.Model, _selectedSet.Model);
+                }
             }
         }
 
@@ -420,7 +417,7 @@ namespace GirderSchedule.App.ViewModels.Main
                     continue;
                 }
 
-                var set = _setFactory.Create("1G1", floor.Setting);
+                var set = _setFactory.Create("G1", floor.Setting);
                 floor.AddSet(set);
             }
         }
@@ -447,7 +444,7 @@ namespace GirderSchedule.App.ViewModels.Main
                 return;
             }
 
-            var memberName = SelectedFloor.FloorPrefix + "G" + (SelectedFloor.Sets.Count + 1);
+            var memberName = "G" + (SelectedFloor.Sets.Count + 1);
             var set = _setFactory.Create(memberName, SelectedFloor.Setting);
             var node = SelectedFloor.AddSet(set);
             SelectedSet = node;
@@ -529,6 +526,11 @@ namespace GirderSchedule.App.ViewModels.Main
 
         private void ExportProjectExcel()
         {
+            if (!SaveProjectBeforeExport())
+            {
+                return;
+            }
+
             _exportService.ExportExcel(Project, Floors);
         }
 
@@ -536,7 +538,7 @@ namespace GirderSchedule.App.ViewModels.Main
         {
             if (string.IsNullOrWhiteSpace(CurrentFilePath))
             {
-                var result = MessageBox.Show("프로젝트 파일이 아직 저장되지 않았습니다.\r\nDXF 내보내기 전에 프로젝트를 먼저 저장해야 합니다.\r\n\r\n프로젝트를 저장하시겠습니까?", "프로젝트 저장 필요", MessageBoxButton.YesNo, MessageBoxImage.Information);
+                var result = MessageBox.Show("프로젝트 파일이 아직 저장되지 않았습니다.\r\n내보내기 전에 프로젝트를 먼저 저장해야 합니다.\r\n\r\n프로젝트를 저장하시겠습니까?", "프로젝트 저장 필요", MessageBoxButton.YesNo, MessageBoxImage.Information);
 
                 if (result != MessageBoxResult.Yes)
                 {
@@ -752,7 +754,7 @@ namespace GirderSchedule.App.ViewModels.Main
             if (SelectedSet != null && floor.Sets.Contains(SelectedSet))
             {
                 SelectedSet.RefreshAll();
-                Editor.LoadSet(SelectedSet.Model);
+                Editor.LoadSet(floor.Model, SelectedSet.Model);
             }
         }
 
@@ -812,7 +814,13 @@ namespace GirderSchedule.App.ViewModels.Main
             _scheduleSetCopyService.CopyTo(_copiedScheduleSet, SelectedSet.Model);
 
             SelectedSet.RefreshAll();
-            Editor.LoadSet(SelectedSet.Model);
+
+            var parentFloor = FindFloorBySet(SelectedSet);
+
+            if (parentFloor != null)
+            {
+                Editor.LoadSet(parentFloor.Model, SelectedSet.Model);
+            }
 
             IsDirty = true;
         }

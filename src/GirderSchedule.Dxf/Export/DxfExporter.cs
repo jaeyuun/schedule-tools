@@ -1,6 +1,4 @@
-using System;
-using System.Collections.Generic;
-using GirderSchedule.Domain.Models;
+using GirderSchedule.Domain.Models.Export;
 using GirderSchedule.Dxf.Documents;
 using GirderSchedule.Dxf.Drawers;
 using GirderSchedule.Dxf.Drawers.Common;
@@ -49,6 +47,8 @@ namespace GirderSchedule.Dxf.Export
             var template = _loader.LoadTemplate(options.TemplatePath);
             var document = template.Document;
 
+            ClearModelSpaceEntities(document);
+
             _validator.Ensure(document);
 
             var scheduleDrawer = CreateScheduleDrawer(document, options, template.Overrides);
@@ -80,6 +80,16 @@ namespace GirderSchedule.Dxf.Export
             var scheduleDrawer = new ScheduleDrawer(textDrawer, tableDrawer, titleBlockDrawer, sectionDrawer, rebarDrawer, dimensionDrawer, rebarTextDrawer, _layoutFactory);
 
             return scheduleDrawer;
+        }
+
+        private static void ClearModelSpaceEntities(DxfDocument document)
+        {
+            #if RELEASE
+            foreach (var entity in document.Entities.All.ToList())
+            {
+                document.Entities.Remove(entity);
+            }
+            #endif
         }
     }
 }

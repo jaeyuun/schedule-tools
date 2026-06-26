@@ -2,29 +2,13 @@
 {
     public sealed class ScheduleItem
     {
-        public string Name { get; set; }
-        public string Position { get; set; }
-        public bool IsSectionEnabled { get; set; }
+        public string Position { get; set; } = string.Empty;
+        public bool IsSectionEnabled { get; set; } = true;
 
-        public SectionData Section { get; set; }
-        public RebarSet TopRebar { get; set; }
-        public RebarSet BottomRebar { get; set; }
-        public StirrupData Stirrup { get; set; }
-        public MemberForceData MemberForce { get; set; }
-        public SkinRebarData SkinRebar { get; set; }
-
-        public ScheduleItem()
-        {
-            Name = string.Empty;
-            Position = string.Empty;
-            IsSectionEnabled = true;
-
-            Section = new SectionData();
-            TopRebar = new RebarSet();
-            BottomRebar = new RebarSet();
-            Stirrup = new StirrupData();
-            MemberForce = new MemberForceData();
-            SkinRebar = new SkinRebarData();
-        }
+        public SectionData Section { get; set; } = new SectionData();
+        public MainRebarData MainRebar { get; set; } = new MainRebarData();
+        public StirrupData Stirrup { get; set; } = new StirrupData();
+        public MemberForceData MemberForce { get; set; } = new MemberForceData();
+        public SkinRebarData SkinRebar { get; set; } = new SkinRebarData();
     }
 }

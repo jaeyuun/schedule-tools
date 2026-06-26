@@ -25,33 +25,33 @@ namespace GirderSchedule.Excel.Layouts
         public const int EndJStartColumn = 18;
         public const int EndJEndColumn = 20;
 
-        public const double DefaultColumnWidth = 8.0;
+        public const double DefaultColumnWidth = 8.43;
         public const double HeaderRowHeight = 13.5;
         public const double DefaultRowHeight = 13.5;
         public const double FloorNameRowHeight = 20.0;
 
         public static readonly ExcelColumnWidth[] ColumnWidths =
         {
-            new ExcelColumnWidth("A", 8.0),
+            new ExcelColumnWidth("A", DefaultColumnWidth),
             new ExcelColumnWidth("B", 13.0),
             new ExcelColumnWidth("C", 6.0),
-            new ExcelColumnWidth("D", 4.0),
+            new ExcelColumnWidth("D", 3.0),
             new ExcelColumnWidth("E", 6.0),
-            new ExcelColumnWidth("F", 15.0),
+            new ExcelColumnWidth("F", 16.0),
             new ExcelColumnWidth("G", 13.0),
-            new ExcelColumnWidth("H", 8.0),
-            new ExcelColumnWidth("I", 8.0),
-            new ExcelColumnWidth("J", 8.0),
-            new ExcelColumnWidth("K", 6.0),
-            new ExcelColumnWidth("L", 6.0),
+            new ExcelColumnWidth("H", DefaultColumnWidth),
+            new ExcelColumnWidth("I", DefaultColumnWidth),
+            new ExcelColumnWidth("J", DefaultColumnWidth),
+            new ExcelColumnWidth("K", DefaultColumnWidth),
+            new ExcelColumnWidth("L", DefaultColumnWidth),
             new ExcelColumnWidth("M", 4.0),
-            new ExcelColumnWidth("N", 6.0),
-            new ExcelColumnWidth("O", 6.0),
+            new ExcelColumnWidth("N", DefaultColumnWidth),
+            new ExcelColumnWidth("O", DefaultColumnWidth),
             new ExcelColumnWidth("P", 4.0),
-            new ExcelColumnWidth("Q", 6.0),
-            new ExcelColumnWidth("R", 6.0),
+            new ExcelColumnWidth("Q", DefaultColumnWidth),
+            new ExcelColumnWidth("R", DefaultColumnWidth),
             new ExcelColumnWidth("S", 4.0),
-            new ExcelColumnWidth("T", 6.0)
+            new ExcelColumnWidth("T", DefaultColumnWidth)
         };
 
         public static int GetSetEndRow(int startRow)
