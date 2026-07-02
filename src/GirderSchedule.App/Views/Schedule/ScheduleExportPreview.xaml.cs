@@ -28,6 +28,8 @@ namespace GirderSchedule.App.Views.Schedule
         private bool _isRefreshQueued;
         private int _currentPageIndex;
 
+        public event EventHandler PreviewStateChanged;
+
         public ObservableCollection<FloorNodeViewModel> Floors
         {
             get { return (ObservableCollection<FloorNodeViewModel>)GetValue(FloorsProperty); }
@@ -40,6 +42,34 @@ namespace GirderSchedule.App.Views.Schedule
             set { SetValue(ScheduleTitleProperty, value); }
         }
 
+        public bool CanGoPreviousPage
+        {
+            get { return _pages.Count > 0 && _currentPageIndex > 0; }
+        }
+
+        public bool CanGoNextPage
+        {
+            get { return _pages.Count > 0 && _currentPageIndex < GetPageCount() - 1; }
+        }
+
+        public string PageText
+        {
+            get { return (_currentPageIndex + 1) + " / " + GetPageCount(); }
+        }
+
+        public string ZoomText
+        {
+            get
+            {
+                if (_panZoomController == null)
+                {
+                    return "100%";
+                }
+
+                return ((int)Math.Round(PreviewScaleTransform.ScaleX * 100.0)) + "%";
+            }
+        }
+
         public ScheduleExportPreview()
         {
             InitializeComponent();
@@ -47,6 +77,48 @@ namespace GirderSchedule.App.Views.Schedule
             Loaded += ScheduleExportPreview_Loaded;
             Unloaded += ScheduleExportPreview_Unloaded;
             SizeChanged += ScheduleExportPreview_SizeChanged;
+        }
+
+        public void GoPreviousPage()
+        {
+            if (_currentPageIndex <= 0)
+            {
+                return;
+            }
+
+            _currentPageIndex--;
+            Redraw();
+
+            if (IsFitMode())
+            {
+                FitToScreen();
+            }
+
+            RaisePreviewStateChanged();
+        }
+
+        public void GoNextPage()
+        {
+            if (_currentPageIndex >= GetPageCount() - 1)
+            {
+                return;
+            }
+
+            _currentPageIndex++;
+            Redraw();
+
+            if (IsFitMode())
+            {
+                FitToScreen();
+            }
+
+            RaisePreviewStateChanged();
+        }
+
+        public void FitToScreenView()
+        {
+            FitToScreen();
+            RaisePreviewStateChanged();
         }
 
         private static void OnFloorsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -104,43 +176,6 @@ namespace GirderSchedule.App.Views.Schedule
             Dispatcher.BeginInvoke(new Action(FitToScreen));
         }
 
-        private void PrevPage_Click(object sender, RoutedEventArgs e)
-        {
-            if (_currentPageIndex <= 0)
-            {
-                return;
-            }
-
-            _currentPageIndex--;
-            Redraw();
-
-            if (IsFitMode())
-            {
-                FitToScreen();
-            }
-        }
-
-        private void NextPage_Click(object sender, RoutedEventArgs e)
-        {
-            if (_currentPageIndex >= GetPageCount() - 1)
-            {
-                return;
-            }
-
-            _currentPageIndex++;
-            Redraw();
-
-            if (IsFitMode())
-            {
-                FitToScreen();
-            }
-        }
-
-        private void Fit_Click(object sender, RoutedEventArgs e)
-        {
-            FitToScreen();
-        }
-
         private void CreatePanZoomController()
         {
             if (_panZoomController != null)
@@ -182,12 +217,7 @@ namespace GirderSchedule.App.Views.Schedule
 
         private void UpdateZoomText(double scale)
         {
-            if (ZoomTextBlock == null)
-            {
-                return;
-            }
-
-            ZoomTextBlock.Text = ((int)Math.Round(scale * 100.0)) + "%";
+            RaisePreviewStateChanged();
         }
 
         private void QueueRefresh(bool fitAfterRefresh)
@@ -209,6 +239,8 @@ namespace GirderSchedule.App.Views.Schedule
                 {
                     FitToScreen();
                 }
+
+                RaisePreviewStateChanged();
             }));
         }
 
@@ -227,7 +259,7 @@ namespace GirderSchedule.App.Views.Schedule
             }
 
             NormalizePageIndex();
-            UpdatePageState();
+            RaisePreviewStateChanged();
         }
 
         private void NormalizePageIndex()
@@ -263,7 +295,7 @@ namespace GirderSchedule.App.Views.Schedule
             var page = GetCurrentPage();
             _renderer.Draw(PreviewCanvas, page, _currentPageIndex + 1, GetPageCount());
 
-            UpdatePageState();
+            RaisePreviewStateChanged();
         }
 
         private ScheduleExportPage GetCurrentPage()
@@ -291,23 +323,13 @@ namespace GirderSchedule.App.Views.Schedule
             return _pages.Count;
         }
 
-        private void UpdatePageState()
+        private void RaisePreviewStateChanged()
         {
-            var pageCount = GetPageCount();
+            var handler = PreviewStateChanged;
 
-            if (PageTextBlock != null)
+            if (handler != null)
             {
-                PageTextBlock.Text = (_currentPageIndex + 1) + " / " + pageCount;
-            }
-
-            if (PrevPageButton != null)
-            {
-                PrevPageButton.IsEnabled = _pages.Count > 0 && _currentPageIndex > 0;
-            }
-
-            if (NextPageButton != null)
-            {
-                NextPageButton.IsEnabled = _pages.Count > 0 && _currentPageIndex < pageCount - 1;
+                handler(this, EventArgs.Empty);
             }
         }
     }

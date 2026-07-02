@@ -23,16 +23,5 @@ namespace GirderSchedule.App.Utils
 
             return Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
         }
-
-        public static string GetDefaultExcelFileName(string projectName)
-        {
-            var name = string.IsNullOrWhiteSpace(projectName) ? "보 일람표" : projectName;
-            return name + "_보일람표.xlsx";
-        }
-
-        public static string GetDefaultExcelPath(string projectName)
-        {
-            return Path.Combine(GetDownloadsDirectory(), GetDefaultExcelFileName(projectName));
-        }
     }
 }

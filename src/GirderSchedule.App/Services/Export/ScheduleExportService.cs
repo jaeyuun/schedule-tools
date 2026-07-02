@@ -1,4 +1,5 @@
-﻿using GirderSchedule.App.Services.Schedule;
+﻿using GirderSchedule.App.Constants;
+using GirderSchedule.App.Services.Schedule;
 using GirderSchedule.App.Utils;
 using GirderSchedule.App.ViewModels.Export;
 using GirderSchedule.App.ViewModels.Schedule;
@@ -44,15 +45,17 @@ namespace GirderSchedule.App.Services.Export
 
             if (pages.Count == 0)
             {
-                MessageBox.Show("내보낼 층 또는 부재가 선택되지 않았습니다.", "DXF 내보내기", MessageBoxButton.OK, MessageBoxImage.Information);
+                AppDialogService.ShowNotice(
+                    Properties.Resources.Title_ExportFailed,
+                    Properties.Resources.Content_NoExportTargetSelected);
                 return;
             }
 
             var dialog = new SaveFileDialog();
-            dialog.Title = "DXF 저장";
-            dialog.Filter = "DXF 파일 (*.dxf)|*.dxf";
+            dialog.Title = FileConstants.DxfSaveDialogTitle;
+            dialog.Filter = FileConstants.DxfFilter;
             dialog.FileName = BuildDxfFileName(projectName, scheduleTitle);
-            dialog.DefaultExt = ".dxf";
+            dialog.DefaultExt = FileConstants.DxfExtension;
             dialog.AddExtension = true;
 
             if (dialog.ShowDialog() != true)
@@ -69,16 +72,18 @@ namespace GirderSchedule.App.Services.Export
 
             if (exportProject == null || exportProject.Floors.Count == 0)
             {
-                MessageBox.Show("내보낼 층 또는 부재가 선택되지 않았습니다.", "Excel 내보내기", MessageBoxButton.OK, MessageBoxImage.Information);
+                AppDialogService.ShowNotice(
+                    Properties.Resources.Title_ExportFailed,
+                    Properties.Resources.Content_NoExportTargetSelected);
                 return;
             }
 
             var dialog = new SaveFileDialog();
-            dialog.Title = "Excel 저장";
-            dialog.Filter = "Excel 파일 (*.xlsx)|*.xlsx";
+            dialog.Title = FileConstants.ExcelSaveDialogTitle;
+            dialog.Filter = FileConstants.ExcelFilter;
             dialog.InitialDirectory = PathUtil.GetDownloadsDirectory();
-            dialog.FileName = PathUtil.GetDefaultExcelFileName(exportProject.ProjectName);
-            dialog.DefaultExt = ".xlsx";
+            dialog.FileName = BuildExcelFileName(exportProject.ProjectName, exportProject.ScheduleTitle);
+            dialog.DefaultExt = FileConstants.ExcelExtension;
             dialog.AddExtension = true;
 
             if (dialog.ShowDialog() != true)
@@ -86,7 +91,7 @@ namespace GirderSchedule.App.Services.Export
                 return;
             }
 
-            ExportExcelFile(exportProject, dialog.FileName);
+            ExportExcelSheet(exportProject, dialog.FileName);
         }
 
         private DxfExportSetting ShowDxfExportSettingWindow()
@@ -116,48 +121,74 @@ namespace GirderSchedule.App.Services.Export
                 options.IncludeCenter = true;
                 options.IncludeRight = true;
                 options.FormColumnCount = setting == null ? 3 : setting.FormColumnCount;
-                options.TemplatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "GirderTemplate.dxf");
+
+                if (!File.Exists(FileConstants.GirderTemplatePath))
+                {
+                    AppDialogService.ShowNotice(
+                        Properties.Resources.Title_ExportFailed,
+                        Properties.Resources.Content_DxfTemplateFileNotFound);
+
+                    return;
+                }
+
+                options.TemplatePath = FileConstants.GirderTemplatePath;
 
                 exporter.Export(pages, filePath, options);
-                MessageBox.Show("DXF 파일을 저장했습니다.", "DXF 저장 완료", MessageBoxButton.OK, MessageBoxImage.Information);
+                AppDialogService.ShowNotice(
+                    Properties.Resources.Title_ExportCompleted,
+                    Properties.Resources.Content_ExportCompleted);
             }
             catch (IOException)
             {
-                MessageBox.Show("DXF 파일을 저장할 수 없습니다.\r\n\r\n저장하려는 파일이 AutoCAD, GstarCAD, 뷰어 또는 다른 프로그램에서 열려 있을 수 있습니다.\r\n파일을 닫은 뒤 다시 저장해 주세요.\r\n\r\n파일 경로: " + filePath, "DXF 저장 실패", MessageBoxButton.OK, MessageBoxImage.Warning);
+                AppDialogService.ShowNotice(
+                    Properties.Resources.Title_ExportFailed, 
+                    string.Format(Properties.Resources.Content_FileSaveFailedFileOpened, filePath));
             }
             catch (UnauthorizedAccessException)
             {
-                MessageBox.Show("DXF 파일을 저장할 권한이 없습니다.\r\n\r\n쓰기 권한이 있는 폴더인지 확인하거나 다른 위치에 저장해 주세요.\r\n\r\n파일 경로: " + filePath, "DXF 저장 실패", MessageBoxButton.OK, MessageBoxImage.Warning);
+                AppDialogService.ShowNotice(
+                    Properties.Resources.Title_ExportFailed,
+                    string.Format(Properties.Resources.Content_FileSaveFailedNoPermission, filePath));
             }
-            catch (Exception ex)
+            catch
             {
-                MessageBox.Show("DXF 저장 중 오류가 발생했습니다.\r\n\r\n" + ex.Message, "DXF 저장 실패", MessageBoxButton.OK, MessageBoxImage.Error);
+                AppDialogService.ShowNotice(
+                    Properties.Resources.Title_ExportFailed,
+                    Properties.Resources.Content_FileSaveFailedWithError);
             }
         }
 
-        private void ExportExcelFile(ScheduleProject exportProject, string filePath)
+        private void ExportExcelSheet(ScheduleProject exportProject, string filePath)
         {
             try
             {
                 var exporter = new ExcelExporter();
 
                 var options = new ExcelExportOptions();
-                options.SheetName = "보 일람표";
+                options.SheetName = FileConstants.ExcelSheetName;
 
                 exporter.Export(exportProject, filePath, options);
-                MessageBox.Show("Excel 파일을 저장했습니다.", "Excel 저장 완료", MessageBoxButton.OK, MessageBoxImage.Information);
+                AppDialogService.ShowNotice(
+                    Properties.Resources.Title_ExportCompleted,
+                    Properties.Resources.Content_ExportCompleted);
             }
             catch (IOException)
             {
-                MessageBox.Show("Excel 파일을 저장할 수 없습니다.\r\n\r\n저장하려는 파일이 Excel 또는 다른 프로그램에서 열려 있을 수 있습니다.\r\n파일을 닫은 뒤 다시 저장해 주세요.\r\n\r\n파일 경로: " + filePath, "Excel 저장 실패", MessageBoxButton.OK, MessageBoxImage.Warning);
+                AppDialogService.ShowNotice(
+                    Properties.Resources.Title_ExportFailed,
+                    string.Format(Properties.Resources.Content_FileSaveFailedFileOpened, filePath));
             }
             catch (UnauthorizedAccessException)
             {
-                MessageBox.Show("Excel 파일을 저장할 권한이 없습니다.\r\n\r\n쓰기 권한이 있는 폴더인지 확인하거나 다른 위치에 저장해 주세요.\r\n\r\n파일 경로: " + filePath, "Excel 저장 실패", MessageBoxButton.OK, MessageBoxImage.Warning);
+                AppDialogService.ShowNotice(
+                    Properties.Resources.Title_ExportFailed,
+                    string.Format(Properties.Resources.Content_FileSaveFailedNoPermission, filePath));
             }
-            catch (Exception ex)
+            catch
             {
-                MessageBox.Show("Excel 저장 중 오류가 발생했습니다.\r\n\r\n" + ex.Message, "Excel 저장 실패", MessageBoxButton.OK, MessageBoxImage.Error);
+                AppDialogService.ShowNotice(
+                    Properties.Resources.Title_ExportFailed,
+                    Properties.Resources.Content_FileSaveFailedWithError);
             }
         }
 
@@ -168,15 +199,33 @@ namespace GirderSchedule.App.Services.Export
 
             if (string.IsNullOrWhiteSpace(projectName))
             {
-                projectName = "프로젝트";
+                projectName = FileConstants.DefaultProjectNameForExport;
             }
 
             if (string.IsNullOrWhiteSpace(scheduleTitle))
             {
-                scheduleTitle = "보일람표";
+                scheduleTitle = FileConstants.DefaultScheduleTitleForExport;
             }
 
-            return projectName + "_" + scheduleTitle + ".dxf";
+            return projectName + "_" + scheduleTitle + FileConstants.DxfExtension;
+        }
+
+        private string BuildExcelFileName(string projectName, string scheduleTitle)
+        {
+            projectName = FileNameUtil.Sanitize(projectName);
+            scheduleTitle = FileNameUtil.Sanitize(scheduleTitle);
+
+            if (string.IsNullOrWhiteSpace(projectName))
+            {
+                projectName = FileConstants.DefaultScheduleTitleForExport;
+            }
+
+            if (string.IsNullOrWhiteSpace(scheduleTitle))
+            {
+                scheduleTitle = FileConstants.DefaultScheduleTitleForExport;
+            }
+
+            return projectName + "_" + scheduleTitle + FileConstants.ExcelExtension;
         }
     }
 }

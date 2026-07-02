@@ -38,8 +38,7 @@ namespace GirderSchedule.App.Services.Schedule
 
             if (setting.MainRebarDiameter > 0)
             {
-                item.TopDiameter = setting.MainRebarDiameter;
-                item.BottomDiameter = setting.MainRebarDiameter;
+                item.MainRebarDiameter = setting.MainRebarDiameter;
             }
 
             if (setting.StirrupDiameter > 0)

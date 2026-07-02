@@ -1,6 +1,6 @@
 ﻿using GirderSchedule.App.Commands;
+using GirderSchedule.App.Services;
 using System;
-using System.Windows;
 using System.Windows.Input;
 
 namespace GirderSchedule.App.ViewModels.Export
@@ -66,7 +66,9 @@ namespace GirderSchedule.App.ViewModels.Export
 
             if (count <= 0)
             {
-                MessageBox.Show("폼 가로 개수는 1 이상으로 입력해 주세요.", "DXF 내보내기 설정", MessageBoxButton.OK, MessageBoxImage.Information);
+                AppDialogService.ShowNotice(
+                    Properties.Resources.Title_ExportFailed,
+                    Properties.Resources.Content_TotalColumnCountMustBeAtLeastOne);
                 return;
             }
 

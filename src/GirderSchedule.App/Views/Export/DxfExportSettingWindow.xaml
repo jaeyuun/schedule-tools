@@ -3,82 +3,66 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="DXF 내보내기 설정"
         Width="720"
-        Height="520"
+        Height="590"
+        WindowStyle="SingleBorderWindow"
+        AllowsTransparency="False"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
-        Background="#F0F0F0">
+        Background="White">
 
     <Window.InputBindings>
         <KeyBinding Key="Enter" Command="{Binding OkCommand}"/>
         <KeyBinding Key="Escape" Command="{Binding CancelCommand}"/>
     </Window.InputBindings>
 
-    <Window.Resources>
-        <Style x:Key="SettingButtonStyle" TargetType="{x:Type Button}">
-            <Setter Property="Height" Value="28"/>
-            <Setter Property="Background" Value="#FAFAFA"/>
-            <Setter Property="BorderBrush" Value="#B8B8B8"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Padding" Value="8,0"/>
-        </Style>
+    <Grid Background="White">
+        <Border Margin="28" Style="{StaticResource CardBorderStyle}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="72"/>
+                </Grid.RowDefinitions>
 
-        <Style x:Key="SettingTextBoxStyle" TargetType="{x:Type TextBox}">
-            <Setter Property="Height" Value="24"/>
-            <Setter Property="Padding" Value="4,0"/>
-            <Setter Property="VerticalContentAlignment" Value="Center"/>
-            <Setter Property="Background" Value="White"/>
-            <Setter Property="BorderBrush" Value="#C8C8C8"/>
-            <Setter Property="BorderThickness" Value="1"/>
-        </Style>
+                <StackPanel Grid.Row="0" Margin="30">
+                    <TextBlock Text="내보내기 옵션" Style="{StaticResource WindowTitleTextStyle}"/>
+                    <TextBlock Text="DXF 출력 방식과 한 줄에 배치할 폼 개수를 설정합니다." Margin="0,6,0,22" Style="{StaticResource CaptionTextStyle}"/>
 
-        <Style x:Key="SectionBorderStyle" TargetType="{x:Type Border}">
-            <Setter Property="Background" Value="White"/>
-            <Setter Property="BorderBrush" Value="#D0D0D0"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Padding" Value="14"/>
-            <Setter Property="Margin" Value="0,0,0,14"/>
-        </Style>
-    </Window.Resources>
-
-    <Border Margin="24" Padding="18" Background="#F7F7F7" BorderBrush="#333333" BorderThickness="1">
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
-
-            <TextBlock Grid.Row="0" Text="DXF 내보내기 설정" FontSize="17" FontWeight="SemiBold" Margin="0,0,0,18"/>
-
-            <StackPanel Grid.Row="1">
-                <Border Style="{StaticResource SectionBorderStyle}">
-                    <StackPanel>
-                        <TextBlock Text="층 출력 방식" FontWeight="SemiBold" Margin="0,0,0,10"/>
-                        <CheckBox Content="층 구분 없이 이어서 출력" IsChecked="{Binding ContinueAcrossFloors, Mode=TwoWay}" Margin="0,0,0,8"/>
-                        <TextBlock Text="체크하면 층이 바뀌어도 이어서 출력하고, 체크 해제하면 층이 바뀔 때 다음 줄부터 출력합니다." Foreground="#666666" FontSize="12" Margin="0,12,0,0"/>
-                    </StackPanel>
-                </Border>
-
-                <Border Style="{StaticResource SectionBorderStyle}">
-                    <StackPanel>
-                        <TextBlock Text="폼 배치" FontWeight="SemiBold" Margin="0,0,0,10"/>
-
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="폼 가로 개수" Width="100" VerticalAlignment="Center"/>
-                            <TextBox Width="80" Style="{StaticResource SettingTextBoxStyle}" Text="{Binding FormColumnCountText, UpdateSourceTrigger=PropertyChanged}"/>
-                            <TextBlock Text="개" VerticalAlignment="Center" Margin="8,0,0,0"/>
-                            <TextBlock Text="기본값: 3" VerticalAlignment="Center" Foreground="#666666" Margin="24,0,0,0"/>
+                    <Border Background="White" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="12" Padding="18" Margin="0,0,0,16">
+                        <StackPanel>
+                            <TextBlock Text="층 출력 방식" Style="{StaticResource SectionTitleTextStyle}"/>
+                            <CheckBox Content="층 구분 없이 이어서 출력" Margin="0,14,0,0" Style="{StaticResource ModernCheckBoxStyle}" IsChecked="{Binding ContinueAcrossFloors, Mode=TwoWay}"/>
+                            <TextBlock Text="체크하면 층이 바뀌어도 이어서 출력하고, 해제하면 층이 바뀔 때 다음 줄부터 출력합니다." Margin="0,12,0,0" Style="{StaticResource CaptionTextStyle}" TextWrapping="Wrap"/>
                         </StackPanel>
+                    </Border>
 
-                        <TextBlock Text="폼 1개는 부재 9세트 기준입니다. 예: 4 입력 시 폼1 폼2 폼3 폼4 / 폼5 폼6 ..." Foreground="#666666" FontSize="12" Margin="0,12,0,0"/>
+                    <Border Background="White" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="12" Padding="18">
+                        <StackPanel>
+                            <TextBlock Text="도면 배치" Style="{StaticResource SectionTitleTextStyle}"/>
+                            <Grid Margin="0,16,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="100"/>
+                                    <ColumnDefinition Width="90"/>
+                                    <ColumnDefinition Width="28"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Grid.Column="0" Text="도면 가로 개수" Foreground="{StaticResource Ink700Brush}" VerticalAlignment="Center"/>
+                                <TextBox Grid.Column="1" Style="{StaticResource ModernTextBoxStyle}" Text="{Binding FormColumnCountText, UpdateSourceTrigger=LostFocus}"/>
+                                <TextBlock Grid.Column="2" Text="개" Margin="8,0,0,0" Foreground="{StaticResource Ink700Brush}" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="3" Text="기본값: 3" Margin="18,0,0,0" Style="{StaticResource CaptionTextStyle}" VerticalAlignment="Center"/>
+                            </Grid>
+                            <TextBlock Text="도면 1개는 부재 9세트 기준입니다. 예: 4 입력 시 도면1 도면2 도면3 도면4 / 도면5 도면6 ..." Margin="0,12,0,0" Style="{StaticResource CaptionTextStyle}" TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <Border Grid.Row="1" Background="White" BorderBrush="{StaticResource LineBrush}" BorderThickness="0,1,0,0" CornerRadius="0,0,12,12">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,24,0">
+                        <Button Width="96" Content="취소" Style="{StaticResource ModernOutlineButtonStyle}" Command="{Binding CancelCommand}"/>
+                        <Button Width="96" Margin="10,0,0,0" Content="확인" Style="{StaticResource ModernPrimaryButtonStyle}" Command="{Binding OkCommand}"/>
                     </StackPanel>
                 </Border>
-            </StackPanel>
-
-            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button Content="확인" Width="80" Margin="0,0,8,0" Style="{StaticResource SettingButtonStyle}" Command="{Binding OkCommand}"/>
-                <Button Content="취소" Width="80" Style="{StaticResource SettingButtonStyle}" Command="{Binding CancelCommand}"/>
-            </StackPanel>
-        </Grid>
-    </Border>
+            </Grid>
+        </Border>
+    </Grid>
 </Window>

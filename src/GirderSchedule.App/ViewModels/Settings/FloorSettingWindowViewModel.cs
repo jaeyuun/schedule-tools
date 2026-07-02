@@ -1,4 +1,5 @@
 ﻿using GirderSchedule.App.Commands;
+using GirderSchedule.App.Services;
 using GirderSchedule.App.Services.Schedule;
 using GirderSchedule.App.ViewModels.Schedule;
 using GirderSchedule.Domain.Models;
@@ -6,13 +7,13 @@ using System;
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Input;
-using System.Xml.XPath;
 
 namespace GirderSchedule.App.ViewModels.Settings
 {
     public sealed class FloorSettingWindowViewModel : ViewModelBase
     {
         private readonly ScheduleSetFactory _setFactory = new ScheduleSetFactory();
+        private readonly ScheduleTextFormatService _textService = new ScheduleTextFormatService();
         private FloorNodeViewModel _selectedFloor;
 
         private string _inputFloorNumber = string.Empty;
@@ -20,6 +21,7 @@ namespace GirderSchedule.App.ViewModels.Settings
         private string _inputMainRebarDiameter = string.Empty;
         private string _inputStirrupDiameter = string.Empty;
         private string _inputSkinRebarDiameter = string.Empty;
+        private bool _isUpdatingSelectedFloor;
 
         public ObservableCollection<FloorNodeViewModel> Floors { get; private set; }
         public event EventHandler FloorSettingChanged;
@@ -122,6 +124,7 @@ namespace GirderSchedule.App.ViewModels.Settings
         public FloorSettingWindowViewModel(ObservableCollection<FloorNodeViewModel> floors)
         {
             Floors = floors;
+            SubscribeFloors();
 
             AddCommand = new RelayCommand(p => Add());
             UpdateCommand = new RelayCommand(p => Update(), p => SelectedFloor != null);
@@ -132,23 +135,29 @@ namespace GirderSchedule.App.ViewModels.Settings
         {
             if (string.IsNullOrWhiteSpace(InputFloorName))
             {
-                MessageBox.Show("층 이름을 입력해 주세요.", "층 추가", MessageBoxButton.OK, MessageBoxImage.Information);
+                AppDialogService.ShowNotice(
+                    Properties.Resources.Title_FloorSetting,
+                    Properties.Resources.Content_InputFloorName);
                 return;
             }
 
             var floor = new ScheduleFloor();
             floor.Setting.Prefix = InputFloorPrefix.Trim();
             floor.Setting.Name = InputFloorName.Trim();
-            floor.Setting.MainRebarDiameter = ParseDouble(InputMainRebarDiameter);
-            floor.Setting.StirrupDiameter = ParseDouble(InputStirrupDiameter);
-            floor.Setting.SkinRebarDiameter = ParseDouble(InputSkinRebarDiameter);
+            floor.Setting.MainRebarDiameter = _textService.ParseDiameter(InputMainRebarDiameter);
+            floor.Setting.StirrupDiameter = _textService.ParseDiameter(InputStirrupDiameter);
+            floor.Setting.SkinRebarDiameter = _textService.ParseDiameter(InputSkinRebarDiameter);
 
             var set = _setFactory.Create("G1", floor.Setting);
             floor.Sets.Add(set);
 
             var node = new FloorNodeViewModel(floor);
+            SubscribeFloor(node);
+
             Floors.Add(node);
             SelectedFloor = node;
+
+            RaiseFloorSettingChanged();
         }
 
         private void Update()
@@ -160,16 +169,27 @@ namespace GirderSchedule.App.ViewModels.Settings
 
             if (string.IsNullOrWhiteSpace(InputFloorName))
             {
-                MessageBox.Show("층 이름을 입력해 주세요.", "층 수정", MessageBoxButton.OK, MessageBoxImage.Information);
+                AppDialogService.ShowNotice(
+                    Properties.Resources.Title_FloorSetting,
+                    Properties.Resources.Content_InputFloorName);
                 return;
             }
 
-            SelectedFloor.FloorPrefix = InputFloorPrefix.Trim();
-            SelectedFloor.FloorName = InputFloorName.Trim();
-            SelectedFloor.MainRebarDiameter = ParseDouble(InputMainRebarDiameter);
-            SelectedFloor.StirrupDiameter = ParseDouble(InputStirrupDiameter);
-            SelectedFloor.SkinRebarDiameter = ParseDouble(InputSkinRebarDiameter);
-            SelectedFloor.RefreshAll();
+            _isUpdatingSelectedFloor = true;
+
+            try
+            {
+                SelectedFloor.FloorPrefix = InputFloorPrefix.Trim();
+                SelectedFloor.FloorName = InputFloorName.Trim();
+                SelectedFloor.MainRebarDiameter = _textService.ParseDiameter(InputMainRebarDiameter);
+                SelectedFloor.StirrupDiameter = _textService.ParseDiameter(InputStirrupDiameter);
+                SelectedFloor.SkinRebarDiameter = _textService.ParseDiameter(InputSkinRebarDiameter);
+                SelectedFloor.RefreshAll();
+            }
+            finally
+            {
+                _isUpdatingSelectedFloor = false;
+            }
 
             RaiseFloorSettingChanged();
         }
@@ -181,24 +201,26 @@ namespace GirderSchedule.App.ViewModels.Settings
                 return;
             }
 
-            var result = MessageBox.Show(
-                "선택한 층과 하위 부재가 모두 삭제됩니다.\r\n삭제하시겠습니까?",
-                "층 삭제",
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Warning);
+            var result = AppDialogService.ShowConfirm(
+                Properties.Resources.Title_DeleteFloor,
+                Properties.Resources.Content_DeleteSelectedFloorWithMembersConfirm);
 
             if (result != MessageBoxResult.Yes)
             {
                 return;
             }
 
-            var index = Floors.IndexOf(SelectedFloor);
-            Floors.Remove(SelectedFloor);
+            var removedFloor = SelectedFloor;
+            var index = Floors.IndexOf(removedFloor);
+
+            UnsubscribeFloor(removedFloor);
+            Floors.Remove(removedFloor);
 
             if (Floors.Count == 0)
             {
                 SelectedFloor = null;
                 ClearInput();
+                RaiseFloorSettingChanged();
                 return;
             }
 
@@ -208,6 +230,7 @@ namespace GirderSchedule.App.ViewModels.Settings
             }
 
             SelectedFloor = Floors[index];
+            RaiseFloorSettingChanged();
         }
 
         private void LoadSelectedFloor()
@@ -217,11 +240,11 @@ namespace GirderSchedule.App.ViewModels.Settings
                 return;
             }
 
-            InputFloorPrefix = SelectedFloor.FloorPrefix.ToString();
+            InputFloorPrefix = SelectedFloor.FloorPrefix;
             InputFloorName = SelectedFloor.FloorName;
-            InputMainRebarDiameter = ToInputText(SelectedFloor.MainRebarDiameter);
-            InputStirrupDiameter = ToInputText(SelectedFloor.StirrupDiameter);
-            InputSkinRebarDiameter = ToInputText(SelectedFloor.SkinRebarDiameter);
+            InputMainRebarDiameter = _textService.FormatDiameterInput(SelectedFloor.MainRebarDiameter);
+            InputStirrupDiameter = _textService.FormatDiameterInput(SelectedFloor.StirrupDiameter);
+            InputSkinRebarDiameter = _textService.FormatDiameterInput(SelectedFloor.SkinRebarDiameter);
         }
 
         private void ClearInput()
@@ -233,48 +256,55 @@ namespace GirderSchedule.App.ViewModels.Settings
             InputSkinRebarDiameter = string.Empty;
         }
 
-        private int ParseInt(string value)
+        private void SubscribeFloors()
         {
-            int result;
-
-            if (int.TryParse(value, out result))
+            if (Floors == null)
             {
-                return result;
+                return;
             }
 
-            return 0;
+            for (var i = 0; i < Floors.Count; i++)
+            {
+                SubscribeFloor(Floors[i]);
+            }
         }
 
-        private double ParseDouble(string value)
+        private void SubscribeFloor(FloorNodeViewModel floor)
         {
-            double result;
-
-            if (double.TryParse(value, out result))
+            if (floor == null)
             {
-                return result;
+                return;
             }
 
-            return 0.0;
+            floor.Changed -= Floor_Changed;
+            floor.Changed += Floor_Changed;
         }
 
-        private string ToInputText(int value)
+        private void UnsubscribeFloor(FloorNodeViewModel floor)
         {
-            if (value <= 0)
+            if (floor == null)
             {
-                return string.Empty;
+                return;
             }
 
-            return value.ToString();
+            floor.Changed -= Floor_Changed;
         }
 
-        private string ToInputText(double value)
+        private void Floor_Changed(object sender, EventArgs e)
         {
-            if (value <= 0.0)
+            if (_isUpdatingSelectedFloor)
             {
-                return string.Empty;
+                return;
             }
 
-            return value.ToString();
+            var floor = sender as FloorNodeViewModel;
+
+            if (floor != null && ReferenceEquals(floor, SelectedFloor))
+            {
+                LoadSelectedFloor();
+            }
+
+            RaiseFloorSettingChanged();
         }
 
         private void RaiseFloorSettingChanged()

@@ -71,6 +71,7 @@ namespace GirderSchedule.App.Services.Schedule
 
             target.Width = source.Width;
             target.Height = source.Height;
+            target.Note = source.Note;
         }
 
         private void CopyMainRebar(MainRebarData source, MainRebarData target)

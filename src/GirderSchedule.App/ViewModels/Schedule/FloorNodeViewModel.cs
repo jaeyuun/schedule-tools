@@ -1,15 +1,21 @@
-﻿using GirderSchedule.Domain.Models;
+﻿using GirderSchedule.App.Services.Schedule;
+using GirderSchedule.Domain.Models;
+using System;
 using System.Collections.ObjectModel;
 
 namespace GirderSchedule.App.ViewModels.Schedule
 {
     public sealed class FloorNodeViewModel : ViewModelBase
     {
+        private readonly ScheduleTextFormatService _textService = new ScheduleTextFormatService();
+
         private readonly ScheduleFloor _model;
         private bool _isChecked = true;
         private bool _isSelected;
         private bool _isChildSelected;
         private bool _isInternalChanging;
+
+        public event EventHandler Changed;
 
         public ScheduleFloor Model
         {
@@ -30,11 +36,8 @@ namespace GirderSchedule.App.ViewModels.Schedule
 
                 _model.Setting.Prefix = value ?? string.Empty;
                 OnPropertyChanged(nameof(FloorPrefix));
-
-                for (var i = 0; i < Sets.Count; i++)
-                {
-                    Sets[i].RefreshAll();
-                }
+                RefreshSets();
+                RaiseChanged();
             }
         }
 
@@ -50,6 +53,7 @@ namespace GirderSchedule.App.ViewModels.Schedule
 
                 _model.Setting.Name = value ?? string.Empty;
                 OnPropertyChanged(nameof(FloorName));
+                RaiseChanged();
             }
         }
 
@@ -70,7 +74,10 @@ namespace GirderSchedule.App.ViewModels.Schedule
 
                 _model.Setting.MainRebarDiameter = value;
                 OnPropertyChanged(nameof(MainRebarDiameter));
+                OnPropertyChanged(nameof(MainRebarDiameterText));
                 OnPropertyChanged(nameof(MainRebarText));
+                RefreshSets();
+                RaiseChanged();
             }
         }
 
@@ -86,7 +93,10 @@ namespace GirderSchedule.App.ViewModels.Schedule
 
                 _model.Setting.StirrupDiameter = value;
                 OnPropertyChanged(nameof(StirrupDiameter));
+                OnPropertyChanged(nameof(StirrupDiameterText));
                 OnPropertyChanged(nameof(StirrupText));
+                RefreshSets();
+                RaiseChanged();
             }
         }
 
@@ -102,23 +112,44 @@ namespace GirderSchedule.App.ViewModels.Schedule
 
                 _model.Setting.SkinRebarDiameter = value;
                 OnPropertyChanged(nameof(SkinRebarDiameter));
+                OnPropertyChanged(nameof(SkinRebarDiameterText));
                 OnPropertyChanged(nameof(SkinRebarText));
+                RefreshSets();
+                RaiseChanged();
             }
+        }
+
+        public string MainRebarDiameterText
+        {
+            get { return _textService.FormatDiameterInput(MainRebarDiameter); }
+            set { MainRebarDiameter = _textService.ParseDiameter(value); }
+        }
+
+        public string StirrupDiameterText
+        {
+            get { return _textService.FormatDiameterInput(StirrupDiameter); }
+            set { StirrupDiameter = _textService.ParseDiameter(value); }
+        }
+
+        public string SkinRebarDiameterText
+        {
+            get { return _textService.FormatDiameterInput(SkinRebarDiameter); }
+            set { SkinRebarDiameter = _textService.ParseDiameter(value); }
         }
 
         public string MainRebarText
         {
-            get { return FormatDiameter(MainRebarDiameter); }
+            get { return _textService.FormatFloorSettingDiameter(MainRebarDiameter); }
         }
 
         public string StirrupText
         {
-            get { return FormatDiameter(StirrupDiameter); }
+            get { return _textService.FormatFloorSettingDiameter(StirrupDiameter); }
         }
 
         public string SkinRebarText
         {
-            get { return FormatDiameter(SkinRebarDiameter); }
+            get { return _textService.FormatFloorSettingDiameter(SkinRebarDiameter); }
         }
 
         public bool IsChecked
@@ -139,14 +170,7 @@ namespace GirderSchedule.App.ViewModels.Schedule
                     return;
                 }
 
-                _isInternalChanging = true;
-
-                for (var i = 0; i < Sets.Count; i++)
-                {
-                    Sets[i].SetCheckedFromParent(value);
-                }
-
-                _isInternalChanging = false;
+                SetChildrenChecked(value);
             }
         }
 
@@ -183,31 +207,18 @@ namespace GirderSchedule.App.ViewModels.Schedule
         public FloorNodeViewModel(ScheduleFloor model)
         {
             _model = model;
-
-            if (_model.Setting == null)
-            {
-                _model.Setting = new FloorSetting();
-            }
-
-            if (_model.Sets == null)
-            {
-                _model.Sets = new System.Collections.Generic.List<ScheduleSet>();
-            }
-
-            Sets = new ObservableCollection<ScheduleSetNodeViewModel>();
-
-            for (var i = 0; i < _model.Sets.Count; i++)
-            {
-                var node = new ScheduleSetNodeViewModel(_model.Sets[i]);
-                node.Parent = this;
-                Sets.Add(node);
-            }
+            EnsureModel();
+            InitializeSets();
         }
 
         public ScheduleSetNodeViewModel AddSet(ScheduleSet set)
         {
-            var node = new ScheduleSetNodeViewModel(set);
-            node.Parent = this;
+            if (set == null)
+            {
+                return null;
+            }
+
+            var node = CreateSetNode(set);
 
             Sets.Add(node);
             Model.Sets.Add(set);
@@ -215,35 +226,6 @@ namespace GirderSchedule.App.ViewModels.Schedule
             UpdateCheckedFromChildren();
 
             return node;
-        }
-
-        public void UpdateCheckedFromChildren()
-        {
-            if (_isInternalChanging)
-            {
-                return;
-            }
-
-            var hasCheckedChild = false;
-
-            for (var i = 0; i < Sets.Count; i++)
-            {
-                if (Sets[i].IsChecked)
-                {
-                    hasCheckedChild = true;
-                    break;
-                }
-            }
-
-            if (_isChecked == hasCheckedChild)
-            {
-                return;
-            }
-
-            _isInternalChanging = true;
-            _isChecked = hasCheckedChild;
-            OnPropertyChanged(nameof(IsChecked));
-            _isInternalChanging = false;
         }
 
         public void RemoveSet(ScheduleSetNodeViewModel node)
@@ -259,34 +241,122 @@ namespace GirderSchedule.App.ViewModels.Schedule
             UpdateCheckedFromChildren();
         }
 
+        public void UpdateCheckedFromChildren()
+        {
+            if (_isInternalChanging)
+            {
+                return;
+            }
+
+            var hasCheckedChild = HasCheckedChild();
+
+            if (_isChecked == hasCheckedChild)
+            {
+                return;
+            }
+
+            _isInternalChanging = true;
+            _isChecked = hasCheckedChild;
+            OnPropertyChanged(nameof(IsChecked));
+            _isInternalChanging = false;
+        }
+
         public void RefreshAll()
         {
             OnPropertyChanged(nameof(FloorPrefix));
             OnPropertyChanged(nameof(FloorName));
+
             OnPropertyChanged(nameof(MainRebarDiameter));
-            OnPropertyChanged(nameof(StirrupDiameter));
-            OnPropertyChanged(nameof(SkinRebarDiameter));
+            OnPropertyChanged(nameof(MainRebarDiameterText));
             OnPropertyChanged(nameof(MainRebarText));
+
+            OnPropertyChanged(nameof(StirrupDiameter));
+            OnPropertyChanged(nameof(StirrupDiameterText));
             OnPropertyChanged(nameof(StirrupText));
+
+            OnPropertyChanged(nameof(SkinRebarDiameter));
+            OnPropertyChanged(nameof(SkinRebarDiameterText));
             OnPropertyChanged(nameof(SkinRebarText));
+
             OnPropertyChanged(nameof(IsChecked));
             OnPropertyChanged(nameof(IsSelected));
             OnPropertyChanged(nameof(IsChildSelected));
 
+            RefreshSets();
+        }
+
+        private void EnsureModel()
+        {
+            if (_model.Setting == null)
+            {
+                _model.Setting = new FloorSetting();
+            }
+
+            if (_model.Sets == null)
+            {
+                _model.Sets = new System.Collections.Generic.List<ScheduleSet>();
+            }
+        }
+
+        private void InitializeSets()
+        {
+            Sets = new ObservableCollection<ScheduleSetNodeViewModel>();
+
+            for (var i = 0; i < _model.Sets.Count; i++)
+            {
+                Sets.Add(CreateSetNode(_model.Sets[i]));
+            }
+        }
+
+        private ScheduleSetNodeViewModel CreateSetNode(ScheduleSet set)
+        {
+            var node = new ScheduleSetNodeViewModel(set);
+            node.Parent = this;
+
+            return node;
+        }
+
+        private void SetChildrenChecked(bool isChecked)
+        {
+            _isInternalChanging = true;
+
+            for (var i = 0; i < Sets.Count; i++)
+            {
+                Sets[i].SetCheckedFromParent(isChecked);
+            }
+
+            _isInternalChanging = false;
+        }
+
+        private bool HasCheckedChild()
+        {
+            for (var i = 0; i < Sets.Count; i++)
+            {
+                if (Sets[i].IsChecked)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private void RefreshSets()
+        {
             for (var i = 0; i < Sets.Count; i++)
             {
                 Sets[i].RefreshAll();
             }
         }
 
-        private string FormatDiameter(double diameter)
+        private void RaiseChanged()
         {
-            if (diameter <= 0)
-            {
-                return "-";
-            }
+            var handler = Changed;
 
-            return "HD" + diameter;
+            if (handler != null)
+            {
+                handler(this, EventArgs.Empty);
+            }
         }
     }
 }

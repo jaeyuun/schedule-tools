@@ -1,0 +1,228 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Content_ExportCompleted" xml:space="preserve">
+    <value>내보내기가 완료되었습니다.</value>
+  </data>
+  <data name="Content_ProjectAlreadyExistsOverwrite" xml:space="preserve">
+    <value>같은 이름의 프로젝트 파일이 이미 있습니다.
+덮어쓰시겠습니까?</value>
+  </data>
+  <data name="Title_ExportFailed" xml:space="preserve">
+    <value>내보내기 실패</value>
+  </data>
+  <data name="Title_ExportCompleted" xml:space="preserve">
+    <value>내보내기 완료</value>
+  </data>
+  <data name="Title_NewProject" xml:space="preserve">
+    <value>새 프로젝트</value>
+  </data>
+  <data name="Title_OpenProject" xml:space="preserve">
+    <value>프로젝트 열기</value>
+  </data>
+  <data name="Title_ProjectSave" xml:space="preserve">
+    <value>프로젝트 저장</value>
+  </data>
+  <data name="Description_SelectProjectSaveFolder" xml:space="preserve">
+    <value>프로젝트를 저장할 폴더를 선택하세요.</value>
+  </data>
+  <data name="Content_InputProjectName" xml:space="preserve">
+    <value>프로젝트 이름을 입력하세요.</value>
+  </data>
+  <data name="Content_SelectProjectFolder" xml:space="preserve">
+    <value>프로젝트 위치를 선택하세요.</value>
+  </data>
+  <data name="Title_DeleteMember" xml:space="preserve">
+    <value>부재 삭제</value>
+  </data>
+  <data name="Content_UnsavedChangesSaveConfirm" xml:space="preserve">
+    <value>저장하지 않은 변경 내용이 있습니다.
+저장하시겠습니까?</value>
+  </data>
+  <data name="Content_DeleteSelectedMemberConfirm" xml:space="preserve">
+    <value>선택한 부재를 삭제하시겠습니까?</value>
+  </data>
+  <data name="Content_ProjectSaveRequiredBeforeExportConfirm" xml:space="preserve">
+    <value>프로젝트 파일이 아직 저장되지 않았습니다.
+내보내기 전에 프로젝트를 먼저 저장해야 합니다.
+프로젝트를 저장하시겠습니까?</value>
+  </data>
+  <data name="Content_DeleteSelectedFloorWithMembersConfirm" xml:space="preserve">
+    <value>선택한 층과 하위 부재가 모두 삭제됩니다.
+삭제하시겠습니까?</value>
+  </data>
+  <data name="Title_FileNotFound" xml:space="preserve">
+    <value>파일 없음</value>
+  </data>
+  <data name="Title_Help" xml:space="preserve">
+    <value>도움말</value>
+  </data>
+  <data name="Content_TotalColumnCountMustBeAtLeastOne" xml:space="preserve">
+    <value>가로 개수는 1 이상으로 입력해 주세요.</value>
+  </data>
+  <data name="Content_RecentProjectFileMissing" xml:space="preserve">
+    <value>프로젝트 파일이 존재하지 않습니다.
+최근 목록에서 제거했습니다.
+
+{0}</value>
+  </data>
+  <data name="Content_InputFloorName" xml:space="preserve">
+    <value>층 이름을 입력해 주세요.</value>
+  </data>
+  <data name="Content_DxfTemplateFileNotFound" xml:space="preserve">
+    <value>DXF 템플릿 파일을 찾을 수 없습니다.</value>
+  </data>
+  <data name="Content_NoExportTargetSelected" xml:space="preserve">
+    <value>내보낼 부재가 선택되지 않았습니다.</value>
+  </data>
+  <data name="Content_FileSaveFailedFileOpened" xml:space="preserve">
+    <value>파일을 저장할 수 없습니다.
+저장하려는 파일이 다른 프로그램에서 열려 있을 수 있습니다.
+파일을 닫은 뒤 다시 저장해 주세요.
+
+파일 경로 : {0}</value>
+  </data>
+  <data name="Content_FileSaveFailedNoPermission" xml:space="preserve">
+    <value>파일을 저장할 권한이 없습니다.
+쓰기 권한이 있는 폴더인지 확인하거나 다른 위치에 저장해 주세요.
+
+파일 경로 : {0}</value>
+  </data>
+  <data name="Content_FileSaveFailedWithError" xml:space="preserve">
+    <value>파일 저장 중 오류가 발생했습니다.</value>
+  </data>
+  <data name="Content_SelectProjectOpen" xml:space="preserve">
+    <value>시작할 프로젝트를 선택하세요.</value>
+  </data>
+  <data name="Title_OpenProjectFailed" xml:space="preserve">
+    <value>프로젝트 열기 실패</value>
+  </data>
+  <data name="Content_FileOpenFailedWithError" xml:space="preserve">
+    <value>파일 여는 중 오류가 발생했습니다.</value>
+  </data>
+  <data name="Title_FloorSetting" xml:space="preserve">
+    <value>층 설정</value>
+  </data>
+  <data name="Title_DeleteFloor" xml:space="preserve">
+    <value>층 삭제</value>
+  </data>
+  <data name="Title_ProjectSaveFailed" xml:space="preserve">
+    <value>프로젝트 저장 실패</value>
+  </data>
+</root>

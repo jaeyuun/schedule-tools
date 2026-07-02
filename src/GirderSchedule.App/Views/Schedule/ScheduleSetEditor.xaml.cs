@@ -1,6 +1,8 @@
 using System;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
+using GirderSchedule.App.Behaviors;
 using GirderSchedule.App.Rendering.Models;
 using GirderSchedule.App.Rendering.Section;
 using GirderSchedule.App.ViewModels.Schedule;
@@ -10,6 +12,7 @@ namespace GirderSchedule.App.Views.Schedule
     public partial class ScheduleSetEditor : UserControl
     {
         private readonly SectionRenderer _sectionRenderer = new SectionRenderer();
+        private ScheduleViewModel _viewModel;
         private bool _isRedrawQueued;
 
         public ScheduleSetEditor()
@@ -21,13 +24,20 @@ namespace GirderSchedule.App.Views.Schedule
             AddHandler(CheckBox.UncheckedEvent, new RoutedEventHandler(CheckBox_Changed), true);
 
             Loaded += SchedulePreview_Loaded;
+            Unloaded += SchedulePreview_Unloaded;
             SizeChanged += SchedulePreview_SizeChanged;
             DataContextChanged += SchedulePreview_DataContextChanged;
         }
 
         private void SchedulePreview_Loaded(object sender, RoutedEventArgs e)
         {
+            NumericTextBoxBehavior.Refresh(this);
             QueueRedraw();
+        }
+
+        private void SchedulePreview_Unloaded(object sender, RoutedEventArgs e)
+        {
+            UnsubscribeViewModel();
         }
 
         private void SchedulePreview_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -37,7 +47,60 @@ namespace GirderSchedule.App.Views.Schedule
 
         private void SchedulePreview_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
+            UnsubscribeViewModel();
+
+            _viewModel = e.NewValue as ScheduleViewModel;
+
+            if (_viewModel != null)
+            {
+                _viewModel.PropertyChanged += ViewModel_PropertyChanged;
+            }
+
+            NumericTextBoxBehavior.Refresh(this);
             QueueRedraw();
+        }
+
+        private void ViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (!IsEditorRefreshProperty(e.PropertyName))
+            {
+                return;
+            }
+
+            Dispatcher.BeginInvoke(new Action(() =>
+            {
+                NumericTextBoxBehavior.Refresh(this);
+                QueueRedraw();
+            }));
+        }
+
+        private bool IsEditorRefreshProperty(string propertyName)
+        {
+            if (string.IsNullOrWhiteSpace(propertyName))
+            {
+                return true;
+            }
+
+            return propertyName == nameof(ScheduleViewModel.CurrentSet) ||
+                   propertyName == nameof(ScheduleViewModel.MemberName) ||
+                   propertyName == nameof(ScheduleViewModel.WidthValue) ||
+                   propertyName == nameof(ScheduleViewModel.HeightValue) ||
+                   propertyName == nameof(ScheduleViewModel.Left) ||
+                   propertyName == nameof(ScheduleViewModel.Center) ||
+                   propertyName == nameof(ScheduleViewModel.Right) ||
+                   propertyName == nameof(ScheduleViewModel.IsWidthOver) ||
+                   propertyName == nameof(ScheduleViewModel.IsHeightOver);
+        }
+
+        private void UnsubscribeViewModel()
+        {
+            if (_viewModel == null)
+            {
+                return;
+            }
+
+            _viewModel.PropertyChanged -= ViewModel_PropertyChanged;
+            _viewModel = null;
         }
 
         private void Input_TextChanged(object sender, TextChangedEventArgs e)

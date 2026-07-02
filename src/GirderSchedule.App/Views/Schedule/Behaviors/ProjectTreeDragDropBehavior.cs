@@ -11,10 +11,13 @@ namespace GirderSchedule.App.Views.Schedule.Behaviors
 {
     public sealed class ProjectTreeDragDropBehavior
     {
+        private const string DropTopTag = "DropTop";
+        private const string DropBottomTag = "DropBottom";
+
         private readonly TreeView _treeView;
 
-        private Point _treeDragStartPoint;
-        private object _treeDragItem;
+        private Point _dragStartPoint;
+        private object _dragItem;
         private TreeViewItem _insertLineItem;
         private bool _insertLineAfter;
         private FloorNodeViewModel _emptyAreaDropFloor;
@@ -58,31 +61,29 @@ namespace GirderSchedule.App.Views.Schedule.Behaviors
             _treeView.DragLeave -= TreeView_DragLeave;
             _treeView.Drop -= TreeView_Drop;
 
-            _treeDragItem = null;
+            _dragItem = null;
             _isAttached = false;
         }
 
         private void TreeView_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            _treeView.Focus();
-            Keyboard.Focus(_treeView);
+            FocusTreeView();
 
             var source = e.OriginalSource as DependencyObject;
 
             if (IsDragIgnoredSource(source))
             {
-                _treeDragItem = null;
+                _dragItem = null;
                 return;
             }
 
-            _treeDragStartPoint = e.GetPosition(null);
-            _treeDragItem = GetTreeViewItemData(source);
+            _dragStartPoint = e.GetPosition(null);
+            _dragItem = GetTreeViewItemData(source);
         }
 
         private void TreeView_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
-            _treeView.Focus();
-            Keyboard.Focus(_treeView);
+            FocusTreeView();
 
             var item = FindVisualParent<TreeViewItem>(e.OriginalSource as DependencyObject);
 
@@ -97,70 +98,44 @@ namespace GirderSchedule.App.Views.Schedule.Behaviors
 
         private void TreeView_MouseMove(object sender, MouseEventArgs e)
         {
-            if (e.LeftButton != MouseButtonState.Pressed || _treeDragItem == null)
+            if (!CanStartDrag(e))
             {
                 return;
             }
 
-            var currentPoint = e.GetPosition(null);
-            var diff = _treeDragStartPoint - currentPoint;
-
-            if (Math.Abs(diff.X) < SystemParameters.MinimumHorizontalDragDistance && Math.Abs(diff.Y) < SystemParameters.MinimumVerticalDragDistance)
-            {
-                return;
-            }
-
-            var data = new DataObject(_treeDragItem.GetType(), _treeDragItem);
+            var data = new DataObject(_dragItem.GetType(), _dragItem);
             DragDrop.DoDragDrop(_treeView, data, DragDropEffects.Move);
 
             ClearInsertLine();
-            _treeDragItem = null;
+            _dragItem = null;
         }
 
         private void TreeView_DragOver(object sender, DragEventArgs e)
         {
-            var source = GetDragData(e);
-            var targetItem = FindVisualParent<TreeViewItem>(e.OriginalSource as DependencyObject);
-            var target = targetItem == null ? null : targetItem.DataContext;
-            var sourceSet = source as ScheduleSetNodeViewModel;
+            var context = CreateDropContext(e);
 
-            if (targetItem == null && sourceSet != null)
+            if (HandleEmptyAreaDragOver(context, e))
             {
-                var lastClosedFloor = GetLastClosedFloor();
-
-                if (lastClosedFloor != null)
-                {
-                    _emptyAreaDropFloor = lastClosedFloor;
-                    ClearInsertLine();
-
-                    e.Effects = DragDropEffects.Move;
-                    e.Handled = true;
-                    return;
-                }
+                return;
             }
 
             _emptyAreaDropFloor = null;
 
-            if (!CanDropTreeItem(source, target))
+            if (!CanDropTreeItem(context.Source, context.Target))
             {
-                e.Effects = DragDropEffects.None;
-                ClearInsertLine();
-                e.Handled = true;
+                RejectDrop(e);
                 return;
             }
 
-            var isAfter = GetIsAfter(targetItem, e);
-            ShowInsertLine(targetItem, isAfter);
+            var isAfter = GetIsAfter(context.TargetItem, e);
+            ShowInsertLine(context.TargetItem, isAfter);
 
-            e.Effects = DragDropEffects.Move;
-            e.Handled = true;
+            AcceptDrop(e);
         }
 
         private void TreeView_DragLeave(object sender, DragEventArgs e)
         {
-            var position = e.GetPosition(_treeView);
-
-            if (position.X >= 0 && position.Y >= 0 && position.X <= _treeView.ActualWidth && position.Y <= _treeView.ActualHeight)
+            if (IsPointerInsideTreeView(e))
             {
                 return;
             }
@@ -170,59 +145,150 @@ namespace GirderSchedule.App.Views.Schedule.Behaviors
 
         private void TreeView_Drop(object sender, DragEventArgs e)
         {
-            var source = GetDragData(e);
-            var targetItem = FindVisualParent<TreeViewItem>(e.OriginalSource as DependencyObject);
-            var target = targetItem == null ? null : targetItem.DataContext;
+            var context = CreateDropContext(e);
+            var viewModel = _treeView.DataContext as MainWindowViewModel;
             var isAfter = _insertLineAfter;
             var emptyAreaDropFloor = _emptyAreaDropFloor;
 
             ClearInsertLine();
-
-            var viewModel = _treeView.DataContext as MainWindowViewModel;
 
             if (viewModel == null)
             {
                 return;
             }
 
-            var sourceSet = source as ScheduleSetNodeViewModel;
-
-            if (sourceSet != null && emptyAreaDropFloor != null)
+            if (DropToEmptyArea(viewModel, context.Source, emptyAreaDropFloor))
             {
-                viewModel.MoveSetToFloor(sourceSet, emptyAreaDropFloor);
                 e.Handled = true;
                 return;
             }
 
-            if (!CanDropTreeItem(source, target))
+            if (!CanDropTreeItem(context.Source, context.Target))
             {
                 return;
             }
 
+            if (DropToTreeItem(viewModel, context.Source, context.Target, isAfter))
+            {
+                e.Handled = true;
+            }
+        }
+
+        private void FocusTreeView()
+        {
+            _treeView.Focus();
+            Keyboard.Focus(_treeView);
+        }
+
+        private bool CanStartDrag(MouseEventArgs e)
+        {
+            if (e.LeftButton != MouseButtonState.Pressed || _dragItem == null)
+            {
+                return false;
+            }
+
+            var currentPoint = e.GetPosition(null);
+            var diff = _dragStartPoint - currentPoint;
+
+            return Math.Abs(diff.X) >= SystemParameters.MinimumHorizontalDragDistance ||
+                   Math.Abs(diff.Y) >= SystemParameters.MinimumVerticalDragDistance;
+        }
+
+        private DropContext CreateDropContext(DragEventArgs e)
+        {
+            var source = GetDragData(e);
+            var targetItem = FindVisualParent<TreeViewItem>(e.OriginalSource as DependencyObject);
+            var target = targetItem == null ? null : targetItem.DataContext;
+
+            return new DropContext(source, targetItem, target);
+        }
+
+        private bool HandleEmptyAreaDragOver(DropContext context, DragEventArgs e)
+        {
+            var sourceSet = context.Source as ScheduleSetNodeViewModel;
+
+            if (context.TargetItem != null || sourceSet == null)
+            {
+                return false;
+            }
+
+            var lastClosedFloor = GetLastClosedFloor();
+
+            if (lastClosedFloor == null)
+            {
+                return false;
+            }
+
+            _emptyAreaDropFloor = lastClosedFloor;
+            ClearInsertLine();
+            AcceptDrop(e);
+
+            return true;
+        }
+
+        private bool DropToEmptyArea(MainWindowViewModel viewModel, object source, FloorNodeViewModel emptyAreaDropFloor)
+        {
+            var sourceSet = source as ScheduleSetNodeViewModel;
+
+            if (sourceSet == null || emptyAreaDropFloor == null)
+            {
+                return false;
+            }
+
+            viewModel.MoveSetToFloor(sourceSet, emptyAreaDropFloor);
+            return true;
+        }
+
+        private bool DropToTreeItem(MainWindowViewModel viewModel, object source, object target, bool isAfter)
+        {
             var sourceFloor = source as FloorNodeViewModel;
             var targetFloor = target as FloorNodeViewModel;
 
             if (sourceFloor != null && targetFloor != null)
             {
                 viewModel.MoveFloor(sourceFloor, targetFloor, isAfter);
-                e.Handled = true;
-                return;
+                return true;
             }
 
+            var sourceSet = source as ScheduleSetNodeViewModel;
             var targetSet = target as ScheduleSetNodeViewModel;
 
             if (sourceSet != null && targetSet != null)
             {
                 viewModel.MoveSet(sourceSet, targetSet, isAfter);
-                e.Handled = true;
-                return;
+                return true;
             }
 
             if (sourceSet != null && targetFloor != null)
             {
                 viewModel.MoveSetToFloor(sourceSet, targetFloor);
-                e.Handled = true;
+                return true;
             }
+
+            return false;
+        }
+
+        private void AcceptDrop(DragEventArgs e)
+        {
+            e.Effects = DragDropEffects.Move;
+            e.Handled = true;
+        }
+
+        private void RejectDrop(DragEventArgs e)
+        {
+            e.Effects = DragDropEffects.None;
+            ClearInsertLine();
+            e.Handled = true;
+        }
+
+        private bool IsPointerInsideTreeView(DragEventArgs e)
+        {
+            var position = e.GetPosition(_treeView);
+
+            return position.X >= 0 &&
+                   position.Y >= 0 &&
+                   position.X <= _treeView.ActualWidth &&
+                   position.Y <= _treeView.ActualHeight;
         }
 
         private object GetDragData(DragEventArgs e)
@@ -290,17 +356,7 @@ namespace GirderSchedule.App.Views.Schedule.Behaviors
 
             _insertLineItem = item;
             _insertLineAfter = isAfter;
-
-            item.BorderBrush = new SolidColorBrush(Color.FromRgb(38, 120, 255));
-
-            if (isAfter)
-            {
-                item.BorderThickness = new Thickness(0, 0, 0, 2);
-            }
-            else
-            {
-                item.BorderThickness = new Thickness(0, 2, 0, 0);
-            }
+            item.Tag = isAfter ? DropBottomTag : DropTopTag;
         }
 
         private void ClearInsertLine()
@@ -322,8 +378,7 @@ namespace GirderSchedule.App.Views.Schedule.Behaviors
                 return;
             }
 
-            item.ClearValue(Control.BorderBrushProperty);
-            item.ClearValue(Control.BorderThicknessProperty);
+            item.ClearValue(FrameworkElement.TagProperty);
         }
 
         private FloorNodeViewModel GetLastClosedFloor()
@@ -336,7 +391,7 @@ namespace GirderSchedule.App.Views.Schedule.Behaviors
             }
 
             var lastFloor = viewModel.Floors[viewModel.Floors.Count - 1];
-            var lastFloorItem = GetFloorTreeViewItem(lastFloor);
+            var lastFloorItem = GetTreeViewItem(_treeView, lastFloor);
 
             if (lastFloorItem == null || lastFloorItem.IsExpanded)
             {
@@ -344,11 +399,6 @@ namespace GirderSchedule.App.Views.Schedule.Behaviors
             }
 
             return lastFloor;
-        }
-
-        private TreeViewItem GetFloorTreeViewItem(FloorNodeViewModel floor)
-        {
-            return GetTreeViewItem(_treeView, floor);
         }
 
         private TreeViewItem GetTreeViewItem(ItemsControl parent, object data)
@@ -426,6 +476,20 @@ namespace GirderSchedule.App.Views.Schedule.Behaviors
             }
 
             return null;
+        }
+
+        private sealed class DropContext
+        {
+            public object Source { get; private set; }
+            public TreeViewItem TargetItem { get; private set; }
+            public object Target { get; private set; }
+
+            public DropContext(object source, TreeViewItem targetItem, object target)
+            {
+                Source = source;
+                TargetItem = targetItem;
+                Target = target;
+            }
         }
     }
 }

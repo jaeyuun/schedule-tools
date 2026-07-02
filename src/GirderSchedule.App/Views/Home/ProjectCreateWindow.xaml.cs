@@ -3,12 +3,12 @@ using System.Windows;
 
 namespace GirderSchedule.App.Views.Home
 {
-    public partial class ProjectSettingWindow : Window
+    public partial class ProjectCreateWindow : Window
     {
-        public ProjectSettingWindow()
+        public ProjectCreateWindow()
         {
             InitializeComponent();
-            DataContext = new ProjectSettingWindowViewModel();
+            DataContext = new ProjectCreateWindowViewModel();
         }
     }
 }

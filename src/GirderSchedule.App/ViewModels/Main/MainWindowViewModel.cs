@@ -1,35 +1,29 @@
-﻿using GirderSchedule.App.Commands;
-using GirderSchedule.App.Services.Export;
+﻿using GirderSchedule.App.Services.Export;
 using GirderSchedule.App.Services.Project;
 using GirderSchedule.App.Services.Schedule;
 using GirderSchedule.App.ViewModels.Schedule;
-using GirderSchedule.App.ViewModels.Settings;
-using GirderSchedule.App.Views.Settings;
 using GirderSchedule.Domain.Models;
-using Microsoft.Win32;
-using System;
 using System.Collections.ObjectModel;
-using System.Windows;
 using System.Windows.Input;
 
 namespace GirderSchedule.App.ViewModels.Main
 {
-    public sealed class MainWindowViewModel : ViewModelBase
+    public sealed partial class MainWindowViewModel : ViewModelBase
     {
-        private readonly ProjectFileService _fileService = new ProjectFileService();
-        private readonly RecentProjectService _recentProjectService = new RecentProjectService();
-        private readonly ScheduleProjectFactory _projectFactory = new ScheduleProjectFactory();
         private readonly ScheduleSetFactory _setFactory = new ScheduleSetFactory();
-        private readonly FloorSettingApplyService _floorSettingApplyService = new FloorSettingApplyService();
-        private readonly ScheduleSetCopyService _scheduleSetCopyService = new ScheduleSetCopyService();
         private readonly ScheduleExportService _exportService = new ScheduleExportService();
+        private readonly ScheduleTreeMoveService _scheduleTreeMoveService = new ScheduleTreeMoveService();
+        private readonly ProjectDisplayNameService _projectDisplayNameService = new ProjectDisplayNameService();
+
+        private ProjectService _projectService;
+        private FloorSettingEditService _floorSettingEditService;
+        private ScheduleSetEditService _scheduleSetEditService;
 
         private ScheduleProject _project;
         private FloorNodeViewModel _selectedFloor;
         private ScheduleSetNodeViewModel _selectedSet;
         private string _currentFilePath = string.Empty;
         private bool _isDirty;
-        private ScheduleSet _copiedScheduleSet;
 
         public ObservableCollection<FloorNodeViewModel> Floors { get; private set; }
         public ScheduleViewModel Editor { get; private set; }
@@ -52,6 +46,7 @@ namespace GirderSchedule.App.ViewModels.Main
                 _project.ProjectName = value;
                 IsDirty = true;
                 OnPropertyChanged(nameof(ProjectName));
+                OnPropertyChanged(nameof(ProjectDisplayName));
                 OnPropertyChanged(nameof(WindowTitle));
             }
         }
@@ -85,6 +80,7 @@ namespace GirderSchedule.App.ViewModels.Main
 
                 _currentFilePath = value;
                 OnPropertyChanged(nameof(CurrentFilePath));
+                OnPropertyChanged(nameof(ProjectDisplayName));
                 OnPropertyChanged(nameof(WindowTitle));
             }
         }
@@ -101,20 +97,19 @@ namespace GirderSchedule.App.ViewModels.Main
 
                 _isDirty = value;
                 OnPropertyChanged(nameof(IsDirty));
+                OnPropertyChanged(nameof(ProjectDisplayName));
                 OnPropertyChanged(nameof(WindowTitle));
             }
         }
 
         public string WindowTitle
         {
-            get
-            {
-                var scheduleTitle = _project == null || string.IsNullOrWhiteSpace(_project.ScheduleTitle) ? "보 일람표" : _project.ScheduleTitle;
-                var projectName = _project == null || string.IsNullOrWhiteSpace(_project.ProjectName) ? "새 프로젝트" : _project.ProjectName;
-                var dirty = IsDirty || string.IsNullOrWhiteSpace(CurrentFilePath) ? " *" : string.Empty;
+            get { return _projectDisplayNameService.GetWindowTitle(Project, IsDirty, CurrentFilePath); }
+        }
 
-                return scheduleTitle + " (" + projectName + ")" + dirty;
-            }
+        public string ProjectDisplayName
+        {
+            get { return _projectDisplayNameService.GetProjectDisplayName(Project, IsDirty); }
         }
 
         public FloorNodeViewModel SelectedFloor
@@ -222,607 +217,15 @@ namespace GirderSchedule.App.ViewModels.Main
 
         private void Initialize()
         {
+            _projectService = new ProjectService(new ProjectFileService(), new RecentProjectService());
+            _floorSettingEditService = new FloorSettingEditService(_setFactory, new FloorSettingApplyService());
+            _scheduleSetEditService = new ScheduleSetEditService(_setFactory, new ScheduleSetCopyService());
+
             Editor = new ScheduleViewModel();
             Editor.CurrentSetChanged += Editor_CurrentSetChanged;
             Floors = new ObservableCollection<FloorNodeViewModel>();
+
             InitializeCommands();
-        }
-
-        private void InitializeCommands()
-        {
-            NewProjectCommand = new RelayCommand(p => NewProject());
-            OpenProjectCommand = new RelayCommand(p => OpenProject());
-            SaveProjectCommand = new RelayCommand(p => SaveProject());
-            SaveAsProjectCommand = new RelayCommand(p => SaveAsProject());
-            EditFloorSettingCommand = new RelayCommand(p => EditFloorSetting());
-            AddSetCommand = new RelayCommand(p => AddSet(), p => SelectedFloor != null);
-            RemoveSetCommand = new RelayCommand(p => RemoveSet(), p => SelectedFloor != null && SelectedSet != null);
-            ExportCurrentSetCommand = new RelayCommand(p => ExportProjectDxf());
-            ExportExcelCommand = new RelayCommand(p => ExportProjectExcel());
-            HelpCommand = new RelayCommand(p => ShowHelp());
-            CopyScheduleSetCommand = new RelayCommand(p => CopyScheduleSet(), p => CanCopyScheduleSet());
-            PasteScheduleSetCommand = new RelayCommand(p => PasteScheduleSet(), p => CanPasteScheduleSet());
-        }
-
-        private void LoadProject(ScheduleProject project)
-        {
-            _project = project;
-            Floors.Clear();
-
-            if (_project != null)
-            {
-                for (var i = 0; i < _project.Floors.Count; i++)
-                {
-                    Floors.Add(new FloorNodeViewModel(_project.Floors[i]));
-                }
-            }
-
-            SelectedFloor = Floors.Count > 0 ? Floors[0] : null;
-            NotifyProjectChanged();
-        }
-
-        private void NotifyProjectChanged()
-        {
-            OnPropertyChanged(nameof(Project));
-            OnPropertyChanged(nameof(ProjectName));
-            OnPropertyChanged(nameof(ScheduleTitle));
-            OnPropertyChanged(nameof(WindowTitle));
-        }
-
-        private void NewProject()
-        {
-            if (!ConfirmSaveIfDirty())
-            {
-                return;
-            }
-
-            CurrentFilePath = string.Empty;
-            LoadProject(_projectFactory.Create("새 프로젝트"));
-            IsDirty = false;
-        }
-
-        private void OpenProject()
-        {
-            if (!ConfirmSaveIfDirty())
-            {
-                return;
-            }
-
-            var dialog = new OpenFileDialog();
-            dialog.Title = "프로젝트 열기";
-            dialog.Filter = "GirderSchedule 프로젝트 (*.gsp)|*.gsp";
-            dialog.DefaultExt = ".gsp";
-
-            if (dialog.ShowDialog() != true)
-            {
-                return;
-            }
-
-            try
-            {
-                var project = _fileService.Load(dialog.FileName);
-                CurrentFilePath = dialog.FileName;
-                LoadProject(project);
-                _recentProjectService.AddOrUpdate(dialog.FileName, project.ProjectName);
-                IsDirty = false;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("프로젝트 파일을 열 수 없습니다.\r\n\r\n" + ex.Message, "열기 실패", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-
-        private bool SaveProject()
-        {
-            if (string.IsNullOrWhiteSpace(CurrentFilePath))
-            {
-                return SaveAsProject();
-            }
-
-            try
-            {
-                _fileService.Save(CurrentFilePath, _project);
-                _recentProjectService.AddOrUpdate(CurrentFilePath, _project.ProjectName);
-                IsDirty = false;
-                return true;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("프로젝트를 저장할 수 없습니다.\r\n\r\n" + ex.Message, "저장 실패", MessageBoxButton.OK, MessageBoxImage.Error);
-                return false;
-            }
-        }
-
-        private bool SaveAsProject()
-        {
-            var dialog = new SaveFileDialog();
-            dialog.Title = "프로젝트 저장";
-            dialog.Filter = "GirderSchedule 프로젝트 (*.gsp)|*.gsp";
-            dialog.DefaultExt = ".gsp";
-            dialog.AddExtension = true;
-            dialog.FileName = string.IsNullOrWhiteSpace(ProjectName) ? "새 프로젝트.gsp" : ProjectName + ".gsp";
-
-            if (dialog.ShowDialog() != true)
-            {
-                return false;
-            }
-
-            try
-            {
-                CurrentFilePath = dialog.FileName;
-                _fileService.Save(CurrentFilePath, _project);
-                _recentProjectService.AddOrUpdate(CurrentFilePath, _project.ProjectName);
-                IsDirty = false;
-                return true;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("프로젝트를 저장할 수 없습니다.\r\n\r\n" + ex.Message, "저장 실패", MessageBoxButton.OK, MessageBoxImage.Error);
-                return false;
-            }
-        }
-
-        public bool ConfirmSaveIfDirty()
-        {
-            if (!IsDirty)
-            {
-                return true;
-            }
-
-            var result = MessageBox.Show("저장하지 않은 변경 내용이 있습니다.\r\n저장하시겠습니까?", "프로젝트 저장", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
-
-            if (result == MessageBoxResult.Cancel)
-            {
-                return false;
-            }
-
-            if (result == MessageBoxResult.Yes)
-            {
-                return SaveProject();
-            }
-
-            return true;
-        }
-
-        private void EditFloorSetting()
-        {
-            var viewModel = new FloorSettingWindowViewModel(Floors);
-            viewModel.SelectedFloor = SelectedFloor;
-            viewModel.FloorSettingChanged += FloorSettingWindow_FloorSettingChanged;
-
-            var window = new FloorSettingWindow();
-            window.Owner = Application.Current.MainWindow;
-            window.DataContext = viewModel;
-            window.ShowDialog();
-
-            viewModel.FloorSettingChanged -= FloorSettingWindow_FloorSettingChanged;
-
-            SyncProjectFloors();
-            EnsureEachFloorHasSet();
-
-            if (Floors.Count > 0 && SelectedFloor == null)
-            {
-                SelectedFloor = Floors[0];
-            }
-        }
-
-        private void EnsureEachFloorHasSet()
-        {
-            for (var i = 0; i < Floors.Count; i++)
-            {
-                var floor = Floors[i];
-
-                if (floor.Sets.Count > 0)
-                {
-                    continue;
-                }
-
-                var set = _setFactory.Create("G1", floor.Setting);
-                floor.AddSet(set);
-            }
-        }
-
-        private void SyncProjectFloors()
-        {
-            if (_project == null)
-            {
-                return;
-            }
-
-            _project.Floors.Clear();
-
-            for (var i = 0; i < Floors.Count; i++)
-            {
-                _project.Floors.Add(Floors[i].Model);
-            }
-        }
-
-        private void AddSet()
-        {
-            if (SelectedFloor == null)
-            {
-                return;
-            }
-
-            var memberName = "G" + (SelectedFloor.Sets.Count + 1);
-            var set = _setFactory.Create(memberName, SelectedFloor.Setting);
-            var node = SelectedFloor.AddSet(set);
-            SelectedSet = node;
-            IsDirty = true;
-        }
-
-        private void RemoveSet()
-        {
-            if (SelectedFloor == null || SelectedSet == null)
-            {
-                return;
-            }
-
-            var result = MessageBox.Show("선택한 부재를 삭제하시겠습니까?", "부재 삭제", MessageBoxButton.YesNo, MessageBoxImage.Warning);
-
-            if (result != MessageBoxResult.Yes)
-            {
-                return;
-            }
-
-            var index = SelectedFloor.Sets.IndexOf(SelectedSet);
-            SelectedFloor.RemoveSet(SelectedSet);
-
-            if (SelectedFloor.Sets.Count == 0)
-            {
-                SelectedSet = null;
-            }
-            else
-            {
-                if (index >= SelectedFloor.Sets.Count)
-                {
-                    index = SelectedFloor.Sets.Count - 1;
-                }
-
-                SelectedSet = SelectedFloor.Sets[index];
-            }
-
-            IsDirty = true;
-        }
-
-        private void Editor_CurrentSetChanged(object sender, EventArgs e)
-        {
-            if (SelectedSet != null)
-            {
-                SelectedSet.RefreshAll();
-            }
-
-            IsDirty = true;
-        }
-
-        private void ShowHelp()
-        {
-            MessageBox.Show("GirderSchedule\r\n보 일람표 작성 도구", "도움말", MessageBoxButton.OK, MessageBoxImage.Information);
-        }
-
-        private void ClearTreeSelection()
-        {
-            for (var i = 0; i < Floors.Count; i++)
-            {
-                Floors[i].IsSelected = false;
-                Floors[i].IsChildSelected = false;
-
-                for (var j = 0; j < Floors[i].Sets.Count; j++)
-                {
-                    Floors[i].Sets[j].IsSelected = false;
-                }
-            }
-        }
-
-        private void ExportProjectDxf()
-        {
-            if (!SaveProjectBeforeExport())
-            {
-                return;
-            }
-
-            _exportService.ExportDxf(ProjectName, ScheduleTitle, Floors);
-        }
-
-        private void ExportProjectExcel()
-        {
-            if (!SaveProjectBeforeExport())
-            {
-                return;
-            }
-
-            _exportService.ExportExcel(Project, Floors);
-        }
-
-        private bool SaveProjectBeforeExport()
-        {
-            if (string.IsNullOrWhiteSpace(CurrentFilePath))
-            {
-                var result = MessageBox.Show("프로젝트 파일이 아직 저장되지 않았습니다.\r\n내보내기 전에 프로젝트를 먼저 저장해야 합니다.\r\n\r\n프로젝트를 저장하시겠습니까?", "프로젝트 저장 필요", MessageBoxButton.YesNo, MessageBoxImage.Information);
-
-                if (result != MessageBoxResult.Yes)
-                {
-                    return false;
-                }
-
-                return SaveAsProject();
-            }
-
-            return SaveProject();
-        }
-
-        public void MoveFloor(FloorNodeViewModel source, FloorNodeViewModel target, bool isAfter)
-        {
-            if (source == null || target == null || ReferenceEquals(source, target))
-            {
-                return;
-            }
-
-            var oldIndex = Floors.IndexOf(source);
-            var insertIndex = Floors.IndexOf(target);
-
-            if (oldIndex < 0 || insertIndex < 0)
-            {
-                return;
-            }
-
-            if (isAfter)
-            {
-                insertIndex++;
-            }
-
-            if (insertIndex > oldIndex)
-            {
-                insertIndex--;
-            }
-
-            if (insertIndex < 0)
-            {
-                insertIndex = 0;
-            }
-
-            if (insertIndex >= Floors.Count)
-            {
-                insertIndex = Floors.Count - 1;
-            }
-
-            if (oldIndex == insertIndex)
-            {
-                SelectedFloor = source;
-                return;
-            }
-
-            Floors.Move(oldIndex, insertIndex);
-            SyncProjectFloors();
-            SelectedFloor = source;
-            IsDirty = true;
-        }
-
-        public void MoveSet(ScheduleSetNodeViewModel source, ScheduleSetNodeViewModel target, bool isAfter)
-        {
-            if (source == null || target == null || ReferenceEquals(source, target))
-            {
-                return;
-            }
-
-            var sourceFloor = FindFloorBySet(source);
-            var targetFloor = FindFloorBySet(target);
-
-            if (sourceFloor == null || targetFloor == null)
-            {
-                return;
-            }
-
-            var insertIndex = targetFloor.Sets.IndexOf(target);
-
-            if (insertIndex < 0)
-            {
-                return;
-            }
-
-            if (isAfter)
-            {
-                insertIndex++;
-            }
-
-            MoveSetToFloorIndex(source, sourceFloor, targetFloor, insertIndex);
-        }
-
-        public void MoveSetToFloorAroundFloor(ScheduleSetNodeViewModel source, FloorNodeViewModel targetFloor, bool isAfter)
-        {
-            if (source == null || targetFloor == null)
-            {
-                return;
-            }
-
-            var sourceFloor = FindFloorBySet(source);
-
-            if (sourceFloor == null)
-            {
-                return;
-            }
-
-            var insertIndex = isAfter ? targetFloor.Sets.Count : 0;
-            MoveSetToFloorIndex(source, sourceFloor, targetFloor, insertIndex);
-        }
-
-        public void MoveSetToFloor(ScheduleSetNodeViewModel source, FloorNodeViewModel targetFloor)
-        {
-            if (source == null || targetFloor == null)
-            {
-                return;
-            }
-
-            var sourceFloor = FindFloorBySet(source);
-
-            if (sourceFloor == null)
-            {
-                return;
-            }
-
-            MoveSetToFloorIndex(source, sourceFloor, targetFloor, targetFloor.Sets.Count);
-        }
-
-        private void MoveSetToFloorIndex(ScheduleSetNodeViewModel source, FloorNodeViewModel sourceFloor, FloorNodeViewModel targetFloor, int insertIndex)
-        {
-            if (source == null || sourceFloor == null || targetFloor == null)
-            {
-                return;
-            }
-
-            var oldIndex = sourceFloor.Sets.IndexOf(source);
-
-            if (oldIndex < 0)
-            {
-                return;
-            }
-
-            if (ReferenceEquals(sourceFloor, targetFloor) && insertIndex > oldIndex)
-            {
-                insertIndex--;
-            }
-
-            if (insertIndex < 0)
-            {
-                insertIndex = 0;
-            }
-
-            if (insertIndex > targetFloor.Sets.Count)
-            {
-                insertIndex = targetFloor.Sets.Count;
-            }
-
-            if (ReferenceEquals(sourceFloor, targetFloor) && oldIndex == insertIndex)
-            {
-                SelectedSet = source;
-                return;
-            }
-
-            sourceFloor.Sets.Remove(source);
-            sourceFloor.Model.Sets.Remove(source.Model);
-
-            if (insertIndex > targetFloor.Sets.Count)
-            {
-                insertIndex = targetFloor.Sets.Count;
-            }
-
-            source.Parent = targetFloor;
-            targetFloor.Sets.Insert(insertIndex, source);
-            targetFloor.Model.Sets.Insert(insertIndex, source.Model);
-
-            sourceFloor.UpdateCheckedFromChildren();
-            targetFloor.UpdateCheckedFromChildren();
-
-            SelectedFloor = targetFloor;
-            SelectedSet = source;
-            IsDirty = true;
-        }
-
-        private FloorNodeViewModel FindFloorBySet(ScheduleSetNodeViewModel set)
-        {
-            if (set == null)
-            {
-                return null;
-            }
-
-            for (var i = 0; i < Floors.Count; i++)
-            {
-                if (Floors[i].Sets.Contains(set))
-                {
-                    return Floors[i];
-                }
-            }
-
-            return null;
-        }
-
-        private void ApplyFloorSettingToSets(FloorNodeViewModel floor)
-        {
-            if (floor == null)
-            {
-                return;
-            }
-
-            for (var i = 0; i < floor.Sets.Count; i++)
-            {
-                ApplyFloorSettingToSet(floor.Sets[i].Model, floor.Setting);
-                floor.Sets[i].RefreshAll();
-            }
-
-            floor.RefreshAll();
-
-            if (SelectedSet != null && floor.Sets.Contains(SelectedSet))
-            {
-                SelectedSet.RefreshAll();
-                Editor.LoadSet(floor.Model, SelectedSet.Model);
-            }
-        }
-
-        private void ApplyFloorSettingToSet(ScheduleSet set, FloorSetting setting)
-        {
-            _floorSettingApplyService.Apply(set, setting);
-        }
-
-        private void FloorSettingWindow_FloorSettingChanged(object sender, EventArgs e)
-        {
-            var viewModel = sender as FloorSettingWindowViewModel;
-
-            if (viewModel == null || viewModel.SelectedFloor == null)
-            {
-                return;
-            }
-
-            SyncProjectFloors();
-            EnsureEachFloorHasSet();
-            ApplyFloorSettingToSets(viewModel.SelectedFloor);
-
-            if (Floors.Count > 0 && SelectedFloor == null)
-            {
-                SelectedFloor = Floors[0];
-            }
-
-            IsDirty = true;
-        }
-
-        private bool CanCopyScheduleSet()
-        {
-            return SelectedSet != null && SelectedSet.Model != null;
-        }
-
-        private bool CanPasteScheduleSet()
-        {
-            return _copiedScheduleSet != null && SelectedSet != null && SelectedSet.Model != null;
-        }
-
-        private void CopyScheduleSet()
-        {
-            if (SelectedSet == null || SelectedSet.Model == null)
-            {
-                return;
-            }
-
-            _copiedScheduleSet = _scheduleSetCopyService.Clone(SelectedSet.Model);
-        }
-
-        private void PasteScheduleSet()
-        {
-            if (_copiedScheduleSet == null || SelectedSet == null || SelectedSet.Model == null)
-            {
-                return;
-            }
-
-            _scheduleSetCopyService.CopyTo(_copiedScheduleSet, SelectedSet.Model);
-
-            SelectedSet.RefreshAll();
-
-            var parentFloor = FindFloorBySet(SelectedSet);
-
-            if (parentFloor != null)
-            {
-                Editor.LoadSet(parentFloor.Model, SelectedSet.Model);
-            }
-
-            IsDirty = true;
         }
     }
 }

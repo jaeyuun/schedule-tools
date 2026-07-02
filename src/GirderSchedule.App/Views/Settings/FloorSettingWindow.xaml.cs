@@ -1,10 +1,10 @@
-﻿using System;
+﻿using GirderSchedule.App.ViewModels.Schedule;
+using GirderSchedule.App.ViewModels.Settings;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using GirderSchedule.App.ViewModels.Schedule;
-using GirderSchedule.App.ViewModels.Settings;
 
 namespace GirderSchedule.App.Views.Settings
 {
@@ -201,11 +201,10 @@ namespace GirderSchedule.App.Views.Settings
             if (isAfter)
             {
                 row.BorderThickness = new Thickness(0, 0, 0, 2);
+                return;
             }
-            else
-            {
-                row.BorderThickness = new Thickness(0, 2, 0, 0);
-            }
+
+            row.BorderThickness = new Thickness(0, 2, 0, 0);
         }
 
         private void ClearInsertLine()

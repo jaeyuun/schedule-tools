@@ -1,0 +1,36 @@
+﻿<Window x:Class="GirderSchedule.App.Views.Common.NoticeDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="{Binding DialogTitle}"
+        Width="360"
+        Height="220"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ShowInTaskbar="False">
+
+    <Border Background="White" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="16" SnapsToDevicePixels="True">
+        <Border.Effect>
+            <DropShadowEffect BlurRadius="22" ShadowDepth="8" Opacity="0.16"/>
+        </Border.Effect>
+
+        <Grid Margin="22">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="14"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="18"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0" Text="{Binding DialogTitle}" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource Ink900Brush}" TextWrapping="Wrap"/>
+            <TextBlock Grid.Row="2" Text="{Binding DialogContent}" FontSize="13" FontWeight="Normal" Foreground="{StaticResource Ink700Brush}" TextWrapping="Wrap" LineHeight="20"/>
+
+            <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Width="86" Content="확인" Style="{StaticResource ModernPrimaryButtonStyle}" IsDefault="true" IsCancel="True" Click="OkButton_Click"/>
+            </StackPanel>
+        </Grid>
+    </Border>
+</Window>

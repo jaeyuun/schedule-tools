@@ -1,9 +1,11 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Globalization;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace GirderSchedule.App.Behaviors
 {
@@ -12,6 +14,10 @@ namespace GirderSchedule.App.Behaviors
         public static readonly DependencyProperty PropertyNameProperty = DependencyProperty.RegisterAttached("PropertyName", typeof(string), typeof(NumericTextBoxBehavior), new PropertyMetadata(null, OnPropertyNameChanged));
         public static readonly DependencyProperty AllowNegativeProperty = DependencyProperty.RegisterAttached("AllowNegative", typeof(bool), typeof(NumericTextBoxBehavior), new PropertyMetadata(false));
         public static readonly DependencyProperty NormalizeOnLostFocusProperty = DependencyProperty.RegisterAttached("NormalizeOnLostFocus", typeof(bool), typeof(NumericTextBoxBehavior), new PropertyMetadata(true));
+        public static readonly DependencyProperty UpdateSourceOnTextChangedProperty = DependencyProperty.RegisterAttached("UpdateSourceOnTextChanged", typeof(bool), typeof(NumericTextBoxBehavior), new PropertyMetadata(false));
+
+        private static readonly DependencyProperty SourceNotifierProperty = DependencyProperty.RegisterAttached("SourceNotifier", typeof(INotifyPropertyChanged), typeof(NumericTextBoxBehavior), new PropertyMetadata(null));
+        private static readonly DependencyProperty SourceHandlerProperty = DependencyProperty.RegisterAttached("SourceHandler", typeof(PropertyChangedEventHandler), typeof(NumericTextBoxBehavior), new PropertyMetadata(null));
 
         private static bool _isUpdatingText;
 
@@ -45,6 +51,38 @@ namespace GirderSchedule.App.Behaviors
             obj.SetValue(NormalizeOnLostFocusProperty, value);
         }
 
+        public static bool GetUpdateSourceOnTextChanged(DependencyObject obj)
+        {
+            return (bool)obj.GetValue(UpdateSourceOnTextChangedProperty);
+        }
+
+        public static void SetUpdateSourceOnTextChanged(DependencyObject obj, bool value)
+        {
+            obj.SetValue(UpdateSourceOnTextChangedProperty, value);
+        }
+
+        public static void Refresh(DependencyObject root)
+        {
+            if (root == null)
+            {
+                return;
+            }
+
+            var textBox = root as TextBox;
+
+            if (textBox != null && !string.IsNullOrWhiteSpace(GetPropertyName(textBox)))
+            {
+                RefreshText(textBox);
+            }
+
+            var childrenCount = VisualTreeHelper.GetChildrenCount(root);
+
+            for (var i = 0; i < childrenCount; i++)
+            {
+                Refresh(VisualTreeHelper.GetChild(root, i));
+            }
+        }
+
         private static void OnPropertyNameChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var textBox = d as TextBox;
@@ -54,36 +92,64 @@ namespace GirderSchedule.App.Behaviors
                 return;
             }
 
-            textBox.Loaded -= TextBox_Loaded;
-            textBox.DataContextChanged -= TextBox_DataContextChanged;
-            textBox.PreviewTextInput -= TextBox_PreviewTextInput;
-            textBox.PreviewKeyDown -= TextBox_PreviewKeyDown;
-            textBox.TextChanged -= TextBox_TextChanged;
-            textBox.LostFocus -= TextBox_LostFocus;
-            DataObject.RemovePastingHandler(textBox, TextBox_Pasting);
+            Detach(textBox);
 
             if (string.IsNullOrWhiteSpace(e.NewValue as string))
             {
                 return;
             }
 
+            Attach(textBox);
+            SubscribeSource(textBox);
+        }
+
+        private static void Attach(TextBox textBox)
+        {
             textBox.Loaded += TextBox_Loaded;
+            textBox.Unloaded += TextBox_Unloaded;
             textBox.DataContextChanged += TextBox_DataContextChanged;
             textBox.PreviewTextInput += TextBox_PreviewTextInput;
             textBox.PreviewKeyDown += TextBox_PreviewKeyDown;
             textBox.TextChanged += TextBox_TextChanged;
             textBox.LostFocus += TextBox_LostFocus;
+
             DataObject.AddPastingHandler(textBox, TextBox_Pasting);
+        }
+
+        private static void Detach(TextBox textBox)
+        {
+            UnsubscribeSource(textBox);
+
+            textBox.Loaded -= TextBox_Loaded;
+            textBox.Unloaded -= TextBox_Unloaded;
+            textBox.DataContextChanged -= TextBox_DataContextChanged;
+            textBox.PreviewTextInput -= TextBox_PreviewTextInput;
+            textBox.PreviewKeyDown -= TextBox_PreviewKeyDown;
+            textBox.TextChanged -= TextBox_TextChanged;
+            textBox.LostFocus -= TextBox_LostFocus;
+
+            DataObject.RemovePastingHandler(textBox, TextBox_Pasting);
         }
 
         private static void TextBox_Loaded(object sender, RoutedEventArgs e)
         {
-            RefreshText(sender as TextBox);
+            var textBox = sender as TextBox;
+
+            SubscribeSource(textBox);
+            RefreshText(textBox);
+        }
+
+        private static void TextBox_Unloaded(object sender, RoutedEventArgs e)
+        {
+            UnsubscribeSource(sender as TextBox);
         }
 
         private static void TextBox_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            RefreshText(sender as TextBox);
+            var textBox = sender as TextBox;
+
+            SubscribeSource(textBox);
+            RefreshText(textBox);
         }
 
         private static void TextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
@@ -96,8 +162,8 @@ namespace GirderSchedule.App.Behaviors
                 return;
             }
 
-            var text = GetProposedText(textBox, e.Text);
-            e.Handled = !IsAllowedText(text, GetAllowNegative(textBox));
+            var proposedText = GetProposedText(textBox, e.Text);
+            e.Handled = !IsAllowedText(proposedText, GetAllowNegative(textBox));
         }
 
         private static void TextBox_PreviewKeyDown(object sender, KeyEventArgs e)
@@ -112,22 +178,16 @@ namespace GirderSchedule.App.Behaviors
         {
             var textBox = sender as TextBox;
 
-            if (textBox == null)
-            {
-                e.CancelCommand();
-                return;
-            }
-
-            if (!e.DataObject.GetDataPresent(typeof(string)))
+            if (textBox == null || !e.DataObject.GetDataPresent(typeof(string)))
             {
                 e.CancelCommand();
                 return;
             }
 
             var pasteText = e.DataObject.GetData(typeof(string)) as string;
-            var text = GetProposedText(textBox, pasteText);
+            var proposedText = GetProposedText(textBox, pasteText);
 
-            if (!IsAllowedText(text, GetAllowNegative(textBox)))
+            if (!IsAllowedText(proposedText, GetAllowNegative(textBox)))
             {
                 e.CancelCommand();
             }
@@ -140,7 +200,14 @@ namespace GirderSchedule.App.Behaviors
                 return;
             }
 
-            ApplyTextToSource(sender as TextBox, false);
+            var textBox = sender as TextBox;
+
+            if (textBox == null || !GetUpdateSourceOnTextChanged(textBox))
+            {
+                return;
+            }
+
+            ApplyTextToSource(textBox, false);
         }
 
         private static void TextBox_LostFocus(object sender, RoutedEventArgs e)
@@ -158,6 +225,81 @@ namespace GirderSchedule.App.Behaviors
             {
                 NormalizeText(textBox);
             }
+        }
+
+        private static void SubscribeSource(TextBox textBox)
+        {
+            if (textBox == null)
+            {
+                return;
+            }
+
+            UnsubscribeSource(textBox);
+
+            var notifier = textBox.DataContext as INotifyPropertyChanged;
+
+            if (notifier == null)
+            {
+                ClearSourceSubscription(textBox);
+                return;
+            }
+
+            PropertyChangedEventHandler handler = delegate (object sender, PropertyChangedEventArgs e)
+            {
+                Source_PropertyChanged(textBox, e);
+            };
+
+            notifier.PropertyChanged += handler;
+
+            textBox.SetValue(SourceNotifierProperty, notifier);
+            textBox.SetValue(SourceHandlerProperty, handler);
+        }
+
+        private static void UnsubscribeSource(TextBox textBox)
+        {
+            if (textBox == null)
+            {
+                return;
+            }
+
+            var notifier = textBox.GetValue(SourceNotifierProperty) as INotifyPropertyChanged;
+            var handler = textBox.GetValue(SourceHandlerProperty) as PropertyChangedEventHandler;
+
+            if (notifier != null && handler != null)
+            {
+                notifier.PropertyChanged -= handler;
+            }
+
+            ClearSourceSubscription(textBox);
+        }
+
+        private static void ClearSourceSubscription(TextBox textBox)
+        {
+            textBox.SetValue(SourceNotifierProperty, null);
+            textBox.SetValue(SourceHandlerProperty, null);
+        }
+
+        private static void Source_PropertyChanged(TextBox textBox, PropertyChangedEventArgs e)
+        {
+            if (textBox == null || textBox.IsKeyboardFocusWithin)
+            {
+                return;
+            }
+
+            var propertyName = GetPropertyName(textBox);
+
+            if (!string.IsNullOrWhiteSpace(e.PropertyName) && e.PropertyName != propertyName)
+            {
+                return;
+            }
+
+            textBox.Dispatcher.BeginInvoke(new Action(() =>
+            {
+                if (!textBox.IsKeyboardFocusWithin)
+                {
+                    RefreshText(textBox);
+                }
+            }));
         }
 
         private static string GetProposedText(TextBox textBox, string input)
@@ -231,16 +373,9 @@ namespace GirderSchedule.App.Behaviors
             }
 
             var source = textBox.DataContext;
-            var propertyName = GetPropertyName(textBox);
+            var property = GetSourceProperty(textBox, source, true);
 
-            if (source == null || string.IsNullOrWhiteSpace(propertyName))
-            {
-                return;
-            }
-
-            var property = source.GetType().GetProperty(propertyName, BindingFlags.Instance | BindingFlags.Public);
-
-            if (property == null || !property.CanWrite)
+            if (source == null || property == null)
             {
                 return;
             }
@@ -267,6 +402,59 @@ namespace GirderSchedule.App.Behaviors
             SetValue(source, property, number);
         }
 
+        private static void RefreshText(TextBox textBox)
+        {
+            if (textBox == null)
+            {
+                return;
+            }
+
+            var source = textBox.DataContext;
+            var property = GetSourceProperty(textBox, source, false);
+
+            if (source == null || property == null)
+            {
+                return;
+            }
+
+            var value = property.GetValue(source, null);
+            SetText(textBox, FormatValue(value));
+        }
+
+        private static PropertyInfo GetSourceProperty(TextBox textBox, object source, bool requireWrite)
+        {
+            if (source == null)
+            {
+                return null;
+            }
+
+            var propertyName = GetPropertyName(textBox);
+
+            if (string.IsNullOrWhiteSpace(propertyName))
+            {
+                return null;
+            }
+
+            var property = source.GetType().GetProperty(propertyName, BindingFlags.Instance | BindingFlags.Public);
+
+            if (property == null)
+            {
+                return null;
+            }
+
+            if (requireWrite && !property.CanWrite)
+            {
+                return null;
+            }
+
+            if (!requireWrite && !property.CanRead)
+            {
+                return null;
+            }
+
+            return property;
+        }
+
         private static bool TryGetNumber(string text, out double number)
         {
             number = 0.0;
@@ -276,12 +464,27 @@ namespace GirderSchedule.App.Behaviors
                 return false;
             }
 
-            text = text.Trim();
+            text = NormalizeNumberText(text.Trim());
 
-            if (text == "-" || text == "." || text == "-.")
+            if (string.IsNullOrWhiteSpace(text))
             {
                 number = 0.0;
                 return true;
+            }
+
+            if (double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out number))
+            {
+                return true;
+            }
+
+            return double.TryParse(text, NumberStyles.Float, CultureInfo.CurrentCulture, out number);
+        }
+
+        private static string NormalizeNumberText(string text)
+        {
+            if (text == "-" || text == "." || text == "-.")
+            {
+                return string.Empty;
             }
 
             if (text.StartsWith("."))
@@ -296,20 +499,14 @@ namespace GirderSchedule.App.Behaviors
             if (text.EndsWith("."))
             {
                 text = text.Substring(0, text.Length - 1);
-
-                if (string.IsNullOrWhiteSpace(text) || text == "-")
-                {
-                    number = 0.0;
-                    return true;
-                }
             }
 
-            if (double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out number))
+            if (text == "-")
             {
-                return true;
+                return string.Empty;
             }
 
-            return double.TryParse(text, NumberStyles.Float, CultureInfo.CurrentCulture, out number);
+            return text;
         }
 
         private static void SetValue(object source, PropertyInfo property, double number)
@@ -374,42 +571,16 @@ namespace GirderSchedule.App.Behaviors
                 return;
             }
 
-            var text = FormatNumber(number);
-
-            _isUpdatingText = true;
-            textBox.Text = text;
-            textBox.CaretIndex = textBox.Text.Length;
-            _isUpdatingText = false;
+            SetText(textBox, FormatNumber(number));
         }
 
-        private static void RefreshText(TextBox textBox)
+        private static void SetText(TextBox textBox, string text)
         {
-            if (textBox == null)
-            {
-                return;
-            }
-
-            var source = textBox.DataContext;
-            var propertyName = GetPropertyName(textBox);
-
-            if (source == null || string.IsNullOrWhiteSpace(propertyName))
-            {
-                return;
-            }
-
-            var property = source.GetType().GetProperty(propertyName, BindingFlags.Instance | BindingFlags.Public);
-
-            if (property == null || !property.CanRead)
-            {
-                return;
-            }
-
-            var value = property.GetValue(source, null);
-            var text = FormatValue(value);
-
             _isUpdatingText = true;
-            textBox.Text = text;
+
+            textBox.Text = text ?? string.Empty;
             textBox.CaretIndex = textBox.Text.Length;
+
             _isUpdatingText = false;
         }
 
@@ -430,7 +601,7 @@ namespace GirderSchedule.App.Behaviors
 
         private static string FormatNumber(double value)
         {
-            return value.ToString("0.##", CultureInfo.InvariantCulture);
+            return value.ToString("0.#", CultureInfo.InvariantCulture);
         }
     }
 }

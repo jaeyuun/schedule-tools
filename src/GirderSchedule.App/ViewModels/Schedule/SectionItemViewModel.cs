@@ -7,14 +7,12 @@ namespace GirderSchedule.App.ViewModels.Schedule
     public sealed class SectionItemViewModel : ViewModelBase
     {
         private readonly ScheduleItem _model;
-        private readonly SectionItemTextService _textService = new SectionItemTextService();
+        private readonly ScheduleTextFormatService _textService = new ScheduleTextFormatService();
 
         public event EventHandler Changed;
+        public event EventHandler SectionEnabledChanged;
 
-        public ScheduleItem Model
-        {
-            get { return _model; }
-        }
+        public ScheduleItem Model { get { return _model; } }
 
         public string Position
         {
@@ -26,8 +24,8 @@ namespace GirderSchedule.App.ViewModels.Schedule
                     return;
                 }
 
-                _model.Position = value;
-                OnPropertyChanged(nameof(Position));
+                _model.Position = value ?? string.Empty;
+                NotifyChanged(nameof(Position));
             }
         }
 
@@ -42,7 +40,7 @@ namespace GirderSchedule.App.ViewModels.Schedule
                 }
 
                 _model.Section.Width = value;
-                OnPropertyChanged(nameof(WidthValue));
+                NotifyChanged(nameof(WidthValue));
             }
         }
 
@@ -57,11 +55,12 @@ namespace GirderSchedule.App.ViewModels.Schedule
                 }
 
                 _model.Section.Height = value;
-                OnPropertyChanged(nameof(HeightValue));
                 OnPropertyChanged(nameof(IsSkinRebarInputEnabled));
+                NotifyChanged(nameof(HeightValue));
             }
         }
 
+        // 보 춤 900.0 초과 시 표피철근 입력
         public bool IsSkinRebarInputEnabled
         {
             get { return _model.Section.Height > 900.0; }
@@ -78,8 +77,7 @@ namespace GirderSchedule.App.ViewModels.Schedule
                 }
 
                 _model.Section.Note = value ?? string.Empty;
-                OnPropertyChanged(nameof(SectionNote));
-                RaiseChanged();
+                NotifyChanged(nameof(SectionNote));
             }
         }
 
@@ -94,13 +92,13 @@ namespace GirderSchedule.App.ViewModels.Schedule
                 }
 
                 _model.MainRebar.Top.FirstCount = value;
-                OnPropertyChanged(nameof(TopCount1));
                 OnPropertyChanged(nameof(TopTotalCount));
                 OnPropertyChanged(nameof(TopText1));
+                NotifyChanged(nameof(TopCount1));
             }
         }
 
-        public double TopDiameter
+        public double MainRebarDiameter
         {
             get { return _model.MainRebar.Diameter; }
             set
@@ -111,9 +109,11 @@ namespace GirderSchedule.App.ViewModels.Schedule
                 }
 
                 _model.MainRebar.Diameter = value;
-                OnPropertyChanged(nameof(TopDiameter));
                 OnPropertyChanged(nameof(TopText1));
                 OnPropertyChanged(nameof(TopText2));
+                OnPropertyChanged(nameof(BottomText1));
+                OnPropertyChanged(nameof(BottomText2));
+                NotifyChanged(nameof(MainRebarDiameter));
             }
         }
 
@@ -128,9 +128,9 @@ namespace GirderSchedule.App.ViewModels.Schedule
                 }
 
                 _model.MainRebar.Top.SecondCount = value;
-                OnPropertyChanged(nameof(TopCount2));
                 OnPropertyChanged(nameof(TopTotalCount));
                 OnPropertyChanged(nameof(TopText2));
+                NotifyChanged(nameof(TopCount2));
             }
         }
 
@@ -150,26 +150,9 @@ namespace GirderSchedule.App.ViewModels.Schedule
                 }
 
                 _model.MainRebar.Bottom.FirstCount = value;
-                OnPropertyChanged(nameof(BottomCount1));
                 OnPropertyChanged(nameof(BottomTotalCount));
                 OnPropertyChanged(nameof(BottomText1));
-            }
-        }
-
-        public double BottomDiameter
-        {
-            get { return _model.MainRebar.Diameter; }
-            set
-            {
-                if (_model.MainRebar.Diameter == value)
-                {
-                    return;
-                }
-
-                _model.MainRebar.Diameter = value;
-                OnPropertyChanged(nameof(BottomDiameter));
-                OnPropertyChanged(nameof(BottomText1));
-                OnPropertyChanged(nameof(BottomText2));
+                NotifyChanged(nameof(BottomCount1));
             }
         }
 
@@ -184,9 +167,9 @@ namespace GirderSchedule.App.ViewModels.Schedule
                 }
 
                 _model.MainRebar.Bottom.SecondCount = value;
-                OnPropertyChanged(nameof(BottomCount2));
                 OnPropertyChanged(nameof(BottomTotalCount));
                 OnPropertyChanged(nameof(BottomText2));
+                NotifyChanged(nameof(BottomCount2));
             }
         }
 
@@ -206,8 +189,8 @@ namespace GirderSchedule.App.ViewModels.Schedule
                 }
 
                 _model.Stirrup.Legs = value;
-                OnPropertyChanged(nameof(StirrupLegs));
                 OnPropertyChanged(nameof(StirrupText));
+                NotifyChanged(nameof(StirrupLegs));
             }
         }
 
@@ -222,8 +205,8 @@ namespace GirderSchedule.App.ViewModels.Schedule
                 }
 
                 _model.Stirrup.Diameter = value;
-                OnPropertyChanged(nameof(StirrupDiameter));
                 OnPropertyChanged(nameof(StirrupText));
+                NotifyChanged(nameof(StirrupDiameter));
             }
         }
 
@@ -238,8 +221,8 @@ namespace GirderSchedule.App.ViewModels.Schedule
                 }
 
                 _model.Stirrup.Spacing = value;
-                OnPropertyChanged(nameof(StirrupSpacing));
                 OnPropertyChanged(nameof(StirrupText));
+                NotifyChanged(nameof(StirrupSpacing));
             }
         }
 
@@ -254,8 +237,8 @@ namespace GirderSchedule.App.ViewModels.Schedule
                 }
 
                 _model.SkinRebar.Diameter = value;
-                OnPropertyChanged(nameof(SkinRebarDiameter));
                 OnPropertyChanged(nameof(SkinRebarText));
+                NotifyChanged(nameof(SkinRebarDiameter));
             }
         }
 
@@ -270,26 +253,25 @@ namespace GirderSchedule.App.ViewModels.Schedule
                 }
 
                 _model.SkinRebar.Spacing = value;
-                OnPropertyChanged(nameof(SkinRebarSpacing));
                 OnPropertyChanged(nameof(SkinRebarText));
+                NotifyChanged(nameof(SkinRebarSpacing));
             }
         }
 
-		public string SkinRebarNote
-		{
-			get { return _model.SkinRebar.Note; }
-			set
-			{
-				if (_model.SkinRebar.Note == value)
-				{
-					return;
-				}
+        public string SkinRebarNote
+        {
+            get { return _model.SkinRebar.Note; }
+            set
+            {
+                if (_model.SkinRebar.Note == value)
+                {
+                    return;
+                }
 
-				_model.SkinRebar.Note = value ?? string.Empty;
-				OnPropertyChanged(nameof(SkinRebarNote));
-				RaiseChanged();
-			}
-		}
+                _model.SkinRebar.Note = value ?? string.Empty;
+                NotifyChanged(nameof(SkinRebarNote));
+            }
+        }
 
         public double? MomentValue
         {
@@ -303,6 +285,7 @@ namespace GirderSchedule.App.ViewModels.Schedule
 
                 _model.MemberForce.Moment = value;
                 OnPropertyChanged(nameof(MomentText));
+                NotifyChanged(nameof(MomentValue));
             }
         }
 
@@ -318,6 +301,7 @@ namespace GirderSchedule.App.ViewModels.Schedule
 
                 _model.MemberForce.Shear = value;
                 OnPropertyChanged(nameof(ShearText));
+                NotifyChanged(nameof(ShearValue));
             }
         }
 
@@ -333,22 +317,22 @@ namespace GirderSchedule.App.ViewModels.Schedule
 
         public string TopText1
         {
-            get { return _textService.FormatLayerText(_model.MainRebar.Top.FirstCount, _model.MainRebar.Diameter); }
+            get { return _textService.FormatMainRebarText(_model.MainRebar.Top.FirstCount, _model.MainRebar.Diameter); }
         }
 
         public string TopText2
         {
-            get { return _textService.FormatLayerText(_model.MainRebar.Top.SecondCount, _model.MainRebar.Diameter); }
+            get { return _textService.FormatMainRebarText(_model.MainRebar.Top.SecondCount, _model.MainRebar.Diameter); }
         }
 
         public string BottomText1
         {
-            get { return _textService.FormatLayerText(_model.MainRebar.Bottom.FirstCount, _model.MainRebar.Diameter); }
+            get { return _textService.FormatMainRebarText(_model.MainRebar.Bottom.FirstCount, _model.MainRebar.Diameter); }
         }
 
         public string BottomText2
         {
-            get { return _textService.FormatLayerText(_model.MainRebar.Bottom.SecondCount, _model.MainRebar.Diameter); }
+            get { return _textService.FormatMainRebarText(_model.MainRebar.Bottom.SecondCount, _model.MainRebar.Diameter); }
         }
 
         public string StirrupText
@@ -373,6 +357,7 @@ namespace GirderSchedule.App.ViewModels.Schedule
 
                 _model.IsSectionEnabled = value;
                 OnPropertyChanged(nameof(IsSectionEnabled));
+                RaiseSectionEnabledChanged();
                 RaiseChanged();
             }
         }
@@ -388,35 +373,57 @@ namespace GirderSchedule.App.ViewModels.Schedule
             OnPropertyChanged(nameof(WidthValue));
             OnPropertyChanged(nameof(HeightValue));
             OnPropertyChanged(nameof(IsSkinRebarInputEnabled));
-            OnPropertyChanged(nameof(TopCount1));
-            OnPropertyChanged(nameof(TopCount2));
-            OnPropertyChanged(nameof(TopDiameter));
-            OnPropertyChanged(nameof(TopTotalCount));
-            OnPropertyChanged(nameof(BottomCount1));
-            OnPropertyChanged(nameof(BottomCount2));
-            OnPropertyChanged(nameof(BottomDiameter));
-            OnPropertyChanged(nameof(BottomTotalCount));
-            OnPropertyChanged(nameof(StirrupLegs));
-            OnPropertyChanged(nameof(StirrupDiameter));
-            OnPropertyChanged(nameof(StirrupSpacing));
-            OnPropertyChanged(nameof(SkinRebarDiameter));
-            OnPropertyChanged(nameof(SkinRebarSpacing));
+
             OnPropertyChanged(nameof(MomentValue));
             OnPropertyChanged(nameof(ShearValue));
             OnPropertyChanged(nameof(MomentText));
             OnPropertyChanged(nameof(ShearText));
+            OnPropertyChanged(nameof(SectionNote));
+
+            OnPropertyChanged(nameof(TopCount1));
+            OnPropertyChanged(nameof(TopCount2));
+            OnPropertyChanged(nameof(MainRebarDiameter));
+            OnPropertyChanged(nameof(TopTotalCount));
+            OnPropertyChanged(nameof(BottomCount1));
+            OnPropertyChanged(nameof(BottomCount2));
+            OnPropertyChanged(nameof(BottomTotalCount));
             OnPropertyChanged(nameof(TopText1));
             OnPropertyChanged(nameof(TopText2));
             OnPropertyChanged(nameof(BottomText1));
             OnPropertyChanged(nameof(BottomText2));
+
+            OnPropertyChanged(nameof(StirrupLegs));
+            OnPropertyChanged(nameof(StirrupDiameter));
+            OnPropertyChanged(nameof(StirrupSpacing));
             OnPropertyChanged(nameof(StirrupText));
+
+            OnPropertyChanged(nameof(SkinRebarDiameter));
+            OnPropertyChanged(nameof(SkinRebarSpacing));
+            OnPropertyChanged(nameof(SkinRebarNote));
             OnPropertyChanged(nameof(SkinRebarText));
+
             OnPropertyChanged(nameof(IsSectionEnabled));
+        }
+
+        private void NotifyChanged(string propertyName)
+        {
+            OnPropertyChanged(propertyName);
+            RaiseChanged();
         }
 
         private void RaiseChanged()
         {
             var handler = Changed;
+
+            if (handler != null)
+            {
+                handler(this, EventArgs.Empty);
+            }
+        }
+
+        private void RaiseSectionEnabledChanged()
+        {
+            var handler = SectionEnabledChanged;
 
             if (handler != null)
             {

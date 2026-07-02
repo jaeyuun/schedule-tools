@@ -9,6 +9,7 @@ namespace GirderSchedule.App.ViewModels.Schedule
     {
         private ScheduleFloor _floor;
         private ScheduleSet _set;
+        private bool _isApplyingSectionPositions;
         private bool _isWidthOver;
         private bool _isHeightOver;
 
@@ -35,6 +36,19 @@ namespace GirderSchedule.App.ViewModels.Schedule
                 }
 
                 return _floor.Setting.Prefix;
+            }
+        }
+
+        public string FloorName
+        {
+            get
+            {
+                if (_floor == null || _floor.Setting == null)
+                {
+                    return string.Empty;
+                }
+
+                return _floor.Setting.Name;
             }
         }
 
@@ -150,6 +164,8 @@ namespace GirderSchedule.App.ViewModels.Schedule
                 return;
             }
 
+            DetachSectionEvents();
+
             _floor = floor;
             _set = set;
 
@@ -157,14 +173,11 @@ namespace GirderSchedule.App.ViewModels.Schedule
             Center = new SectionItemViewModel(_set.Center);
             Right = new SectionItemViewModel(_set.Right);
 
-            Left.Changed += SectionItem_Changed;
-            Center.Changed += SectionItem_Changed;
-            Right.Changed += SectionItem_Changed;
-
-            ApplySectionEnabledPositions();
+            AttachSectionEvents();
 
             OnPropertyChanged(nameof(CurrentSet));
             OnPropertyChanged(nameof(FloorPrefix));
+            OnPropertyChanged(nameof(FloorName));
             OnPropertyChanged(nameof(MemberName));
             OnPropertyChanged(nameof(WidthValue));
             OnPropertyChanged(nameof(HeightValue));
@@ -173,7 +186,48 @@ namespace GirderSchedule.App.ViewModels.Schedule
             OnPropertyChanged(nameof(Right));
 
             RefreshItems();
-            RaiseCurrentSetChanged();
+        }
+
+        private void AttachSectionEvents()
+        {
+            if (Left != null)
+            {
+                Left.Changed += SectionItem_Changed;
+                Left.SectionEnabledChanged += SectionItem_SectionEnabledChanged;
+            }
+
+            if (Center != null)
+            {
+                Center.Changed += SectionItem_Changed;
+                Center.SectionEnabledChanged += SectionItem_SectionEnabledChanged;
+            }
+
+            if (Right != null)
+            {
+                Right.Changed += SectionItem_Changed;
+                Right.SectionEnabledChanged += SectionItem_SectionEnabledChanged;
+            }
+        }
+
+        private void DetachSectionEvents()
+        {
+            if (Left != null)
+            {
+                Left.Changed -= SectionItem_Changed;
+                Left.SectionEnabledChanged -= SectionItem_SectionEnabledChanged;
+            }
+
+            if (Center != null)
+            {
+                Center.Changed -= SectionItem_Changed;
+                Center.SectionEnabledChanged -= SectionItem_SectionEnabledChanged;
+            }
+
+            if (Right != null)
+            {
+                Right.Changed -= SectionItem_Changed;
+                Right.SectionEnabledChanged -= SectionItem_SectionEnabledChanged;
+            }
         }
 
         private void RefreshItems()
@@ -190,6 +244,8 @@ namespace GirderSchedule.App.ViewModels.Schedule
             OnPropertyChanged(nameof(Left));
             OnPropertyChanged(nameof(Center));
             OnPropertyChanged(nameof(Right));
+            OnPropertyChanged(nameof(WidthValue));
+            OnPropertyChanged(nameof(HeightValue));
         }
 
         private void RaiseCurrentSetChanged()
@@ -204,6 +260,22 @@ namespace GirderSchedule.App.ViewModels.Schedule
 
         private void SectionItem_Changed(object sender, EventArgs e)
         {
+            if (_isApplyingSectionPositions)
+            {
+                return;
+            }
+
+            RefreshItems();
+            RaiseCurrentSetChanged();
+        }
+
+        private void SectionItem_SectionEnabledChanged(object sender, EventArgs e)
+        {
+            if (_isApplyingSectionPositions)
+            {
+                return;
+            }
+
             ApplySectionEnabledPositions();
             RefreshItems();
             RaiseCurrentSetChanged();
@@ -219,29 +291,38 @@ namespace GirderSchedule.App.ViewModels.Schedule
             var isSelectedLeft = Left.IsSectionEnabled;
             var isSelectedRight = Right.IsSectionEnabled;
 
-            if (isSelectedLeft && isSelectedRight)
+            _isApplyingSectionPositions = true;
+
+            try
             {
-                Left.Position = "END";
-                Center.Position = "CEN";
-                Right.Position = "END";
+                if (isSelectedLeft && isSelectedRight)
+                {
+                    Left.Position = "END";
+                    Center.Position = "CEN";
+                    Right.Position = "END";
+                }
+                else if (isSelectedLeft && !isSelectedRight)
+                {
+                    Left.Position = "BOTH";
+                    Center.Position = "CEN";
+                    Right.Position = string.Empty;
+                }
+                else if (!isSelectedLeft && isSelectedRight)
+                {
+                    Left.Position = string.Empty;
+                    Center.Position = "CEN";
+                    Right.Position = "BOTH";
+                }
+                else
+                {
+                    Left.Position = string.Empty;
+                    Center.Position = "ALL";
+                    Right.Position = string.Empty;
+                }
             }
-            else if (isSelectedLeft && !isSelectedRight)
+            finally
             {
-                Left.Position = "BOTH";
-                Center.Position = "CEN";
-                Right.Position = string.Empty;
-            }
-            else if (!isSelectedLeft && isSelectedRight)
-            {
-                Left.Position = string.Empty;
-                Center.Position = "CEN";
-                Right.Position = "BOTH";
-            }
-            else
-            {
-                Left.Position = string.Empty;
-                Center.Position = "ALL";
-                Right.Position = string.Empty;
+                _isApplyingSectionPositions = false;
             }
         }
     }

@@ -5,78 +5,8 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="Styles/TextBoxStyles.xaml"/>
+                <ResourceDictionary Source="Views/Styles/ModernTheme.xaml"/>
             </ResourceDictionary.MergedDictionaries>
-
-            <Style TargetType="{x:Type Window}">
-                <Setter Property="FontSize" Value="12"/>
-                <Setter Property="FontFamily" Value="Malgun Gothic"/>
-            </Style>
-
-            <Style TargetType="{x:Type UserControl}">
-                <Setter Property="FontSize" Value="12"/>
-                <Setter Property="FontFamily" Value="Malgun Gothic"/>
-            </Style>
-
-            <Style TargetType="{x:Type TextBlock}">
-                <Setter Property="FontSize" Value="12"/>
-                <Setter Property="FontFamily" Value="Malgun Gothic"/>
-            </Style>
-
-            <Style TargetType="{x:Type TextBox}">
-                <Setter Property="FontSize" Value="12"/>
-                <Setter Property="FontFamily" Value="Malgun Gothic"/>
-            </Style>
-
-            <Style TargetType="{x:Type Button}">
-                <Setter Property="FontSize" Value="12"/>
-                <Setter Property="FontFamily" Value="Malgun Gothic"/>
-            </Style>
-
-            <Style TargetType="{x:Type CheckBox}">
-                <Setter Property="FontSize" Value="12"/>
-                <Setter Property="FontFamily" Value="Malgun Gothic"/>
-            </Style>
-
-            <Style TargetType="{x:Type ComboBox}">
-                <Setter Property="FontSize" Value="12"/>
-                <Setter Property="FontFamily" Value="Malgun Gothic"/>
-            </Style>
-
-            <Style TargetType="{x:Type ListBox}">
-                <Setter Property="FontSize" Value="12"/>
-                <Setter Property="FontFamily" Value="Malgun Gothic"/>
-            </Style>
-
-            <Style TargetType="{x:Type TreeView}">
-                <Setter Property="FontSize" Value="12"/>
-                <Setter Property="FontFamily" Value="Malgun Gothic"/>
-            </Style>
-
-            <Style TargetType="{x:Type TreeViewItem}">
-                <Setter Property="FontSize" Value="12"/>
-                <Setter Property="FontFamily" Value="Malgun Gothic"/>
-            </Style>
-
-            <Style TargetType="{x:Type DataGrid}">
-                <Setter Property="FontSize" Value="12"/>
-                <Setter Property="FontFamily" Value="Malgun Gothic"/>
-            </Style>
-
-            <Style TargetType="{x:Type DataGridColumnHeader}">
-                <Setter Property="FontSize" Value="12"/>
-                <Setter Property="FontFamily" Value="Malgun Gothic"/>
-            </Style>
-
-            <Style TargetType="{x:Type Menu}">
-                <Setter Property="FontSize" Value="12"/>
-                <Setter Property="FontFamily" Value="Malgun Gothic"/>
-            </Style>
-
-            <Style TargetType="{x:Type MenuItem}">
-                <Setter Property="FontSize" Value="12"/>
-                <Setter Property="FontFamily" Value="Malgun Gothic"/>
-            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>
