@@ -67,15 +67,16 @@ namespace GirderSchedule.Dxf.Export
         private ScheduleDrawer CreateScheduleDrawer(DxfDocument document, DxfExportOptions options, DxfOverrideSet overrides)
         {
             var layerNames = options.LayerNames ?? new DxfLayerNameSet();
+            var styleNames = options.StyleNames ?? new DxfStyleNameSet();
             var styler = new DxfEntityStyler(document, layerNames, overrides);
 
             var entityDrawer = new DxfEntityDrawer(document, styler);
-            var textDrawer = new TextDrawer(document, styler);
+            var textDrawer = new TextDrawer(document, styler, styleNames);
             var tableDrawer = new TableDrawer(textDrawer, entityDrawer);
-            var titleBlockDrawer = new TitleBlockDrawer(document, textDrawer, entityDrawer);
+            var titleBlockDrawer = new TitleBlockDrawer(document, textDrawer, entityDrawer, styleNames);
             var sectionDrawer = new SectionDrawer(entityDrawer);
             var rebarDrawer = new RebarDrawer(document, styler);
-            var dimensionDrawer = new DimensionDrawer(document, styler);
+            var dimensionDrawer = new DimensionDrawer(document, styler, styleNames);
             var rebarTextDrawer = new RebarTextDrawer(textDrawer);
             var scheduleDrawer = new ScheduleDrawer(textDrawer, tableDrawer, titleBlockDrawer, sectionDrawer, rebarDrawer, dimensionDrawer, rebarTextDrawer, _layoutFactory);
 

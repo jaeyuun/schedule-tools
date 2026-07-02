@@ -18,6 +18,8 @@
 	<ItemGroup>
 		<Compile Remove="Resources\**" />
 		<EmbeddedResource Remove="Resources\**" />
+		<Compile Remove="Resource\**" />
+		<EmbeddedResource Remove="Resource\**" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -52,6 +54,13 @@
 
 	<ItemGroup>
 		<None Update="Resources\GirderTemplate.dxf">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+
+
+	<ItemGroup>
+		<None Update="Resource\GriderScheduleTemplate.dxf">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>

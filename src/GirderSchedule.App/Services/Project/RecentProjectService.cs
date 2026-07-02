@@ -1,9 +1,9 @@
-﻿using System;
+﻿using GirderSchedule.App.Common;
+using GirderSchedule.App.Models;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text.Json;
-using GirderSchedule.App.Models;
 
 namespace GirderSchedule.App.Services.Project
 {
@@ -27,8 +27,7 @@ namespace GirderSchedule.App.Services.Project
                 return new List<RecentProjectInfo>();
             }
 
-            var json = File.ReadAllText(_filePath);
-            var items = JsonSerializer.Deserialize<List<RecentProjectInfo>>(json);
+            var items = AppJsonSerializer.Read<List<RecentProjectInfo>>(_filePath);
 
             if (items == null)
             {
@@ -58,9 +57,7 @@ namespace GirderSchedule.App.Services.Project
                 .Take(20)
                 .ToList();
 
-            var options = new JsonSerializerOptions { WriteIndented = true };
-            var json = JsonSerializer.Serialize(ordered, options);
-            File.WriteAllText(_filePath, json);
+            AppJsonSerializer.Write(_filePath, ordered);
         }
 
         public void AddOrUpdate(string filePath, string projectName)

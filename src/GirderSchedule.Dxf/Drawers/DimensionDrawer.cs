@@ -1,4 +1,5 @@
 ﻿using GirderSchedule.Domain.Models;
+using GirderSchedule.Domain.Models.Settings;
 using GirderSchedule.Dxf.Constants;
 using GirderSchedule.Dxf.Geometry;
 using GirderSchedule.Dxf.Layouts;
@@ -16,11 +17,13 @@ namespace GirderSchedule.Dxf.Drawers
 
         private readonly DxfDocument _document;
         private readonly DxfEntityStyler _styler;
+        private readonly DxfStyleNameSet _styleNames;
 
-        public DimensionDrawer(DxfDocument document, DxfEntityStyler styler)
+        public DimensionDrawer(DxfDocument document, DxfEntityStyler styler, DxfStyleNameSet styleNameSet)
         {
             _document = document;
             _styler = styler;
+            _styleNames = styleNameSet ?? new DxfStyleNameSet();
         }
 
         public void Draw(SectionLayout layout, ScheduleItem item, bool isWidthOver, bool isHeightOver)
@@ -54,7 +57,7 @@ namespace GirderSchedule.Dxf.Drawers
         {
             var dimension = new AlignedDimension(DxfPointConverter.ToVector2(x1, y1), DxfPointConverter.ToVector2(x2, y2), offset, GetDimensionStyle());
 
-            _styler.Apply(dimension, DxfStyleRole.Dimension);
+            _styler.ApplyDimension(dimension);
 
             if (!string.IsNullOrWhiteSpace(userText))
             {
@@ -67,6 +70,11 @@ namespace GirderSchedule.Dxf.Drawers
 
         private DimensionStyle GetDimensionStyle()
         {
+            if (!string.IsNullOrWhiteSpace(_styleNames.DimensionStyleName) && _document.DimensionStyles.Contains(_styleNames.DimensionStyleName))
+            {
+                return _document.DimensionStyles[_styleNames.DimensionStyleName];
+            }
+
             if (_document.DimensionStyles.Contains(DxfStyles.Dimension))
             {
                 return _document.DimensionStyles[DxfStyles.Dimension];

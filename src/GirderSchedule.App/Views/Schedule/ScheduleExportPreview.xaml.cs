@@ -1,7 +1,7 @@
 ﻿using GirderSchedule.App.Rendering.Previews;
 using GirderSchedule.App.Services.Previews;
 using GirderSchedule.App.Services.Schedule;
-using GirderSchedule.App.ViewModels.Export;
+using GirderSchedule.App.ViewModels.Settings;
 using GirderSchedule.App.ViewModels.Schedule;
 using GirderSchedule.App.Views.Schedule.Behaviors;
 using GirderSchedule.Domain.Models.Export;

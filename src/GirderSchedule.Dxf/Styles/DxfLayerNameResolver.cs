@@ -1,4 +1,5 @@
-﻿using GirderSchedule.Dxf.Constants;
+﻿using GirderSchedule.Domain.Models.Settings;
+using GirderSchedule.Dxf.Constants;
 using netDxf;
 using netDxf.Tables;
 
@@ -15,11 +16,16 @@ namespace GirderSchedule.Dxf.Styles
             _layerNames = layerNames ?? new DxfLayerNameSet();
         }
 
-        public Layer GetLayer(DxfStyleRole role)
+        public Layer GetLayer(DxfLayerRole role)
         {
-            var layerName = GetLayerName(role);
+            var layerName = _layerNames.GetLayerName(role);
             var templateLayerName = _layerNames.GetTemplateLayerName(role);
 
+            return GetLayer(layerName, templateLayerName);
+        }
+
+        public Layer GetLayer(string layerName, string templateLayerName)
+        {
             if (string.IsNullOrWhiteSpace(layerName))
             {
                 layerName = templateLayerName;
@@ -40,11 +46,6 @@ namespace GirderSchedule.Dxf.Styles
             _document.Layers.Add(layer);
 
             return layer;
-        }
-
-        public string GetLayerName(DxfStyleRole role)
-        {
-            return _layerNames.GetLayerName(role);
         }
 
         private void CopyLayerProperties(Layer target, string templateLayerName)

@@ -5,18 +5,16 @@
         Width="1040"
         Height="660"
         MinHeight="620"
-        WindowStyle="SingleBorderWindow"
-        AllowsTransparency="False"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
-        Background="White">
+        Background="{StaticResource AppBackgroundBrush}">
 
     <Window.InputBindings>
         <KeyBinding Key="Enter" Command="{Binding UpdateCommand}"/>
     </Window.InputBindings>
 
-    <Grid Background="White">
-        <Border Margin="24" Style="{StaticResource CardBorderStyle}">
+    <Grid>
+        <Border Style="{StaticResource CardBorderStyle}">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -62,7 +60,7 @@
                                 <DataGridTemplateColumn Header="층 표현" Width="70">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <TextBlock Text="{Binding FloorPrefix}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                            <TextBlock Text="{Binding FloorPrefix}" VerticalAlignment="Center"/>
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                     <DataGridTemplateColumn.CellEditingTemplate>

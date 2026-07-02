@@ -1,74 +1,69 @@
-﻿using GirderSchedule.Dxf.Constants;
+﻿using GirderSchedule.Domain.Models.Settings;
+using GirderSchedule.Dxf.Constants;
 
 namespace GirderSchedule.Dxf.Styles
 {
     public sealed class DxfLayerNameSet
     {
+        public string FormLine { get; set; }
+        public string FormText { get; set; }
+        public string MemberForce { get; set; }
+        public string Girder { get; set; }
         public string Rebar { get; set; }
         public string Stirrup { get; set; }
-        public string Form { get; set; }
-        public string Girder { get; set; }
-        public string Dimension { get; set; }
-        public string TitleText { get; set; }
-        public string ContentText { get; set; }
-        public string Defpoint { get; set; }
+        public string Text { get; set; }
 
         public DxfLayerNameSet()
         {
+            FormLine = DxfLayers.FormLine;
+            FormText = DxfLayers.FormText;
+            MemberForce = DxfLayers.Defpoint;
+            Girder = DxfLayers.RcGir;
             Rebar = DxfLayers.Rebar;
             Stirrup = DxfLayers.Rebar;
-            Form = DxfLayers.FormLine;
-            Girder = DxfLayers.RcGir;
-            Dimension = DxfLayers.Dim;
-            TitleText = DxfLayers.FormText;
-            ContentText = DxfLayers.Text;
-            Defpoint = DxfLayers.Defpoint;
+            Text = DxfLayers.Text;
         }
 
-        public string GetLayerName(DxfStyleRole role)
+        public string GetLayerName(DxfLayerRole role)
         {
             switch (role)
             {
-                case DxfStyleRole.Rebar:
-                    return Rebar;
-                case DxfStyleRole.Stirrup:
-                    return Stirrup;
-                case DxfStyleRole.Form:
-                    return Form;
-                case DxfStyleRole.Girder:
+                case DxfLayerRole.FormLine:
+                    return FormLine;
+                case DxfLayerRole.FormText:
+                    return FormText;
+                case DxfLayerRole.MemberForce:
+                    return MemberForce;
+                case DxfLayerRole.Girder:
                     return Girder;
-                case DxfStyleRole.Dimension:
-                    return Dimension;
-                case DxfStyleRole.TitleText:
-                    return TitleText;
-                case DxfStyleRole.ContentText:
-                    return ContentText;
-                case DxfStyleRole.Defpoint:
-                    return Defpoint;
+                case DxfLayerRole.Rebar:
+                    return Rebar;
+                case DxfLayerRole.Stirrup:
+                    return Stirrup;
+                case DxfLayerRole.Text:
+                    return Text;
                 default:
                     return DxfLayers.Text;
             }
         }
 
-        public string GetTemplateLayerName(DxfStyleRole role)
+        public string GetTemplateLayerName(DxfLayerRole role)
         {
             switch (role)
             {
-                case DxfStyleRole.Rebar:
-                case DxfStyleRole.Stirrup:
-                    return DxfLayers.Rebar;
-                case DxfStyleRole.Form:
+                case DxfLayerRole.FormLine:
                     return DxfLayers.FormLine;
-                case DxfStyleRole.Girder:
-                    return DxfLayers.RcGir;
-                case DxfStyleRole.Dimension:
-                    return DxfLayers.Dim;
-                case DxfStyleRole.TitleText:
+                case DxfLayerRole.FormText:
                     return DxfLayers.FormText;
-                case DxfStyleRole.ContentText:
-                    return DxfLayers.Text;
-                case DxfStyleRole.Defpoint:
+                case DxfLayerRole.MemberForce:
                     return DxfLayers.Defpoint;
+                case DxfLayerRole.Girder:
+                    return DxfLayers.RcGir;
+                case DxfLayerRole.Rebar:
+                case DxfLayerRole.Stirrup:
+                    return DxfLayers.Rebar;
+                case DxfLayerRole.Text:
+                    return DxfLayers.Text;
                 default:
                     return DxfLayers.Text;
             }

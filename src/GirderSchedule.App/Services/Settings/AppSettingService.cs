@@ -1,7 +1,7 @@
-﻿using System;
-using System.IO;
-using System.Text.Json;
+﻿using GirderSchedule.App.Common;
 using GirderSchedule.App.Models;
+using System;
+using System.IO;
 
 namespace GirderSchedule.App.Services.Settings
 {
@@ -27,8 +27,7 @@ namespace GirderSchedule.App.Services.Settings
                 return setting;
             }
 
-            var json = File.ReadAllText(_settingFilePath);
-            var loaded = JsonSerializer.Deserialize<AppSetting>(json);
+            var loaded = AppJsonSerializer.Read<AppSetting>(_settingFilePath);
 
             if (loaded == null || string.IsNullOrWhiteSpace(loaded.DefaultProjectFolder))
             {
@@ -56,10 +55,7 @@ namespace GirderSchedule.App.Services.Settings
             }
 
             Directory.CreateDirectory(setting.DefaultProjectFolder);
-
-            var options = new JsonSerializerOptions { WriteIndented = true };
-            var json = JsonSerializer.Serialize(setting, options);
-            File.WriteAllText(_settingFilePath, json);
+            AppJsonSerializer.Write(_settingFilePath, setting);
         }
 
         public string GetDefaultProjectFolder()

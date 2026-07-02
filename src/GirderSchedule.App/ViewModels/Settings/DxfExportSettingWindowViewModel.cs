@@ -3,7 +3,7 @@ using GirderSchedule.App.Services;
 using System;
 using System.Windows.Input;
 
-namespace GirderSchedule.App.ViewModels.Export
+namespace GirderSchedule.App.ViewModels.Settings
 {
     public sealed class DxfExportSettingWindowViewModel : ViewModelBase
     {

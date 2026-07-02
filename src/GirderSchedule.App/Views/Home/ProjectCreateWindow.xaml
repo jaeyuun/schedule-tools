@@ -10,9 +10,9 @@
         WindowStyle="SingleBorderWindow"
         AllowsTransparency="False"
         WindowStartupLocation="CenterOwner"
-        Background="White">
+        Background="{StaticResource AppBackgroundBrush}">
 
-    <Grid Background="White">
+    <Grid Background="{StaticResource AppBackgroundBrush}">
         <views:ProjectCreateForm/>
     </Grid>
 </Window>

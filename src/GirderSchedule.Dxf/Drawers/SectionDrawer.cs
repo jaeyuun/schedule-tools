@@ -1,4 +1,5 @@
-﻿using GirderSchedule.Dxf.Drawers.Common;
+﻿using GirderSchedule.Domain.Models.Settings;
+using GirderSchedule.Dxf.Drawers.Common;
 using GirderSchedule.Dxf.Geometry;
 using GirderSchedule.Dxf.Layouts;
 using GirderSchedule.Dxf.Styles;
@@ -21,8 +22,8 @@ namespace GirderSchedule.Dxf.Drawers
                 return;
             }
 
-            _entityDrawer.AddLine(DxfStyleRole.Girder, layout.OuterLeft - layout.SideWing, layout.OuterTop, layout.OuterRight + layout.SideWing, layout.OuterTop);
-            _entityDrawer.AddPolyline(DxfStyleRole.Girder, false,
+            _entityDrawer.AddLine(DxfLayerRole.Girder, layout.OuterLeft - layout.SideWing, layout.OuterTop, layout.OuterRight + layout.SideWing, layout.OuterTop);
+            _entityDrawer.AddPolyline(DxfLayerRole.Girder, false,
                 layout.OuterLeft - layout.SideWing, layout.OuterShelfY,
                 layout.OuterLeft, layout.OuterShelfY,
                 layout.OuterLeft, layout.OuterBottom,
@@ -38,7 +39,7 @@ namespace GirderSchedule.Dxf.Drawers
                 return;
             }
 
-            _entityDrawer.AddLine(DxfStyleRole.Rebar, box.Left, box.Top, box.Right, box.Bottom);
+            _entityDrawer.AddLine(DxfLayerRole.Rebar, box.Left, box.Top, box.Right, box.Bottom);
         }
     }
 }

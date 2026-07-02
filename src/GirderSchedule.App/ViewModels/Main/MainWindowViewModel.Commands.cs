@@ -18,6 +18,7 @@ namespace GirderSchedule.App.ViewModels.Main
             SaveProjectCommand = new RelayCommand(p => SaveProject());
             SaveAsProjectCommand = new RelayCommand(p => SaveAsProject());
             EditFloorSettingCommand = new RelayCommand(p => EditFloorSetting());
+            EditDxfLayerSettingCommand = new RelayCommand(p => EditDxfLayerSetting());
             AddSetCommand = new RelayCommand(p => AddSet(), p => SelectedFloor != null);
             RemoveSetCommand = new RelayCommand(p => RemoveSet(), p => SelectedFloor != null && SelectedSet != null);
             ExportCurrentSetCommand = new RelayCommand(p => ExportProjectDxf());
@@ -78,6 +79,19 @@ namespace GirderSchedule.App.ViewModels.Main
             if (Floors.Count > 0 && SelectedFloor == null)
             {
                 SelectedFloor = Floors[0];
+            }
+        }
+
+        private void EditDxfLayerSetting()
+        {
+            var originalSettingName = Project.DxfSettingName;
+            var viewModel = new DxfLayerSettingWindowViewModel(Project);
+            var window = new DxfLayerSettingWindow();
+            window.Owner = Application.Current.MainWindow;
+            window.DataContext = viewModel;
+            if (window.ShowDialog() == true && Project.DxfSettingName != originalSettingName)
+            {
+                IsDirty = true;
             }
         }
 
@@ -174,7 +188,7 @@ namespace GirderSchedule.App.ViewModels.Main
                 return;
             }
 
-            _exportService.ExportDxf(ProjectName, ScheduleTitle, Floors);
+            _exportService.ExportDxf(Project, Floors);
         }
 
         private void ExportProjectExcel()

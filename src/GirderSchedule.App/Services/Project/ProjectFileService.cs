@@ -1,20 +1,23 @@
-﻿using GirderSchedule.Domain.Models;
+﻿using GirderSchedule.App.Common;
+using GirderSchedule.App.Services.Schedule;
+using GirderSchedule.Domain.Models;
+using GirderSchedule.Domain.Models.Settings;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Text;
-using System.Text.Json;
 
 namespace GirderSchedule.App.Services.Project
 {
     public sealed class ProjectFileService
     {
         private const string Header = "GIRDER_SCHEDULE_PROJECT_V1";
+        private readonly DxfSettingService _dxfSettingService = new DxfSettingService();
 
         public void Save(string filePath, ScheduleProject project)
         {
-            var options = CreateJsonOptions();
-            var json = JsonSerializer.Serialize(project, options);
+            var json = AppJsonSerializer.Serialize(project);
             var jsonBytes = Encoding.UTF8.GetBytes(json);
 
             using (var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write))
@@ -47,7 +50,7 @@ namespace GirderSchedule.App.Services.Project
                     gzipStream.CopyTo(memoryStream);
 
                     var json = Encoding.UTF8.GetString(memoryStream.ToArray());
-                    var project = JsonSerializer.Deserialize<ScheduleProject>(json, CreateJsonOptions());
+                    var project = AppJsonSerializer.Deserialize<ScheduleProject>(json);
 
                     if (project == null)
                     {
@@ -60,19 +63,13 @@ namespace GirderSchedule.App.Services.Project
             }
         }
 
-        private JsonSerializerOptions CreateJsonOptions()
-        {
-            var options = new JsonSerializerOptions();
-            options.WriteIndented = true;
-            options.PropertyNameCaseInsensitive = true;
-            return options;
-        }
-
         private void EnsureProject(ScheduleProject project)
         {
+            project.DxfSettingName = _dxfSettingService.NormalizeSettingName(project.DxfSettingName);
+
             if (project.Floors == null)
             {
-                project.Floors = new System.Collections.Generic.List<ScheduleFloor>();
+                project.Floors = new List<ScheduleFloor>();
             }
 
             for (var i = 0; i < project.Floors.Count; i++)
@@ -86,7 +83,7 @@ namespace GirderSchedule.App.Services.Project
 
                 if (floor.Sets == null)
                 {
-                    floor.Sets = new System.Collections.Generic.List<ScheduleSet>();
+                    floor.Sets = new List<ScheduleSet>();
                 }
             }
         }

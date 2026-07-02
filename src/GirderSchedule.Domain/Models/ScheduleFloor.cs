@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using GirderSchedule.Domain.Models.Settings;
+using System.Collections.Generic;
 
 namespace GirderSchedule.Domain.Models
 {

@@ -1,3 +1,4 @@
+using GirderSchedule.Domain.Models.Settings;
 using GirderSchedule.Dxf.Drawers.Common;
 using GirderSchedule.Dxf.Geometry;
 using GirderSchedule.Dxf.Layouts;
@@ -114,12 +115,12 @@ namespace GirderSchedule.Dxf.Drawers
 
         private void DrawFormLine(double baseX, double baseY, double x1, double y1, double x2, double y2)
         {
-            _entityDrawer.AddPolyline(DxfStyleRole.Form, false, baseX + x1, baseY + y1, baseX + x2, baseY + y2);
+            _entityDrawer.AddPolyline(DxfLayerRole.FormLine, false, baseX + x1, baseY + y1, baseX + x2, baseY + y2);
         }
 
         private void DrawDefpointLine(double baseX, double baseY, double x1, double y1, double x2, double y2)
         {
-            _entityDrawer.AddPolyline(DxfStyleRole.Defpoint, false, baseX + x1, baseY + y1, baseX + x2, baseY + y2);
+            _entityDrawer.AddPolyline(DxfLayerRole.MemberForce, false, baseX + x1, baseY + y1, baseX + x2, baseY + y2);
         }
     }
 }

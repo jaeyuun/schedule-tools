@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using GirderSchedule.Domain.Layouts;
 using GirderSchedule.Domain.Models;
+using GirderSchedule.Domain.Models.Settings;
 using GirderSchedule.Domain.Services;
 using GirderSchedule.Dxf.Constants;
 using GirderSchedule.Dxf.Geometry;
@@ -188,7 +189,7 @@ namespace GirderSchedule.Dxf.Drawers
             insert.Scale = new Vector3(insertScale, insertScale, insertScale);
             insert.Rotation = 0.0;
 
-            _styler.Apply(insert, DxfStyleRole.Rebar);
+            _styler.Apply(insert, DxfLayerRole.Rebar);
             _document.Entities.Add(insert);
         }
 
@@ -224,8 +225,8 @@ namespace GirderSchedule.Dxf.Drawers
             var hatch = new Hatch(HatchPattern.Solid, false);
             var boundary = new HatchBoundaryPath(new EntityObject[] { circle });
 
-            _styler.Apply(circle, DxfStyleRole.Rebar);
-            _styler.Apply(hatch, DxfStyleRole.Rebar);
+            _styler.Apply(circle, DxfLayerRole.Rebar);
+            _styler.Apply(hatch, DxfLayerRole.Rebar);
 
             hatch.BoundaryPaths.Add(boundary);
 
@@ -266,7 +267,7 @@ namespace GirderSchedule.Dxf.Drawers
             }
 
             polyline.IsClosed = isClosed;
-            _styler.Apply(polyline, DxfStyleRole.Rebar);
+            _styler.Apply(polyline, DxfLayerRole.Rebar);
 
             if (width > 0.0)
             {

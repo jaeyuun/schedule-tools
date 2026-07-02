@@ -166,12 +166,12 @@ namespace GirderSchedule.Dxf.Drawers
 
             if (item.MemberForce.Moment.HasValue)
             {
-                _textDrawer.DrawDefPointText("M = " + item.MemberForce.Moment.Value.ToString("0"), box.Left + ScheduleTextLayout.MemberForceMomentOffsetX, box.CenterY, ScheduleTextLayout.MemberForceTextHeight);
+                _textDrawer.DrawMemberForceText("M = " + item.MemberForce.Moment.Value.ToString("0"), box.Left + ScheduleTextLayout.MemberForceMomentOffsetX, box.CenterY, ScheduleTextLayout.MemberForceTextHeight);
             }
 
             if (item.MemberForce.Shear.HasValue)
             {
-                _textDrawer.DrawDefPointText("V = " + item.MemberForce.Shear.Value.ToString("0"), box.Left + ScheduleTextLayout.MemberForceShearOffsetX, box.CenterY, ScheduleTextLayout.MemberForceTextHeight);
+                _textDrawer.DrawMemberForceText("V = " + item.MemberForce.Shear.Value.ToString("0"), box.Left + ScheduleTextLayout.MemberForceShearOffsetX, box.CenterY, ScheduleTextLayout.MemberForceTextHeight);
             }
         }
 

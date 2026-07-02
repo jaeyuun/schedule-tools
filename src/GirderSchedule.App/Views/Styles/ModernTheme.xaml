@@ -58,6 +58,7 @@
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="CornerRadius" Value="14"/>
         <Setter Property="SnapsToDevicePixels" Value="True"/>
+        <Setter Property="Margin" Value="28"/>
     </Style>
 
     <!-- TextBlock -->

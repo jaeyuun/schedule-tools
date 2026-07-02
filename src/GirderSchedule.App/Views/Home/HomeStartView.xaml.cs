@@ -58,7 +58,7 @@ namespace GirderSchedule.App.Views.Home
             SearchTextBox.Focus();
         }
 
-        private static T? FindParent<T>(DependencyObject? child) where T : DependencyObject
+        private static T FindParent<T>(DependencyObject child) where T : DependencyObject
         {
             var parent = child == null ? null : VisualTreeHelper.GetParent(child);
 

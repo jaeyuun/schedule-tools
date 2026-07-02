@@ -186,6 +186,7 @@ namespace GirderSchedule.App.ViewModels.Main
         public ICommand SaveProjectCommand { get; private set; }
         public ICommand SaveAsProjectCommand { get; private set; }
         public ICommand EditFloorSettingCommand { get; private set; }
+        public ICommand EditDxfLayerSettingCommand { get; private set; }
         public ICommand AddSetCommand { get; private set; }
         public ICommand RemoveSetCommand { get; private set; }
         public ICommand ExportCurrentSetCommand { get; private set; }

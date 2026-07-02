@@ -1,3 +1,4 @@
+using GirderSchedule.Domain.Models.Settings;
 using GirderSchedule.Dxf.Geometry;
 using GirderSchedule.Dxf.Styles;
 using netDxf;
@@ -17,26 +18,26 @@ namespace GirderSchedule.Dxf.Drawers.Common
             _styler = styler;
         }
 
-        public Line AddLine(DxfStyleRole role, double x1, double y1, double x2, double y2)
+        public Line AddLine(DxfLayerRole role, double x1, double y1, double x2, double y2)
         {
             var line = new Line(DxfPointConverter.ToVector3(x1, y1), DxfPointConverter.ToVector3(x2, y2));
             AddEntity(line, role);
             return line;
         }
 
-        public Circle AddCircle(DxfStyleRole role, double centerX, double centerY, double radius)
+        public Circle AddCircle(DxfLayerRole role, double centerX, double centerY, double radius)
         {
             var circle = new Circle(DxfPointConverter.ToVector3(centerX, centerY), radius);
             AddEntity(circle, role);
             return circle;
         }
 
-        public Polyline2D AddPolyline(DxfStyleRole role, bool isClosed, params double[] values)
+        public Polyline2D AddPolyline(DxfLayerRole role, bool isClosed, params double[] values)
         {
             return AddPolylineCore(role, isClosed, 0.0, values);
         }
 
-        private Polyline2D AddPolylineCore(DxfStyleRole role, bool isClosed, double width, params double[] values)
+        private Polyline2D AddPolylineCore(DxfLayerRole role, bool isClosed, double width, params double[] values)
         {
             if (values == null || values.Length == 0 || values.Length % 2 != 0)
             {
@@ -83,7 +84,7 @@ namespace GirderSchedule.Dxf.Drawers.Common
             return insert;
         }
 
-        private void AddEntity(EntityObject entity, DxfStyleRole role)
+        private void AddEntity(EntityObject entity, DxfLayerRole role)
         {
             if (entity == null)
             {

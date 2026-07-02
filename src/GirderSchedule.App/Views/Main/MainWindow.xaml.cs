@@ -1,4 +1,6 @@
 ﻿using GirderSchedule.App.ViewModels.Main;
+using GirderSchedule.App.ViewModels.Settings;
+using GirderSchedule.App.Views.Settings;
 using GirderSchedule.Domain.Models;
 using System.ComponentModel;
 using System.Windows;

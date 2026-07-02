@@ -6,6 +6,7 @@ namespace GirderSchedule.Domain.Models
     {
         public string ProjectName { get; set; } = "새 프로젝트";
         public string ScheduleTitle { get; set; } = "보 일람표";
+        public string DxfSettingName { get; set; } = "Default";
         public List<ScheduleFloor> Floors { get; set; } = new List<ScheduleFloor>();
     }
 }

@@ -73,8 +73,8 @@
         </Style>
     </UserControl.Resources>
 
-    <Grid Background="White">
-        <Border Margin="28" Padding="28" Style="{StaticResource CardBorderStyle}">
+    <Grid Background="{StaticResource AppBackgroundBrush}">
+        <Border Padding="28" Style="{StaticResource CardBorderStyle}">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>

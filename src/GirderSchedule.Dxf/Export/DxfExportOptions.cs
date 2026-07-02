@@ -12,17 +12,17 @@ namespace GirderSchedule.Dxf.Export
         public string TemplatePath { get; set; }
         public int FormColumnCount { get; set; }
         public DxfLayerNameSet LayerNames { get; set; }
+        public DxfStyleNameSet StyleNames { get; set; }
 
         public DxfExportOptions()
         {
             IncludeLeft = true;
             IncludeCenter = true;
             IncludeRight = true;
-            IsWidthOver = false;
-            IsHeightOver = false;
             TemplatePath = string.Empty;
             FormColumnCount = 3;
             LayerNames = new DxfLayerNameSet();
+            StyleNames = new DxfStyleNameSet();
         }
     }
 }

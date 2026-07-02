@@ -1,4 +1,4 @@
-﻿namespace GirderSchedule.Domain.Models
+﻿namespace GirderSchedule.Domain.Models.Settings
 {
     public sealed class FloorSetting
     {

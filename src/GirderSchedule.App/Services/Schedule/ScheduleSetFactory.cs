@@ -1,4 +1,5 @@
 ﻿using GirderSchedule.Domain.Models;
+using GirderSchedule.Domain.Models.Settings;
 
 namespace GirderSchedule.App.Services.Schedule
 {

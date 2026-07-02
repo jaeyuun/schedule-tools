@@ -1,4 +1,4 @@
-﻿using GirderSchedule.App.ViewModels.Export;
+﻿using GirderSchedule.App.ViewModels.Settings;
 using GirderSchedule.App.ViewModels.Schedule;
 using GirderSchedule.Domain.Models;
 using GirderSchedule.Domain.Models.Export;

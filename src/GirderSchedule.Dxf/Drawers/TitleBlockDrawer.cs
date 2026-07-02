@@ -1,4 +1,5 @@
 using GirderSchedule.Domain.Models.Export;
+using GirderSchedule.Domain.Models.Settings;
 using GirderSchedule.Dxf.Constants;
 using GirderSchedule.Dxf.Drawers.Common;
 using GirderSchedule.Dxf.Layouts;
@@ -12,12 +13,14 @@ namespace GirderSchedule.Dxf.Drawers
         private readonly DxfDocument _document;
         private readonly TextDrawer _textDrawer;
         private readonly DxfEntityDrawer _entityDrawer;
+        private readonly DxfStyleNameSet _styleNames;
 
-        public TitleBlockDrawer(DxfDocument document, TextDrawer textDrawer, DxfEntityDrawer entityDrawer)
+        public TitleBlockDrawer(DxfDocument document, TextDrawer textDrawer, DxfEntityDrawer entityDrawer, DxfStyleNameSet styleNames)
         {
             _document = document;
             _textDrawer = textDrawer;
             _entityDrawer = entityDrawer;
+            _styleNames = styleNames ?? new DxfStyleNameSet();
         }
 
         public void Draw(ScheduleExportPage page, double pageBaseX, double pageBaseY)
@@ -29,12 +32,14 @@ namespace GirderSchedule.Dxf.Drawers
 
         private void DrawBlock(double x, double y)
         {
-            if (!_document.Blocks.Contains(DxfBlocks.TitleBlock))
+            var blockName = string.IsNullOrWhiteSpace(_styleNames.DrawingBlockName) ? DxfBlocks.TitleBlock : _styleNames.DrawingBlockName;
+
+            if (!_document.Blocks.Contains(blockName))
             {
                 return;
             }
 
-            _entityDrawer.AddUnstyledInsert(_document.Blocks[DxfBlocks.TitleBlock], x, y, TitleBlockLayout.BlockScale, 0.0);
+            _entityDrawer.AddUnstyledInsert(_document.Blocks[blockName], x, y, TitleBlockLayout.BlockScale, 0.0);
         }
 
         private void DrawTitle(ScheduleExportPage page, double pageBaseX, double pageBaseY)
@@ -55,12 +60,12 @@ namespace GirderSchedule.Dxf.Drawers
 
         private void DrawTitleCircle(double pageBaseX, double pageBaseY)
         {
-            _entityDrawer.AddCircle(DxfStyleRole.TitleText, pageBaseX + TitleBlockLayout.TitleCircleCenterX, pageBaseY + TitleBlockLayout.TitleCircleCenterY, TitleBlockLayout.TitleCircleRadius);
+            _entityDrawer.AddCircle(DxfLayerRole.FormText, pageBaseX + TitleBlockLayout.TitleCircleCenterX, pageBaseY + TitleBlockLayout.TitleCircleCenterY, TitleBlockLayout.TitleCircleRadius);
         }
 
         private void DrawTitleLine(double pageBaseX, double pageBaseY)
         {
-            _entityDrawer.AddLine(DxfStyleRole.TitleText, pageBaseX + TitleBlockLayout.TitleLineStartX, pageBaseY + TitleBlockLayout.TitleLineY, pageBaseX + TitleBlockLayout.TitleLineEndX, pageBaseY + TitleBlockLayout.TitleLineY);
+            _entityDrawer.AddLine(DxfLayerRole.FormText, pageBaseX + TitleBlockLayout.TitleLineStartX, pageBaseY + TitleBlockLayout.TitleLineY, pageBaseX + TitleBlockLayout.TitleLineEndX, pageBaseY + TitleBlockLayout.TitleLineY);
         }
 
         private void DrawDrawingName(ScheduleExportPage page, double pageBaseX, double pageBaseY)

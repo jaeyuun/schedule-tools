@@ -1,4 +1,5 @@
-﻿using GirderSchedule.Dxf.Constants;
+﻿using GirderSchedule.Domain.Models.Settings;
+using GirderSchedule.Dxf.Constants;
 using GirderSchedule.Dxf.Styles.Overrides;
 using netDxf;
 using netDxf.Entities;
@@ -21,7 +22,7 @@ namespace GirderSchedule.Dxf.Styles
             _overrides = overrides;
         }
 
-        public void Apply(EntityObject entity, DxfStyleRole role)
+        public void Apply(EntityObject entity, DxfLayerRole role)
         {
             if (entity == null)
             {
@@ -32,7 +33,28 @@ namespace GirderSchedule.Dxf.Styles
             ApplyTemplateOverride(entity, role);
         }
 
-        private void ApplyBaseStyle(EntityObject entity, DxfStyleRole role)
+        public void ApplyDimension(EntityObject entity)
+        {
+            if (entity == null)
+            {
+                return;
+            }
+
+            ApplyBaseStyle(entity, DxfLayers.Dim, DxfLayers.Dim);
+        }
+
+        public void ApplyMemberForce(EntityObject entity)
+        {
+            if (entity == null)
+            {
+                return;
+            }
+
+            ApplyBaseStyle(entity, DxfLayerRole.MemberForce);
+            ApplyTemplateOverride(entity, DxfLayerRole.MemberForce);
+        }
+
+        private void ApplyBaseStyle(EntityObject entity, DxfLayerRole role)
         {
             var layer = _layerResolver.GetLayer(role);
 
@@ -42,7 +64,19 @@ namespace GirderSchedule.Dxf.Styles
             entity.Lineweight = Lineweight.ByLayer;
         }
 
-        private void ApplyTemplateOverride(EntityObject entity, DxfStyleRole role)
+        private void ApplyBaseStyle(EntityObject entity, string layerName, string templateLayerName)
+        {
+            var layer = _layerResolver.GetLayer(layerName, templateLayerName);
+
+            entity.Layer = layer;
+            entity.Color = AciColor.ByLayer;
+            entity.Linetype = Linetype.ByLayer;
+            entity.Lineweight = Lineweight.ByLayer;
+
+            ApplyTemplateOverride(entity, templateLayerName);
+        }
+
+        private void ApplyTemplateOverride(EntityObject entity, DxfLayerRole role)
         {
             if (_overrides == null)
             {
@@ -60,9 +94,26 @@ namespace GirderSchedule.Dxf.Styles
             }
         }
 
-        private Linetype GetRoleLinetype(DxfStyleRole role)
+        private void ApplyTemplateOverride(EntityObject entity, string templateLayerName)
         {
-            return role == DxfStyleRole.Girder ? GetLinetype(DxfStyles.RcGirderLine) : Linetype.ByLayer;
+            if (_overrides == null)
+            {
+                return;
+            }
+
+            var layer = entity.Layer;
+
+            _overrides.Apply(entity, templateLayerName);
+
+            if (layer != null)
+            {
+                entity.Layer = layer;
+            }
+        }
+
+        private Linetype GetRoleLinetype(DxfLayerRole role)
+        {
+            return role == DxfLayerRole.Girder ? GetLinetype(DxfStyles.RcGirderLine) : Linetype.ByLayer;
         }
 
         private Linetype GetLinetype(string name)
@@ -72,9 +123,9 @@ namespace GirderSchedule.Dxf.Styles
                 return _document.Linetypes[name];
             }
 
-            if (_document.Linetypes.Contains(DxfStyles.Continuous))
+            if (_document.Linetypes.Contains(DxfStyles.RcGirderLine))
             {
-                return _document.Linetypes[DxfStyles.Continuous];
+                return _document.Linetypes[DxfStyles.RcGirderLine];
             }
 
             return Linetype.Continuous;

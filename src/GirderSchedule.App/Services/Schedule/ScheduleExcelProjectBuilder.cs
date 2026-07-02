@@ -1,5 +1,6 @@
 ﻿using GirderSchedule.App.ViewModels.Schedule;
 using GirderSchedule.Domain.Models;
+using GirderSchedule.Domain.Models.Settings;
 using System.Collections.ObjectModel;
 
 namespace GirderSchedule.App.Services.Schedule

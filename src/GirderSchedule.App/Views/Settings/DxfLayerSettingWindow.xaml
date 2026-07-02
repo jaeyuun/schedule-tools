@@ -1,0 +1,152 @@
+﻿<Window x:Class="GirderSchedule.App.Views.Settings.DxfLayerSettingWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="DXF 설정"
+        Width="900"
+        Height="660"
+        MinHeight="620"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        Background="{StaticResource AppBackgroundBrush}">
+
+    <Window.InputBindings>
+        <KeyBinding Key="Enter" Command="{Binding CloseCommand}"/>
+        <KeyBinding Key="Escape" Command="{Binding CloseCommand}"/>
+    </Window.InputBindings>
+
+    <Grid>
+        <Border Style="{StaticResource CardBorderStyle}">
+            <Grid Margin="28">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="18"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="18"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="22"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <StackPanel Grid.Row="0">
+                    <TextBlock Text="DXF 설정" Style="{StaticResource WindowTitleTextStyle}"/>
+                    <TextBlock Text="공유 템플릿, 스타일, 레이어 설정을 관리합니다." Margin="0,6,0,0" Style="{StaticResource CaptionTextStyle}"/>
+                </StackPanel>
+
+                <Border Grid.Row="2" Background="White" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="12" Padding="18">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="12"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="64"/>
+                            <ColumnDefinition Width="220"/>
+                            <ColumnDefinition Width="12"/>
+                            <ColumnDefinition Width="220"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="80"/>
+                            <ColumnDefinition Width="10"/>
+                            <ColumnDefinition Width="80"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="설정" Foreground="{StaticResource Ink700Brush}"/>
+                        <ComboBox Grid.Row="0" Grid.Column="1" ItemsSource="{Binding SettingNames}" SelectedItem="{Binding SelectedSettingName}" Style="{StaticResource ModernComboBoxStyle}"/>
+                        <TextBox Grid.Row="0" Grid.Column="3" Text="{Binding SettingNameText, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ModernTextBoxStyle}"/>
+                        <Button Grid.Row="0" Grid.Column="5" Content="저장" Style="{StaticResource ModernOutlineButtonStyle}" Command="{Binding SaveSettingCommand}"/>
+                        <Button Grid.Row="0" Grid.Column="7" Content="삭제" Style="{StaticResource ModernOutlineButtonStyle}" Command="{Binding DeleteSettingCommand}"/>
+
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="템플릿" Foreground="{StaticResource Ink700Brush}"/>
+                        <ComboBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3" ItemsSource="{Binding TemplateNames}" SelectedItem="{Binding SelectedTemplateName}" Style="{StaticResource ModernComboBoxStyle}"/>
+                        <Button Grid.Row="2" Grid.Column="5" Content="추가" Style="{StaticResource ModernOutlineButtonStyle}" Command="{Binding AddTemplateCommand}"/>
+                        <Button Grid.Row="2" Grid.Column="7" Content="삭제" Style="{StaticResource ModernOutlineButtonStyle}" Command="{Binding DeleteTemplateCommand}"/>
+                    </Grid>
+                </Border>
+                
+                <Grid Grid.Row="4">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="360"/>
+                        <ColumnDefinition Width="18"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="0" Background="White" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="12" Padding="18">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="12"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" Text="스타일 설정" Style="{StaticResource SectionTitleTextStyle}"/>
+
+                            <DataGrid Grid.Row="2"
+                                      ItemsSource="{Binding Styles}"
+                                      Style="{StaticResource ModernDataGridStyle}"
+                                      ColumnHeaderStyle="{StaticResource ModernDataGridColumnHeaderStyle}"
+                                      RowStyle="{StaticResource ModernDataGridRowStyle}"
+                                      CellStyle="{StaticResource ModernDataGridCellStyle}">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="항목" Width="110" Binding="{Binding DisplayName}" IsReadOnly="True"/>
+                                    <DataGridTemplateColumn Header="스타일명" Width="*">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding StyleName}" VerticalAlignment="Center"/>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                        <DataGridTemplateColumn.CellEditingTemplate>
+                                            <DataTemplate>
+                                                <TextBox Style="{StaticResource GridCellTextBoxStyle}" HorizontalContentAlignment="Left" Text="{Binding StyleName, UpdateSourceTrigger=LostFocus}"/>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellEditingTemplate>
+                                    </DataGridTemplateColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Grid>
+                    </Border>
+
+                    <Border Grid.Column="2" Background="White" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="12" Padding="18">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="12"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" Text="레이어 설정" Style="{StaticResource SectionTitleTextStyle}"/>
+
+                            <DataGrid Grid.Row="2"
+                                      ItemsSource="{Binding Layers}"
+                                      Style="{StaticResource ModernDataGridStyle}"
+                                      ColumnHeaderStyle="{StaticResource ModernDataGridColumnHeaderStyle}"
+                                      RowStyle="{StaticResource ModernDataGridRowStyle}"
+                                      CellStyle="{StaticResource ModernDataGridCellStyle}">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="항목" Width="130" Binding="{Binding DisplayName}" IsReadOnly="True"/>
+                                    <DataGridTemplateColumn Header="레이어명" Width="*">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding LayerName}" VerticalAlignment="Center"/>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                        <DataGridTemplateColumn.CellEditingTemplate>
+                                            <DataTemplate>
+                                                <TextBox Margin="0,0,16,0" Style="{StaticResource GridCellTextBoxStyle}" HorizontalContentAlignment="Left" Text="{Binding LayerName, UpdateSourceTrigger=LostFocus}"/>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellEditingTemplate>
+                                    </DataGridTemplateColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Grid>
+                    </Border>
+                </Grid>
+
+                <StackPanel Grid.Row="6" Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Width="96" Content="기본값" Style="{StaticResource ModernOutlineButtonStyle}" Command="{Binding ResetCommand}"/>
+                    <Button Width="96" Margin="10,0,0,0" Content="닫기" Style="{StaticResource ModernPrimaryButtonStyle}" Command="{Binding CloseCommand}"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

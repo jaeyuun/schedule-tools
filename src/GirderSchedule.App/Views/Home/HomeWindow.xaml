@@ -11,7 +11,7 @@
         WindowStyle="SingleBorderWindow"
         AllowsTransparency="False"
         WindowStartupLocation="CenterScreen"
-        Background="White">
+        Background="{StaticResource AppBackgroundBrush}">
 
     <Window.Resources>
         <DataTemplate DataType="{x:Type home:HomeStartViewModel}">

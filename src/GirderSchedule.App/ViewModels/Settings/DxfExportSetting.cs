@@ -1,4 +1,4 @@
-﻿namespace GirderSchedule.App.ViewModels.Export
+﻿namespace GirderSchedule.App.ViewModels.Settings
 {
     public sealed class DxfExportSetting
     {

@@ -1,20 +1,20 @@
-﻿using GirderSchedule.App.ViewModels.Export;
+﻿using GirderSchedule.App.ViewModels.Settings;
 using System;
 using System.Windows;
 
-namespace GirderSchedule.App.Views.Export
+namespace GirderSchedule.App.Views.Settings
 {
-    public partial class DxfExportSettingWindow : Window
+    public partial class DxfLayerSettingWindow : Window
     {
-        public DxfExportSettingWindow()
+        public DxfLayerSettingWindow()
         {
             InitializeComponent();
-            DataContextChanged += DxfExportSettingWindow_DataContextChanged;
+            DataContextChanged += DxfLayerSettingWindow_DataContextChanged;
         }
 
-        private void DxfExportSettingWindow_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        private void DxfLayerSettingWindow_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            var oldViewModel = e.OldValue as DxfExportSettingWindowViewModel;
+            var oldViewModel = e.OldValue as DxfLayerSettingWindowViewModel;
 
             if (oldViewModel != null)
             {
@@ -22,7 +22,7 @@ namespace GirderSchedule.App.Views.Export
                 oldViewModel.Cancelled -= ViewModel_Cancelled;
             }
 
-            var newViewModel = e.NewValue as DxfExportSettingWindowViewModel;
+            var newViewModel = e.NewValue as DxfLayerSettingWindowViewModel;
 
             if (newViewModel != null)
             {
