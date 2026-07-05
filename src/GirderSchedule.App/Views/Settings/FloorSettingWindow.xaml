@@ -37,25 +37,20 @@
                         <TextBlock Text="도면에 출력할 층 이름과 층별 기본 철근 규격을 관리합니다." Margin="0,6,0,0" Style="{StaticResource CaptionTextStyle}"/>
                     </StackPanel>
 
-                    <Border Grid.Row="2" Background="White" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="10" ClipToBounds="True">
-                        <DataGrid x:Name="FloorGrid"
+                    <DataGrid Grid.Row="2"
+                            x:Name="FloorGrid"
                             ItemsSource="{Binding Floors}"
                             SelectedItem="{Binding SelectedFloor, Mode=TwoWay}"
-                            CanUserSortColumns="False"
-                            CanUserReorderColumns="False"
                             AllowDrop="True"
                             PreviewMouseLeftButtonDown="FloorGrid_PreviewMouseLeftButtonDown"
                             MouseMove="FloorGrid_MouseMove"
                             DragOver="FloorGrid_DragOver"
                             DragLeave="FloorGrid_DragLeave"
                             Drop="FloorGrid_Drop"
-                            Background="Transparent"
-                            BorderThickness="0"
                             Style="{StaticResource ModernDataGridStyle}"
                             ColumnHeaderStyle="{StaticResource ModernDataGridColumnHeaderStyle}"
                             RowStyle="{StaticResource ModernDataGridRowStyle}"
                             CellStyle="{StaticResource ModernDataGridCellStyle}">
-
                             <DataGrid.Columns>
                                 <DataGridTemplateColumn Header="층 표현" Width="70">
                                     <DataGridTemplateColumn.CellTemplate>
@@ -144,7 +139,6 @@
                                 </DataGridTemplateColumn>
                             </DataGrid.Columns>
                         </DataGrid>
-                    </Border>
                 </Grid>
 
                 <Border Grid.Column="1" Grid.Row="0" Background="#FBFDFF" BorderBrush="{StaticResource LineBrush}" BorderThickness="1,0,0,0" CornerRadius="0,12,0,0" VerticalAlignment="Stretch">
