@@ -68,7 +68,7 @@ namespace GirderSchedule.Dxf.Export
         {
             var layerNames = options.LayerNames ?? new DxfLayerNameSet();
             var styleNames = options.StyleNames ?? new DxfStyleNameSet();
-            var styler = new DxfEntityStyler(document, layerNames, overrides);
+            var styler = new DxfEntityStyler(document, layerNames, styleNames, overrides);
 
             var entityDrawer = new DxfEntityDrawer(document, styler);
             var textDrawer = new TextDrawer(document, styler, styleNames);

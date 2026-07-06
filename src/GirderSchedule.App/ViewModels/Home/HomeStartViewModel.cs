@@ -80,7 +80,9 @@ namespace GirderSchedule.App.ViewModels.Home
         {
             if (SelectedRecentProject == null)
             {
-                AppDialogService.ShowNotice(Properties.Resources.Title_OpenProjectFailed, Properties.Resources.Content_SelectProjectOpen);
+                AppDialogService.ShowNotice(
+                    Properties.Resources.Title_OpenProjectFailed,
+                    Properties.Resources.Content_SelectProjectOpen);
                 return;
             }
 
@@ -141,7 +143,9 @@ namespace GirderSchedule.App.ViewModels.Home
             }
             catch
             {
-                AppDialogService.ShowNotice(Properties.Resources.Title_OpenProjectFailed, Properties.Resources.Content_FileOpenFailedWithError);
+                AppDialogService.ShowNotice(
+                    Properties.Resources.Title_OpenProjectFailed, 
+                    Properties.Resources.Content_FileOpenFailedWithError);
             }
         }
 

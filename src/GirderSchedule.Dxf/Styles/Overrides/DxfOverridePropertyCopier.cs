@@ -1,46 +1,10 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Reflection;
 
 namespace GirderSchedule.Dxf.Styles.Overrides
 {
     internal static class DxfOverridePropertyCopier
     {
-        public static void CopyWritableProperty(object source, object target, string name)
-        {
-            if (source == null || target == null)
-            {
-                return;
-            }
-
-            var sourceProperty = FindProperty(source.GetType(), name);
-            var targetProperty = FindProperty(target.GetType(), name);
-
-            if (sourceProperty == null || targetProperty == null)
-            {
-                return;
-            }
-
-            if (!sourceProperty.CanRead || !targetProperty.CanWrite)
-            {
-                return;
-            }
-
-            if (!targetProperty.PropertyType.IsAssignableFrom(sourceProperty.PropertyType))
-            {
-                return;
-            }
-
-            try
-            {
-                var value = sourceProperty.GetValue(source, null);
-                targetProperty.SetValue(target, value, null);
-            }
-            catch
-            {
-            }
-        }
-
         public static PropertyInfo FindProperty(Type type, string name)
         {
             while (type != null)
@@ -65,16 +29,11 @@ namespace GirderSchedule.Dxf.Styles.Overrides
                 return null;
             }
 
-            var valuesProperty = collection.GetType().GetProperty("Values", BindingFlags.Instance | BindingFlags.Public);
+            var values = GetValuesProperty(collection);
 
-            if (valuesProperty != null && valuesProperty.CanRead)
+            if (values != null)
             {
-                var values = valuesProperty.GetValue(collection, null) as IEnumerable;
-
-                if (values != null)
-                {
-                    return values;
-                }
+                return values;
             }
 
             return collection as IEnumerable;
@@ -94,13 +53,7 @@ namespace GirderSchedule.Dxf.Styles.Overrides
                 return;
             }
 
-            try
-            {
-                clearMethod.Invoke(collection, null);
-            }
-            catch
-            {
-            }
+            TryInvoke(clearMethod, collection, null);
         }
 
         public static void AddObjectToCollection(object collection, object value)
@@ -110,7 +63,50 @@ namespace GirderSchedule.Dxf.Styles.Overrides
                 return;
             }
 
-            var methods = collection.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public);
+            var addMethod = FindAddMethod(collection.GetType(), value.GetType());
+
+            if (addMethod == null)
+            {
+                return;
+            }
+
+            TryInvoke(addMethod, collection, new[] { value });
+        }
+
+        public static object CloneObject(object value)
+        {
+            if (value == null)
+            {
+                return null;
+            }
+
+            var cloneMethod = value.GetType().GetMethod("Clone", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, Type.EmptyTypes, null);
+
+            if (cloneMethod == null)
+            {
+                return value;
+            }
+
+            var clone = TryInvoke(cloneMethod, value, null);
+
+            return clone ?? value;
+        }
+
+        private static IEnumerable GetValuesProperty(object collection)
+        {
+            var valuesProperty = collection.GetType().GetProperty("Values", BindingFlags.Instance | BindingFlags.Public);
+
+            if (valuesProperty == null || !valuesProperty.CanRead)
+            {
+                return null;
+            }
+
+            return TryGetValue(valuesProperty, collection) as IEnumerable;
+        }
+
+        private static MethodInfo FindAddMethod(Type collectionType, Type valueType)
+        {
+            var methods = collectionType.GetMethods(BindingFlags.Instance | BindingFlags.Public);
 
             for (var i = 0; i < methods.Length; i++)
             {
@@ -128,44 +124,38 @@ namespace GirderSchedule.Dxf.Styles.Overrides
                     continue;
                 }
 
-                if (!parameters[0].ParameterType.IsAssignableFrom(value.GetType()))
+                if (!parameters[0].ParameterType.IsAssignableFrom(valueType))
                 {
                     continue;
                 }
 
-                try
-                {
-                    method.Invoke(collection, new[] { value });
-                    return;
-                }
-                catch
-                {
-                    return;
-                }
+                return method;
             }
+
+            return null;
         }
 
-        public static object CloneObject(object value)
+        private static object TryGetValue(PropertyInfo property, object target)
         {
-            if (value == null)
-            {
-                return null;
-            }
-
-            var cloneMethod = value.GetType().GetMethod("Clone", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, Type.EmptyTypes, null);
-
-            if (cloneMethod == null)
-            {
-                return value;
-            }
-
             try
             {
-                return cloneMethod.Invoke(value, null);
+                return property.GetValue(target, null);
             }
             catch
             {
-                return value;
+                return null;
+            }
+        }
+
+        private static object TryInvoke(MethodInfo method, object target, object[] parameters)
+        {
+            try
+            {
+                return method.Invoke(target, parameters);
+            }
+            catch
+            {
+                return null;
             }
         }
     }

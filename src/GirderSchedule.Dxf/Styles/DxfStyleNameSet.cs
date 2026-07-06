@@ -1,18 +1,34 @@
-﻿using GirderSchedule.Dxf.Constants;
+﻿using GirderSchedule.Domain.Models.Settings;
+using GirderSchedule.Dxf.Constants;
 
 namespace GirderSchedule.Dxf.Styles
 {
     public sealed class DxfStyleNameSet
     {
-        public string TextStyleName { get; set; }
-        public string DimensionStyleName { get; set; }
-        public string DrawingBlockName { get; set; }
+        public string Text { get; set; }
+        public string Dimension { get; set; }
+        public string Block { get; set; }
 
         public DxfStyleNameSet()
         {
-            TextStyleName = DxfStyles.DefaultText;
-            DimensionStyleName = DxfStyles.Dimension;
-            DrawingBlockName = DxfBlocks.TitleBlock;
+            Text = DxfStyles.DefaultText;
+            Dimension = DxfStyles.Dimension;
+            Block = DxfBlocks.TitleBlock;
+        }
+
+        public string GetStyleName(DxfStyleRole role)
+        {
+            switch (role)
+            {
+                case DxfStyleRole.Text:
+                    return Text;
+                case DxfStyleRole.Block:
+                    return Block;
+                case DxfStyleRole.Dimension:
+                    return Dimension;
+                default:
+                    return string.Empty;
+            }
         }
     }
 }

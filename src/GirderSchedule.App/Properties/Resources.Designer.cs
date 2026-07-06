@@ -80,6 +80,51 @@ namespace GirderSchedule.App.Properties {
         }
         
         /// <summary>
+        ///   기본 설정은 삭제할 수 없습니다.과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string Content_DxfSettingDeleteFailed {
+            get {
+                return ResourceManager.GetString("Content_DxfSettingDeleteFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   유효하지 않은 항목 이름이 있습니다.과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string Content_DxfSettingNameError {
+            get {
+                return ResourceManager.GetString("Content_DxfSettingNameError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   항목 이름을 설정해주세요.과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string Content_DxfSettingNameSet {
+            get {
+                return ResourceManager.GetString("Content_DxfSettingNameSet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   DXF 템플릿 파일을 추가하지 못했습니다.과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string Content_DxfTemplateAddFailed {
+            get {
+                return ResourceManager.GetString("Content_DxfTemplateAddFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   기본 DXF 템플릿은 삭제할 수 없습니다.과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string Content_DxfTemplateDeleteFailed {
+            get {
+                return ResourceManager.GetString("Content_DxfTemplateDeleteFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   DXF 템플릿 파일을 찾을 수 없습니다.과(와) 유사한 지역화된 문자열을 찾습니다.
         /// </summary>
         public static string Content_DxfTemplateFileNotFound {
@@ -261,6 +306,15 @@ namespace GirderSchedule.App.Properties {
         public static string Title_DeleteMember {
             get {
                 return ResourceManager.GetString("Title_DeleteMember", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   DXF 설정과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string Title_DxfSetting {
+            get {
+                return ResourceManager.GetString("Title_DxfSetting", resourceCulture);
             }
         }
         

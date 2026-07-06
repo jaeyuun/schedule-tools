@@ -1,7 +1,9 @@
 using GirderSchedule.App.Common;
+using GirderSchedule.App.Constants;
 using GirderSchedule.Domain.Models.Settings;
 using GirderSchedule.Dxf.Constants;
 using GirderSchedule.Dxf.Documents;
+using netDxf;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,44 +15,12 @@ namespace GirderSchedule.App.Services.Schedule
 {
     public sealed class DxfSettingService
     {
-        private const string SettingHeader = "GIRDER_SCHEDULE_DXF_SETTING_V1";
-        private const string DxfLayerFolderName = "DxfLayer";
-        private const string SettingFolderName = "Setting";
-        private const string TemplateFolderName = "Template";
-        private const string SettingExtension = ".gds";
-        private const string DefaultSettingName = "Default";
-        private const string DefaultTemplateName = "GriderScheduleTemplate.dxf";
-
-        public string DefaultSetting
-        {
-            get { return DefaultSettingName; }
-        }
-
-        public string GetRootDirectory()
-        {
-            return Path.Combine(AppDomain.CurrentDomain.BaseDirectory, DxfLayerFolderName);
-        }
-
-        public string GetSettingDirectory()
-        {
-            return Path.Combine(GetRootDirectory(), SettingFolderName);
-        }
-
-        public string GetTemplateDirectory()
-        {
-            return Path.Combine(GetRootDirectory(), TemplateFolderName);
-        }
-
-        public string GetDefaultTemplatePath()
-        {
-            return Path.Combine(GetTemplateDirectory(), DefaultTemplateName);
-        }
+        private const string Header = "GIRDER_SCHEDULE_DXF_SETTING_V1";
 
         public void EnsureDefaultStorage()
         {
-            Directory.CreateDirectory(GetSettingDirectory());
-            Directory.CreateDirectory(GetTemplateDirectory());
-            EnsureDefaultTemplate();
+            Directory.CreateDirectory(FileConstants.SettingPath);
+            Directory.CreateDirectory(FileConstants.TemplatePath);
             EnsureDefaultSetting();
         }
 
@@ -58,10 +28,10 @@ namespace GirderSchedule.App.Services.Schedule
         {
             EnsureDefaultStorage();
 
-            return Directory.GetFiles(GetSettingDirectory(), "*" + SettingExtension)
+            return Directory.GetFiles(FileConstants.SettingPath, $"*{FileConstants.DxfSettingExtension}")
                 .Select(Path.GetFileNameWithoutExtension)
                 .Where(name => !string.IsNullOrWhiteSpace(name))
-                .OrderBy(name => string.Equals(name, DefaultSettingName, StringComparison.OrdinalIgnoreCase) ? 0 : 1)
+                .OrderBy(name => IsDefaultSettingName(name) ? 0 : 1)
                 .ThenBy(name => name)
                 .ToList();
         }
@@ -70,12 +40,19 @@ namespace GirderSchedule.App.Services.Schedule
         {
             EnsureDefaultStorage();
 
-            return Directory.GetFiles(GetTemplateDirectory(), "*.dxf")
+            var names = Directory.GetFiles(FileConstants.TemplatePath, $"*{FileConstants.DxfExtension}")
                 .Select(Path.GetFileName)
                 .Where(name => !string.IsNullOrWhiteSpace(name))
-                .OrderBy(name => string.Equals(name, DefaultTemplateName, StringComparison.OrdinalIgnoreCase) ? 0 : 1)
-                .ThenBy(name => name)
+                .Where(name => !IsDefaultTemplateName(name))
+                .OrderBy(name => name)
                 .ToList();
+
+            if (File.Exists(FileConstants.DefaultTemplateFilePath))
+            {
+                names.Insert(0, FileConstants.TemplateFileName);
+            }
+
+            return names;
         }
 
         public bool SettingExists(string settingName)
@@ -87,7 +64,7 @@ namespace GirderSchedule.App.Services.Schedule
         {
             if (string.IsNullOrWhiteSpace(settingName) || !SettingExists(settingName))
             {
-                return DefaultSettingName;
+                return FileConstants.DxfSettingName;
             }
 
             return settingName;
@@ -105,33 +82,14 @@ namespace GirderSchedule.App.Services.Schedule
                 return CreateDefaultSettingProfile();
             }
 
-            using (var fileStream = new FileStream(path, FileMode.Open, FileAccess.Read))
-            using (var reader = new BinaryReader(fileStream, Encoding.UTF8, true))
-            {
-                var header = reader.ReadString();
+            return ReadSettingFile(path, settingName);
+        }
 
-                if (header != SettingHeader)
-                {
-                    return CreateDefaultSettingProfile();
-                }
-
-                using (var gzipStream = new GZipStream(fileStream, CompressionMode.Decompress))
-                using (var memoryStream = new MemoryStream())
-                {
-                    gzipStream.CopyTo(memoryStream);
-
-                    var json = Encoding.UTF8.GetString(memoryStream.ToArray());
-                    var profile = AppJsonSerializer.Deserialize<DxfSettingProfile>(json);
-
-                    if (profile == null)
-                    {
-                        return CreateDefaultSettingProfile();
-                    }
-
-                    EnsureProfile(profile, settingName);
-                    return profile;
-                }
-            }
+        public void SaveSetting(DxfSettingProfile profile)
+        {
+            Directory.CreateDirectory(FileConstants.SettingPath);
+            Directory.CreateDirectory(FileConstants.TemplatePath);
+            SaveSettingCore(profile);
         }
 
         public string AddTemplate(string sourceTemplatePath)
@@ -144,19 +102,21 @@ namespace GirderSchedule.App.Services.Schedule
             }
 
             var fileName = Path.GetFileName(sourceTemplatePath);
-            var destinationPath = Path.Combine(GetTemplateDirectory(), fileName);
+            var destinationPath = Path.Combine(FileConstants.TemplatePath, fileName);
+
             File.Copy(sourceTemplatePath, destinationPath, true);
+
             return fileName;
         }
 
         public bool DeleteTemplate(string templateName)
         {
-            if (string.Equals(templateName, DefaultTemplateName, StringComparison.OrdinalIgnoreCase))
+            if (IsDefaultTemplateName(templateName))
             {
                 return false;
             }
 
-            var path = GetTemplatePath(templateName);
+            var path = Path.Combine(FileConstants.TemplatePath, templateName);
 
             if (!File.Exists(path))
             {
@@ -165,12 +125,13 @@ namespace GirderSchedule.App.Services.Schedule
 
             File.Delete(path);
             ReassignDeletedTemplate(templateName);
+
             return true;
         }
 
         public bool DeleteSetting(string settingName)
         {
-            if (string.Equals(settingName, DefaultSettingName, StringComparison.OrdinalIgnoreCase))
+            if (IsDefaultSettingName(settingName))
             {
                 return false;
             }
@@ -183,54 +144,38 @@ namespace GirderSchedule.App.Services.Schedule
             }
 
             File.Delete(path);
-            return true;
-        }
 
-        public bool RenameSetting(string oldName, string newName)
-        {
-            if (string.IsNullOrWhiteSpace(oldName) || string.IsNullOrWhiteSpace(newName))
-            {
-                return false;
-            }
-
-            if (string.Equals(oldName, DefaultSettingName, StringComparison.OrdinalIgnoreCase))
-            {
-                return false;
-            }
-
-            var oldPath = GetSettingPath(oldName);
-            var newPath = GetSettingPath(newName);
-
-            if (!File.Exists(oldPath) || File.Exists(newPath))
-            {
-                return false;
-            }
-
-            File.Move(oldPath, newPath);
-
-            var profile = LoadSetting(newName);
-            profile.SettingName = newName;
-            SaveSetting(profile);
             return true;
         }
 
         public string GetTemplatePath(string templateName)
         {
-            if (string.IsNullOrWhiteSpace(templateName))
+            if (IsDefaultTemplateName(templateName))
             {
-                templateName = DefaultTemplateName;
+                return FileConstants.DefaultTemplateFilePath;
             }
 
-            return Path.Combine(GetTemplateDirectory(), templateName);
+            return Path.Combine(FileConstants.TemplatePath, templateName);
         }
 
-        public DxfStyleSetting CreateDefaultStyleSetting()
+        public DxfSettingProfile CreateDefaultSettingProfile()
         {
-            return new DxfStyleSetting
+            return new DxfSettingProfile
             {
-                TextStyleName = DxfStyles.DefaultText,
-                DrawingBlockName = DxfBlocks.TitleBlock,
-                DimensionStyleName = DxfStyles.Dimension
+                SettingName = FileConstants.DxfSettingName,
+                TemplateName = FileConstants.TemplateFileName,
+                StyleSettings = CreateDefaultStyleSettings(),
+                LayerSettings = CreateDefaultLayerSettings()
+            };
+        }
+
+        public List<DxfStyleSetting> CreateDefaultStyleSettings()
+        {
+            return new List<DxfStyleSetting>
+            {
+                new DxfStyleSetting(DxfStyleRole.Text, "글꼴", DxfStyles.DefaultText),
+                new DxfStyleSetting(DxfStyleRole.Block, "도면", DxfBlocks.TitleBlock),
+                new DxfStyleSetting(DxfStyleRole.Dimension, "치수선", DxfStyles.Dimension),
             };
         }
 
@@ -244,7 +189,8 @@ namespace GirderSchedule.App.Services.Schedule
                 new DxfLayerSetting(DxfLayerRole.Girder, "보 외곽", DxfLayers.RcGir),
                 new DxfLayerSetting(DxfLayerRole.Rebar, "주근", DxfLayers.Rebar),
                 new DxfLayerSetting(DxfLayerRole.Stirrup, "스터럽", DxfLayers.Rebar),
-                new DxfLayerSetting(DxfLayerRole.Text, "텍스트", DxfLayers.Text)
+                new DxfLayerSetting(DxfLayerRole.Text, "텍스트", DxfLayers.Text),
+                new DxfLayerSetting(DxfLayerRole.Dimension, "치수선", DxfLayers.Dim)
             };
         }
 
@@ -252,60 +198,17 @@ namespace GirderSchedule.App.Services.Schedule
         {
             var result = new DxfSettingValidationResult();
 
-            if (profile == null)
+            if (!ValidateProfileBase(profile, result))
             {
-                result.TemplateError = "설정이 비어 있습니다.";
-                return result;
-            }
-
-            var templatePath = GetTemplatePath(profile.TemplateName);
-
-            if (string.IsNullOrWhiteSpace(profile.TemplateName) || !File.Exists(templatePath))
-            {
-                result.TemplateError = "템플릿 파일을 찾을 수 없습니다.";
                 return result;
             }
 
             try
             {
-                var loader = new DxfDocumentLoader();
-                var template = loader.LoadTemplate(templatePath);
-                var document = template.Document;
+                var document = LoadTemplateDocument(profile.TemplateName);
 
-                if (profile.StyleSetting == null)
-                {
-                    result.TemplateError = "스타일 설정이 비어 있습니다.";
-                    return result;
-                }
-
-                if (!document.TextStyles.Contains(profile.StyleSetting.TextStyleName))
-                {
-                    result.InvalidStyles.Add("글꼴");
-                }
-
-                if (!document.Blocks.Contains(profile.StyleSetting.DrawingBlockName))
-                {
-                    result.InvalidStyles.Add("도면");
-                }
-
-                if (!document.DimensionStyles.Contains(profile.StyleSetting.DimensionStyleName))
-                {
-                    result.InvalidStyles.Add("치수선");
-                }
-
-                if (profile.LayerSettings == null)
-                {
-                    result.TemplateError = "레이어 설정이 비어 있습니다.";
-                    return result;
-                }
-
-                foreach (var layer in profile.LayerSettings)
-                {
-                    if (string.IsNullOrWhiteSpace(layer.LayerName) || !document.Layers.Contains(layer.LayerName))
-                    {
-                        result.InvalidLayers.Add(layer.DisplayName);
-                    }
-                }
+                ValidateStyleSettings(document, profile.StyleSettings, result);
+                ValidateLayerSettings(document, profile.LayerSettings, result);
             }
             catch
             {
@@ -315,45 +218,40 @@ namespace GirderSchedule.App.Services.Schedule
             return result;
         }
 
-        public void SaveSetting(DxfSettingProfile profile)
+        private DxfSettingProfile ReadSettingFile(string path, string fallbackSettingName)
         {
-            Directory.CreateDirectory(GetSettingDirectory());
-            Directory.CreateDirectory(GetTemplateDirectory());
-            SaveSettingCore(profile);
-        }
-
-        private void EnsureDefaultTemplate()
-        {
-            var defaultTemplatePath = GetDefaultTemplatePath();
-
-            if (File.Exists(defaultTemplatePath))
+            using (var fileStream = new FileStream(path, FileMode.Open, FileAccess.Read))
+            using (var reader = new BinaryReader(fileStream, Encoding.UTF8, true))
             {
-                return;
-            }
+                var header = reader.ReadString();
 
-            var resourceTemplatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resource", DefaultTemplateName);
-            var legacyTemplatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "GirderTemplate.dxf");
+                if (header != Header)
+                {
+                    return CreateDefaultSettingProfile();
+                }
 
-            if (File.Exists(resourceTemplatePath))
-            {
-                File.Copy(resourceTemplatePath, defaultTemplatePath, true);
-                return;
-            }
+                var json = ReadCompressedJson(fileStream);
+                var profile = AppJsonSerializer.Deserialize<DxfSettingProfile>(json);
 
-            if (File.Exists(legacyTemplatePath))
-            {
-                File.Copy(legacyTemplatePath, defaultTemplatePath, true);
+                if (profile == null)
+                {
+                    return CreateDefaultSettingProfile();
+                }
+
+                EnsureProfile(profile, fallbackSettingName);
+
+                return profile;
             }
         }
 
-        private void EnsureDefaultSetting()
+        private static string ReadCompressedJson(Stream stream)
         {
-            if (SettingExists(DefaultSettingName))
+            using (var gzipStream = new GZipStream(stream, CompressionMode.Decompress))
+            using (var memoryStream = new MemoryStream())
             {
-                return;
+                gzipStream.CopyTo(memoryStream);
+                return Encoding.UTF8.GetString(memoryStream.ToArray());
             }
-
-            SaveSettingCore(CreateDefaultSettingProfile());
         }
 
         private void SaveSettingCore(DxfSettingProfile profile)
@@ -367,12 +265,18 @@ namespace GirderSchedule.App.Services.Schedule
 
             var path = GetSettingPath(profile.SettingName);
             var json = AppJsonSerializer.Serialize(profile);
+
+            WriteSettingFile(path, json);
+        }
+
+        private static void WriteSettingFile(string path, string json)
+        {
             var jsonBytes = Encoding.UTF8.GetBytes(json);
 
             using (var fileStream = new FileStream(path, FileMode.Create, FileAccess.Write))
             using (var writer = new BinaryWriter(fileStream, Encoding.UTF8))
             {
-                writer.Write(SettingHeader);
+                writer.Write(Header);
 
                 using (var gzipStream = new GZipStream(fileStream, CompressionLevel.Optimal, true))
                 {
@@ -381,15 +285,99 @@ namespace GirderSchedule.App.Services.Schedule
             }
         }
 
-        private DxfSettingProfile CreateDefaultSettingProfile()
+        private bool ValidateProfileBase(DxfSettingProfile profile, DxfSettingValidationResult result)
         {
-            return new DxfSettingProfile
+            if (profile == null)
             {
-                SettingName = DefaultSettingName,
-                TemplateName = DefaultTemplateName,
-                StyleSetting = CreateDefaultStyleSetting(),
-                LayerSettings = CreateDefaultLayerSettings()
-            };
+                result.TemplateError = "설정이 비어 있습니다.";
+                return false;
+            }
+
+            var templatePath = GetTemplatePath(profile.TemplateName);
+
+            if (string.IsNullOrWhiteSpace(profile.TemplateName) || !File.Exists(templatePath))
+            {
+                result.TemplateError = "템플릿 파일을 찾을 수 없습니다.";
+                return false;
+            }
+
+            if (profile.StyleSettings == null)
+            {
+                result.TemplateError = "스타일 설정이 비어 있습니다.";
+                return false;
+            }
+
+            if (profile.LayerSettings == null)
+            {
+                result.TemplateError = "레이어 설정이 비어 있습니다.";
+                return false;
+            }
+
+            return true;
+        }
+
+        private DxfDocument LoadTemplateDocument(string templateName)
+        {
+            var templatePath = GetTemplatePath(templateName);
+            var loader = new DxfDocumentLoader();
+            var template = loader.LoadTemplate(templatePath);
+
+            return template.Document;
+        }
+
+        private static void ValidateStyleSettings(DxfDocument document, List<DxfStyleSetting> styles, DxfSettingValidationResult result)
+        {
+            foreach (var style in styles)
+            {
+                if (!ContainsDxfStyle(document, style))
+                {
+                    result.InvalidStyles.Add(style.DisplayName);
+                }
+            }
+        }
+
+        private static void ValidateLayerSettings(DxfDocument document, List<DxfLayerSetting> layers, DxfSettingValidationResult result)
+        {
+            foreach (var layer in layers)
+            {
+                if (string.IsNullOrWhiteSpace(layer.LayerName) || !document.Layers.Contains(layer.LayerName))
+                {
+                    result.InvalidLayers.Add(layer.DisplayName);
+                }
+            }
+        }
+
+        private static bool ContainsDxfStyle(DxfDocument document, DxfStyleSetting style)
+        {
+            if (document == null || style == null || string.IsNullOrWhiteSpace(style.StyleName))
+            {
+                return false;
+            }
+
+            switch (style.Role)
+            {
+                case DxfStyleRole.Text:
+                    return document.TextStyles.Contains(style.StyleName);
+
+                case DxfStyleRole.Block:
+                    return document.Blocks.Contains(style.StyleName);
+
+                case DxfStyleRole.Dimension:
+                    return document.DimensionStyles.Contains(style.StyleName);
+
+                default:
+                    return false;
+            }
+        }
+
+        private void EnsureDefaultSetting()
+        {
+            if (SettingExists(FileConstants.DxfSettingName))
+            {
+                return;
+            }
+
+            SaveSettingCore(CreateDefaultSettingProfile());
         }
 
         private void EnsureProfile(DxfSettingProfile profile, string fallbackSettingName)
@@ -399,74 +387,78 @@ namespace GirderSchedule.App.Services.Schedule
                 return;
             }
 
+            EnsureProfileNames(profile, fallbackSettingName);
+            EnsureStyleSettings(profile);
+            EnsureLayerSettings(profile);
+        }
+
+        private static void EnsureProfileNames(DxfSettingProfile profile, string fallbackSettingName)
+        {
             if (string.IsNullOrWhiteSpace(profile.SettingName))
             {
-                profile.SettingName = string.IsNullOrWhiteSpace(fallbackSettingName) ? DefaultSettingName : fallbackSettingName;
+                profile.SettingName = string.IsNullOrWhiteSpace(fallbackSettingName) ? FileConstants.DxfSettingName : fallbackSettingName;
             }
 
             if (string.IsNullOrWhiteSpace(profile.TemplateName))
             {
-                profile.TemplateName = DefaultTemplateName;
+                profile.TemplateName = FileConstants.TemplateFileName;
             }
-
-            if (profile.StyleSetting == null)
-            {
-                profile.StyleSetting = CreateDefaultStyleSetting();
-            }
-
-            EnsureStyleSetting(profile.StyleSetting);
-
-            if (profile.LayerSettings == null)
-            {
-                profile.LayerSettings = new List<DxfLayerSetting>();
-            }
-
-            EnsureLayerSettings(profile);
         }
 
-        private void EnsureStyleSetting(DxfStyleSetting styleSetting)
+        private void EnsureStyleSettings(DxfSettingProfile profile)
         {
-            var defaultStyle = CreateDefaultStyleSetting();
-
-            if (string.IsNullOrWhiteSpace(styleSetting.TextStyleName))
+            if (profile.StyleSettings == null)
             {
-                styleSetting.TextStyleName = defaultStyle.TextStyleName;
+                profile.StyleSettings = new List<DxfStyleSetting>();
             }
 
-            if (string.IsNullOrWhiteSpace(styleSetting.DrawingBlockName))
+            var defaultStyles = CreateDefaultStyleSettings();
+
+            foreach (var defaultStyle in defaultStyles)
             {
-                styleSetting.DrawingBlockName = defaultStyle.DrawingBlockName;
+                EnsureStyleSetting(profile.StyleSettings, defaultStyle);
             }
 
-            if (string.IsNullOrWhiteSpace(styleSetting.DimensionStyleName))
+            profile.StyleSettings = profile.StyleSettings
+                .GroupBy(x => x.Role)
+                .Select(x => x.First())
+                .OrderBy(x => x.Role)
+                .ToList();
+        }
+
+        private static void EnsureStyleSetting(List<DxfStyleSetting> styles, DxfStyleSetting defaultStyle)
+        {
+            var style = styles.FirstOrDefault(x => x.Role == defaultStyle.Role);
+
+            if (style == null)
             {
-                styleSetting.DimensionStyleName = defaultStyle.DimensionStyleName;
+                styles.Add(defaultStyle);
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(style.DisplayName))
+            {
+                style.DisplayName = defaultStyle.DisplayName;
+            }
+
+            if (string.IsNullOrWhiteSpace(style.StyleName))
+            {
+                style.StyleName = defaultStyle.StyleName;
             }
         }
 
         private void EnsureLayerSettings(DxfSettingProfile profile)
         {
+            if (profile.LayerSettings == null)
+            {
+                profile.LayerSettings = new List<DxfLayerSetting>();
+            }
+
             var defaultLayers = CreateDefaultLayerSettings();
 
             foreach (var defaultLayer in defaultLayers)
             {
-                var layer = profile.LayerSettings.FirstOrDefault(x => x.Role == defaultLayer.Role);
-
-                if (layer == null)
-                {
-                    profile.LayerSettings.Add(defaultLayer);
-                    continue;
-                }
-
-                if (string.IsNullOrWhiteSpace(layer.DisplayName))
-                {
-                    layer.DisplayName = defaultLayer.DisplayName;
-                }
-
-                if (string.IsNullOrWhiteSpace(layer.LayerName))
-                {
-                    layer.LayerName = defaultLayer.LayerName;
-                }
+                EnsureLayerSetting(profile.LayerSettings, defaultLayer);
             }
 
             profile.LayerSettings = profile.LayerSettings
@@ -474,6 +466,27 @@ namespace GirderSchedule.App.Services.Schedule
                 .Select(x => x.First())
                 .OrderBy(x => x.Role)
                 .ToList();
+        }
+
+        private static void EnsureLayerSetting(List<DxfLayerSetting> layers, DxfLayerSetting defaultLayer)
+        {
+            var layer = layers.FirstOrDefault(x => x.Role == defaultLayer.Role);
+
+            if (layer == null)
+            {
+                layers.Add(defaultLayer);
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(layer.DisplayName))
+            {
+                layer.DisplayName = defaultLayer.DisplayName;
+            }
+
+            if (string.IsNullOrWhiteSpace(layer.LayerName))
+            {
+                layer.LayerName = defaultLayer.LayerName;
+            }
         }
 
         private void ReassignDeletedTemplate(string deletedTemplateName)
@@ -484,20 +497,42 @@ namespace GirderSchedule.App.Services.Schedule
 
                 if (string.Equals(profile.TemplateName, deletedTemplateName, StringComparison.OrdinalIgnoreCase))
                 {
-                    profile.TemplateName = DefaultTemplateName;
+                    profile.TemplateName = FileConstants.TemplateFileName;
                     SaveSetting(profile);
                 }
             }
+        }
+
+        private void RenameSettingProfile(string newName)
+        {
+            var profile = LoadSetting(newName);
+            profile.SettingName = newName;
+            SaveSetting(profile);
         }
 
         private string GetSettingPath(string settingName)
         {
             if (string.IsNullOrWhiteSpace(settingName))
             {
-                settingName = DefaultSettingName;
+                settingName = FileConstants.DxfSettingName;
             }
 
-            return Path.Combine(GetSettingDirectory(), settingName + SettingExtension);
+            return Path.Combine(FileConstants.SettingPath, settingName + FileConstants.DxfSettingExtension);
+        }
+
+        private static bool IsDefaultSettingName(string settingName)
+        {
+            return string.Equals(settingName, FileConstants.DxfSettingName, StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static bool IsDefaultTemplateName(string templateName)
+        {
+            if (string.IsNullOrWhiteSpace(templateName))
+            {
+                return true;
+            }
+
+            return string.Equals(templateName, FileConstants.TemplateFileName, StringComparison.OrdinalIgnoreCase);
         }
     }
 

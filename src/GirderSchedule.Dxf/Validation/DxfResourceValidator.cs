@@ -35,7 +35,7 @@ namespace GirderSchedule.Dxf.Validation
             {
                 if (!document.DimensionStyles.Contains(names[i]))
                 {
-                    throw new InvalidOperationException("DXF 템플릿에 필요한 치수 스타일이 없습니다. DimensionStyle: " + names[i]);
+                    throw new InvalidOperationException("DXF 템플릿에 필요한 치수 스타일이 없습니다. Dimension: " + names[i]);
                 }
             }
         }

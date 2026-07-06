@@ -2,8 +2,19 @@
 {
     public sealed class DxfStyleSetting
     {
-        public string TextStyleName { get; set; } = string.Empty;
-        public string DrawingBlockName { get; set; } = string.Empty;
-        public string DimensionStyleName { get; set; } = string.Empty;
+        public DxfStyleRole Role { get; set; }
+        public string DisplayName { get; set; } = string.Empty;
+        public string StyleName { get; set; } = string.Empty;
+
+        public DxfStyleSetting()
+        {
+        }
+
+        public DxfStyleSetting(DxfStyleRole role, string displayName, string styleName)
+        {
+            Role = role;
+            DisplayName = displayName;
+            StyleName = styleName;
+        }
     }
 }

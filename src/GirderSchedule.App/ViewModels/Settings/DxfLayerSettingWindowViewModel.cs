@@ -1,4 +1,5 @@
 using GirderSchedule.App.Commands;
+using GirderSchedule.App.Constants;
 using GirderSchedule.App.Services;
 using GirderSchedule.App.Services.Schedule;
 using GirderSchedule.Domain.Models;
@@ -134,32 +135,21 @@ namespace GirderSchedule.App.ViewModels.Settings
             var profile = new DxfSettingProfile();
             profile.SettingName = SelectedSettingName;
             profile.TemplateName = SelectedTemplateName;
-            profile.StyleSetting = CreateStyleSetting();
+            profile.StyleSettings = CreateStyleSettings();
             profile.LayerSettings = CreateLayerSettings();
             return profile;
         }
 
-        public DxfStyleSetting CreateStyleSetting()
+        public List<DxfStyleSetting> CreateStyleSettings()
         {
-            var setting = new DxfStyleSetting();
+            var settings = new List<DxfStyleSetting>();
 
             foreach (var style in Styles)
             {
-                if (style.Role == DxfStyleRole.TextStyle)
-                {
-                    setting.TextStyleName = style.StyleName;
-                }
-                else if (style.Role == DxfStyleRole.DrawingBlock)
-                {
-                    setting.DrawingBlockName = style.StyleName;
-                }
-                else if (style.Role == DxfStyleRole.DimensionStyle)
-                {
-                    setting.DimensionStyleName = style.StyleName;
-                }
+                settings.Add(new DxfStyleSetting(style.Role, style.DisplayName, style.StyleName));
             }
 
-            return setting;
+            return settings;
         }
 
         public List<DxfLayerSetting> CreateLayerSettings()
@@ -180,7 +170,7 @@ namespace GirderSchedule.App.ViewModels.Settings
             RefreshTemplateNames();
             RefreshSettingNames();
 
-            var settingName = _project == null ? _settingService.DefaultSetting : _project.DxfSettingName;
+            var settingName = _project == null ? FileConstants.DxfSettingName : _project.DxfSettingName;
             settingName = _settingService.NormalizeSettingName(settingName);
 
             if (_project != null && _project.DxfSettingName != settingName)
@@ -233,11 +223,12 @@ namespace GirderSchedule.App.ViewModels.Settings
 
             Styles.Clear();
 
-            if (profile.StyleSetting != null)
+            if (profile.StyleSettings != null)
             {
-                Styles.Add(new DxfStyleItemViewModel(DxfStyleRole.TextStyle, "글꼴", profile.StyleSetting.TextStyleName));
-                Styles.Add(new DxfStyleItemViewModel(DxfStyleRole.DrawingBlock, "도면", profile.StyleSetting.DrawingBlockName));
-                Styles.Add(new DxfStyleItemViewModel(DxfStyleRole.DimensionStyle, "치수선", profile.StyleSetting.DimensionStyleName));
+                foreach (var style in profile.StyleSettings)
+                {
+                    Styles.Add(new DxfStyleItemViewModel(style.Role, style.DisplayName, style.StyleName));
+                }
             }
 
             Layers.Clear();
@@ -256,8 +247,8 @@ namespace GirderSchedule.App.ViewModels.Settings
         private void AddTemplate()
         {
             var dialog = new OpenFileDialog();
-            dialog.Title = "DXF 템플릿 선택";
-            dialog.Filter = "DXF 파일 (*.dxf)|*.dxf";
+            dialog.Title = FileConstants.DxfOpenDialogTitle;
+            dialog.Filter = FileConstants.DxfFilter;
             dialog.CheckFileExists = true;
             dialog.Multiselect = false;
 
@@ -270,7 +261,9 @@ namespace GirderSchedule.App.ViewModels.Settings
 
             if (string.IsNullOrWhiteSpace(templateName))
             {
-                AppDialogService.ShowNotice("DXF 설정", "템플릿을 추가하지 못했습니다.");
+                AppDialogService.ShowNotice(
+                    Properties.Resources.Title_DxfSetting,
+                    Properties.Resources.Content_DxfTemplateAddFailed);
                 return;
             }
 
@@ -282,7 +275,9 @@ namespace GirderSchedule.App.ViewModels.Settings
         {
             if (!_settingService.DeleteTemplate(SelectedTemplateName))
             {
-                AppDialogService.ShowNotice("DXF 설정", "기본 템플릿은 삭제할 수 없습니다.");
+                AppDialogService.ShowNotice(
+                    Properties.Resources.Title_DxfSetting,
+                    Properties.Resources.Content_DxfTemplateDeleteFailed);
                 return;
             }
 
@@ -296,7 +291,9 @@ namespace GirderSchedule.App.ViewModels.Settings
 
             if (string.IsNullOrWhiteSpace(settingName))
             {
-                AppDialogService.ShowNotice("DXF 설정", "설정 이름을 입력해 주세요.");
+                AppDialogService.ShowNotice(
+                    Properties.Resources.Title_DxfSetting,
+                    Properties.Resources.Content_DxfSettingNameSet);
                 return;
             }
 
@@ -305,7 +302,9 @@ namespace GirderSchedule.App.ViewModels.Settings
 
             if (!_settingService.Validate(profile).IsValid)
             {
-                AppDialogService.ShowNotice("DXF 설정", "유효하지 않은 템플릿, 스타일명, 레이어명이 있습니다.");
+                AppDialogService.ShowNotice(
+                    Properties.Resources.Title_DxfSetting,
+                    Properties.Resources.Content_DxfSettingNameError);
                 return;
             }
 
@@ -331,17 +330,19 @@ namespace GirderSchedule.App.ViewModels.Settings
         {
             if (!_settingService.DeleteSetting(SelectedSettingName))
             {
-                AppDialogService.ShowNotice("DXF 설정", "설정을 삭제하지 못했습니다.");
+                AppDialogService.ShowNotice(
+                    Properties.Resources.Title_DxfSetting,
+                    Properties.Resources.Content_DxfSettingDeleteFailed);
                 return;
             }
 
             RefreshSettingNames();
-            SelectedSettingName = _settingService.DefaultSetting;
+            SelectedSettingName = FileConstants.DxfSettingName;
         }
 
         private void Reset()
         {
-            var profile = _settingService.LoadSetting(_settingService.DefaultSetting);
+            var profile = _settingService.CreateDefaultSettingProfile();
             ApplyProfile(profile);
         }
 
@@ -349,7 +350,9 @@ namespace GirderSchedule.App.ViewModels.Settings
         {
             if (!ValidateCurrentSetting())
             {
-                AppDialogService.ShowNotice("DXF 설정", "유효하지 않은 템플릿, 스타일명, 레이어명이 있습니다.");
+                AppDialogService.ShowNotice(
+                    Properties.Resources.Title_DxfSetting,
+                    Properties.Resources.Content_DxfSettingNameError);
                 return;
             }
 
@@ -389,7 +392,7 @@ namespace GirderSchedule.App.ViewModels.Settings
                 return true;
             }
 
-            if (HasStyleChanges(_loadedProfile.StyleSetting, currentProfile.StyleSetting))
+            if (HasStyleChanges(_loadedProfile.StyleSettings, currentProfile.StyleSettings))
             {
                 return true;
             }
@@ -402,26 +405,34 @@ namespace GirderSchedule.App.ViewModels.Settings
             return false;
         }
 
-        private bool HasStyleChanges(DxfStyleSetting original, DxfStyleSetting current)
+        private bool HasStyleChanges(List<DxfStyleSetting> original, List<DxfStyleSetting> current)
         {
             if (original == null || current == null)
             {
                 return original != current;
             }
 
-            if (!string.Equals(original.TextStyleName, current.TextStyleName, StringComparison.Ordinal))
+            if (original.Count != current.Count)
             {
                 return true;
             }
 
-            if (!string.Equals(original.DrawingBlockName, current.DrawingBlockName, StringComparison.Ordinal))
+            for (var i = 0; i < original.Count; i++)
             {
-                return true;
-            }
+                if (original[i].Role != current[i].Role)
+                {
+                    return true;
+                }
 
-            if (!string.Equals(original.DimensionStyleName, current.DimensionStyleName, StringComparison.Ordinal))
-            {
-                return true;
+                if (!string.Equals(original[i].DisplayName, current[i].DisplayName, StringComparison.Ordinal))
+                {
+                    return true;
+                }
+
+                if (!string.Equals(original[i].StyleName, current[i].StyleName, StringComparison.Ordinal))
+                {
+                    return true;
+                }
             }
 
             return false;
@@ -523,12 +534,14 @@ namespace GirderSchedule.App.ViewModels.Settings
             snapshot.SettingName = profile.SettingName;
             snapshot.TemplateName = profile.TemplateName;
 
-            if (profile.StyleSetting != null)
+            snapshot.StyleSettings = new List<DxfStyleSetting>();
+
+            if (profile.StyleSettings != null)
             {
-                snapshot.StyleSetting = new DxfStyleSetting();
-                snapshot.StyleSetting.TextStyleName = profile.StyleSetting.TextStyleName;
-                snapshot.StyleSetting.DrawingBlockName = profile.StyleSetting.DrawingBlockName;
-                snapshot.StyleSetting.DimensionStyleName = profile.StyleSetting.DimensionStyleName;
+                foreach (var style in profile.StyleSettings)
+                {
+                    snapshot.StyleSettings.Add(new DxfStyleSetting(style.Role, style.DisplayName, style.StyleName));
+                }
             }
 
             snapshot.LayerSettings = new List<DxfLayerSetting>();

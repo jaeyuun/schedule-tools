@@ -1,22 +1,17 @@
 ﻿using netDxf.Entities;
-using netDxf.Tables;
 
 namespace GirderSchedule.Dxf.Styles.Overrides
 {
     public sealed class DxfDimensionOverride
     {
         private readonly Dimension _source;
-        private readonly DimensionStyle _sourceStyle;
 
-        public string LayerName { get; private set; }
-        public string StyleName { get; private set; }
+        private string _styleName;
 
         public DxfDimensionOverride(Dimension source)
         {
             _source = source;
-            _sourceStyle = source.Style;
-            LayerName = source.Layer == null ? string.Empty : source.Layer.Name;
-            StyleName = source.Style == null ? string.Empty : source.Style.Name;
+            _styleName = source.Style == null ? string.Empty : source.Style.Name;
         }
 
         public bool IsMatch(Dimension target)
@@ -26,22 +21,9 @@ namespace GirderSchedule.Dxf.Styles.Overrides
                 return false;
             }
 
-            var layerName = target.Layer == null ? string.Empty : target.Layer.Name;
             var styleName = target.Style == null ? string.Empty : target.Style.Name;
 
-            return LayerName == layerName && StyleName == styleName;
-        }
-
-        public bool IsMatch(Dimension target, string templateLayerName)
-        {
-            if (target == null)
-            {
-                return false;
-            }
-
-            var styleName = target.Style == null ? string.Empty : target.Style.Name;
-
-            return LayerName == templateLayerName && StyleName == styleName;
+            return string.Equals(_styleName, styleName, StringComparison.OrdinalIgnoreCase);
         }
 
         public void Apply(Dimension target)
@@ -51,32 +33,10 @@ namespace GirderSchedule.Dxf.Styles.Overrides
                 return;
             }
 
-            if (_sourceStyle != null)
-            {
-                target.Style = _sourceStyle;
-            }
-
-            CopyDimensionEntityValues(target);
-            CopyStyleOverrides(target);
+            CopyDimensionStyleOverrides(target);
         }
 
-        private void CopyDimensionEntityValues(Dimension target)
-        {
-            CopyDimensionProperty(target, "Color");
-            CopyDimensionProperty(target, "Linetype");
-            CopyDimensionProperty(target, "Lineweight");
-            CopyDimensionProperty(target, "Transparency");
-            CopyDimensionProperty(target, "LinetypeScale");
-            CopyDimensionProperty(target, "Normal");
-            CopyDimensionProperty(target, "Elevation");
-        }
-
-        private void CopyDimensionProperty(Dimension target, string name)
-        {
-            DxfOverridePropertyCopier.CopyWritableProperty(_source, target, name);
-        }
-
-        private void CopyStyleOverrides(Dimension target)
+        private void CopyDimensionStyleOverrides(Dimension target)
         {
             var sourceProperty = DxfOverridePropertyCopier.FindProperty(_source.GetType(), "StyleOverrides");
             var targetProperty = DxfOverridePropertyCopier.FindProperty(target.GetType(), "StyleOverrides");

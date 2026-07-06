@@ -120,7 +120,7 @@ namespace GirderSchedule.App.Services.Export
         {
             try
             {
-                var settingName = project == null ? _dxfSettingService.DefaultSetting : project.DxfSettingName;
+                var settingName = project == null ? FileConstants.DxfSettingName : project.DxfSettingName;
                 var dxfProfile = _dxfSettingService.LoadSetting(settingName);
                 var templatePath = _dxfSettingService.GetTemplatePath(dxfProfile.TemplateName);
 
@@ -132,7 +132,7 @@ namespace GirderSchedule.App.Services.Export
                     return;
                 }
 
-                var options = CreateDxfExportOptions(setting, dxfProfile, templatePath);
+                var options = DxfExportOptionFactory.Create(dxfProfile, templatePath, setting.FormColumnCount);
                 var exporter = new DxfExporter();
 
                 exporter.Export(pages, filePath, options);
@@ -141,13 +141,25 @@ namespace GirderSchedule.App.Services.Export
                     Properties.Resources.Title_ExportCompleted,
                     Properties.Resources.Content_ExportCompleted);
             }
+            catch (UnauthorizedAccessException)
+            {
+                AppDialogService.ShowNotice(
+                    Properties.Resources.Title_ExportFailed,
+                    string.Format(Properties.Resources.Content_FileSaveFailedNoPermission, filePath));
+            }
             catch (IOException)
             {
                 AppDialogService.ShowNotice(
                     Properties.Resources.Title_ExportFailed,
                     string.Format(Properties.Resources.Content_FileSaveFailedFileOpened, filePath));
             }
-            catch (UnauthorizedAccessException)
+            catch (Exception ex) when (ex.InnerException is IOException)
+            {
+                AppDialogService.ShowNotice(
+                    Properties.Resources.Title_ExportFailed,
+                    string.Format(Properties.Resources.Content_FileSaveFailedFileOpened, filePath));
+            }
+            catch (Exception ex) when (ex.InnerException is UnauthorizedAccessException)
             {
                 AppDialogService.ShowNotice(
                     Properties.Resources.Title_ExportFailed,
@@ -159,79 +171,6 @@ namespace GirderSchedule.App.Services.Export
                     Properties.Resources.Title_ExportFailed,
                     Properties.Resources.Content_FileSaveFailedWithError);
             }
-        }
-
-        private DxfExportOptions CreateDxfExportOptions(DxfExportSetting setting, DxfSettingProfile dxfProfile, string templatePath)
-        {
-            var options = new DxfExportOptions();
-            options.IncludeLeft = true;
-            options.IncludeCenter = true;
-            options.IncludeRight = true;
-            options.FormColumnCount = setting == null ? 3 : setting.FormColumnCount;
-            options.TemplatePath = templatePath;
-            options.LayerNames = CreateLayerNameSet(dxfProfile == null ? null : dxfProfile.LayerSettings);
-            options.StyleNames = CreateStyleNameSet(dxfProfile == null ? null : dxfProfile.StyleSetting);
-
-            return options;
-        }
-
-        private DxfLayerNameSet CreateLayerNameSet(List<DxfLayerSetting> layerSettings)
-        {
-            var layerNames = new DxfLayerNameSet();
-
-            if (layerSettings == null)
-            {
-                return layerNames;
-            }
-
-            layerNames.FormLine = GetLayerName(layerSettings, DxfLayerRole.FormLine, layerNames.FormLine);
-            layerNames.FormText = GetLayerName(layerSettings, DxfLayerRole.FormText, layerNames.FormText);
-            layerNames.MemberForce = GetLayerName(layerSettings, DxfLayerRole.MemberForce, layerNames.MemberForce);
-            layerNames.Girder = GetLayerName(layerSettings, DxfLayerRole.Girder, layerNames.Girder);
-            layerNames.Rebar = GetLayerName(layerSettings, DxfLayerRole.Rebar, layerNames.Rebar);
-            layerNames.Stirrup = GetLayerName(layerSettings, DxfLayerRole.Stirrup, layerNames.Stirrup);
-            layerNames.Text = GetLayerName(layerSettings, DxfLayerRole.Text, layerNames.Text);
-
-            return layerNames;
-        }
-
-        private DxfStyleNameSet CreateStyleNameSet(DxfStyleSetting styleSetting)
-        {
-            var styleNames = new DxfStyleNameSet();
-
-            if (styleSetting == null)
-            {
-                return styleNames;
-            }
-
-            if (!string.IsNullOrWhiteSpace(styleSetting.TextStyleName))
-            {
-                styleNames.TextStyleName = styleSetting.TextStyleName;
-            }
-
-            if (!string.IsNullOrWhiteSpace(styleSetting.DrawingBlockName))
-            {
-                styleNames.DrawingBlockName = styleSetting.DrawingBlockName;
-            }
-
-            if (!string.IsNullOrWhiteSpace(styleSetting.DimensionStyleName))
-            {
-                styleNames.DimensionStyleName = styleSetting.DimensionStyleName;
-            }
-
-            return styleNames;
-        }
-
-        private string GetLayerName(List<DxfLayerSetting> layerSettings, DxfLayerRole role, string fallback)
-        {
-            var layer = layerSettings.FirstOrDefault(x => x.Role == role);
-
-            if (layer == null || string.IsNullOrWhiteSpace(layer.LayerName))
-            {
-                return fallback;
-            }
-
-            return layer.LayerName;
         }
 
         private void ExportExcelSheet(ScheduleProject exportProject, string filePath)

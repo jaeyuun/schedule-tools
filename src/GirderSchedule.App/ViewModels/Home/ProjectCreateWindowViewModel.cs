@@ -103,13 +103,17 @@ namespace GirderSchedule.App.ViewModels.Home
         {
             if (string.IsNullOrWhiteSpace(ProjectName))
             {
-                AppDialogService.ShowNotice(Properties.Resources.Title_NewProject, Properties.Resources.Content_InputProjectName);
+                AppDialogService.ShowNotice(
+                    Properties.Resources.Title_NewProject,
+                    Properties.Resources.Content_InputProjectName);
                 return;
             }
 
             if (string.IsNullOrWhiteSpace(FolderPath))
             {
-                AppDialogService.ShowNotice(Properties.Resources.Title_NewProject, Properties.Resources.Content_SelectProjectFolder);
+                AppDialogService.ShowNotice(
+                    Properties.Resources.Title_NewProject,
+                    Properties.Resources.Content_SelectProjectFolder);
                 return;
             }
 
@@ -120,7 +124,9 @@ namespace GirderSchedule.App.ViewModels.Home
 
             if (File.Exists(filePath))
             {
-                var result = AppDialogService.ShowConfirm(Properties.Resources.Title_NewProject, Properties.Resources.Content_ProjectAlreadyExistsOverwrite);
+                var result = AppDialogService.ShowConfirm(
+                    Properties.Resources.Title_NewProject,
+                    Properties.Resources.Content_ProjectAlreadyExistsOverwrite);
 
                 if (result != MessageBoxResult.Yes)
                 {

@@ -1,7 +1,6 @@
 ﻿using GirderSchedule.Domain.Models.Settings;
 using GirderSchedule.Dxf.Export;
 using GirderSchedule.Dxf.Styles;
-using System;
 using System.Linq;
 
 namespace GirderSchedule.App.Services.Schedule
@@ -34,6 +33,7 @@ namespace GirderSchedule.App.Services.Schedule
             layerNames.Rebar = GetLayerName(profile, DxfLayerRole.Rebar, layerNames.Rebar);
             layerNames.Stirrup = GetLayerName(profile, DxfLayerRole.Stirrup, layerNames.Stirrup);
             layerNames.Text = GetLayerName(profile, DxfLayerRole.Text, layerNames.Text);
+            layerNames.Dimension = GetLayerName(profile, DxfLayerRole.Dimension, layerNames.Dimension);
 
             return layerNames;
         }
@@ -42,14 +42,14 @@ namespace GirderSchedule.App.Services.Schedule
         {
             var styleNames = new DxfStyleNameSet();
 
-            if (profile == null || profile.StyleSetting == null)
+            if (profile == null || profile.StyleSettings == null)
             {
                 return styleNames;
             }
 
-            styleNames.TextStyleName = profile.StyleSetting.TextStyleName;
-            styleNames.DrawingBlockName = profile.StyleSetting.DrawingBlockName;
-            styleNames.DimensionStyleName = profile.StyleSetting.DimensionStyleName;
+            styleNames.Text = GetStyleName(profile, DxfStyleRole.Text, styleNames.Text);
+            styleNames.Block = GetStyleName(profile, DxfStyleRole.Block, styleNames.Block);
+            styleNames.Dimension = GetStyleName(profile, DxfStyleRole.Dimension, styleNames.Dimension);
 
             return styleNames;
         }
@@ -58,6 +58,12 @@ namespace GirderSchedule.App.Services.Schedule
         {
             var layer = profile.LayerSettings.FirstOrDefault(x => x.Role == role);
             return layer == null || string.IsNullOrWhiteSpace(layer.LayerName) ? fallback : layer.LayerName;
+        }
+
+        private static string GetStyleName(DxfSettingProfile profile, DxfStyleRole role, string fallback)
+        {
+            var style = profile.StyleSettings.FirstOrDefault(x => x.Role == role);
+            return style == null || string.IsNullOrWhiteSpace(style.StyleName) ? fallback : style.StyleName;
         }
     }
 }

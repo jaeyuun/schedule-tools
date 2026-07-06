@@ -57,7 +57,9 @@ namespace GirderSchedule.Dxf.Drawers
         {
             var dimension = new AlignedDimension(DxfPointConverter.ToVector2(x1, y1), DxfPointConverter.ToVector2(x2, y2), offset, GetDimensionStyle());
 
-            _styler.ApplyDimension(dimension);
+            _styler.ApplyLayer(dimension, DxfLayerRole.Dimension);
+            _styler.ApplyStyle(dimension, DxfStyleRole.Dimension);
+            _styler.ApplyOverride(dimension, DxfOverrideRole.Dimension);
 
             if (!string.IsNullOrWhiteSpace(userText))
             {
@@ -70,9 +72,9 @@ namespace GirderSchedule.Dxf.Drawers
 
         private DimensionStyle GetDimensionStyle()
         {
-            if (!string.IsNullOrWhiteSpace(_styleNames.DimensionStyleName) && _document.DimensionStyles.Contains(_styleNames.DimensionStyleName))
+            if (!string.IsNullOrWhiteSpace(_styleNames.Dimension) && _document.DimensionStyles.Contains(_styleNames.Dimension))
             {
-                return _document.DimensionStyles[_styleNames.DimensionStyleName];
+                return _document.DimensionStyles[_styleNames.Dimension];
             }
 
             if (_document.DimensionStyles.Contains(DxfStyles.Dimension))

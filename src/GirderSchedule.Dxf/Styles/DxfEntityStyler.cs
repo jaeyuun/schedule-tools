@@ -11,104 +11,127 @@ namespace GirderSchedule.Dxf.Styles
     {
         private readonly DxfDocument _document;
         private readonly DxfLayerNameSet _layerNames;
-        private readonly DxfLayerNameResolver _layerResolver;
+        private readonly DxfStyleNameSet _styleNames;
         private readonly DxfOverrideSet _overrides;
 
-        public DxfEntityStyler(DxfDocument document, DxfLayerNameSet layerNames, DxfOverrideSet overrides)
+        public DxfEntityStyler(DxfDocument document, DxfLayerNameSet layerNames, DxfStyleNameSet styleNames, DxfOverrideSet overrides)
         {
             _document = document;
             _layerNames = layerNames ?? new DxfLayerNameSet();
-            _layerResolver = new DxfLayerNameResolver(document, _layerNames);
+            _styleNames = styleNames;
             _overrides = overrides;
         }
 
-        public void Apply(EntityObject entity, DxfLayerRole role)
+        public void ApplyLayer(EntityObject entity, DxfLayerRole role)
         {
             if (entity == null)
             {
                 return;
             }
 
-            ApplyBaseStyle(entity, role);
-            ApplyTemplateOverride(entity, role);
-        }
-
-        public void ApplyDimension(EntityObject entity)
-        {
-            if (entity == null)
-            {
-                return;
-            }
-
-            ApplyBaseStyle(entity, DxfLayers.Dim, DxfLayers.Dim);
-        }
-
-        public void ApplyMemberForce(EntityObject entity)
-        {
-            if (entity == null)
-            {
-                return;
-            }
-
-            ApplyBaseStyle(entity, DxfLayerRole.MemberForce);
-            ApplyTemplateOverride(entity, DxfLayerRole.MemberForce);
-        }
-
-        private void ApplyBaseStyle(EntityObject entity, DxfLayerRole role)
-        {
-            var layer = _layerResolver.GetLayer(role);
+            var layer = GetLayer(role);
 
             entity.Layer = layer;
             entity.Color = AciColor.ByLayer;
             entity.Linetype = GetRoleLinetype(role);
             entity.Lineweight = Lineweight.ByLayer;
+            entity.Transparency = Transparency.ByLayer;
         }
 
-        private void ApplyBaseStyle(EntityObject entity, string layerName, string templateLayerName)
+        public void ApplyStyle(EntityObject entity, DxfStyleRole role)
         {
-            var layer = _layerResolver.GetLayer(layerName, templateLayerName);
-
-            entity.Layer = layer;
-            entity.Color = AciColor.ByLayer;
-            entity.Linetype = Linetype.ByLayer;
-            entity.Lineweight = Lineweight.ByLayer;
-
-            ApplyTemplateOverride(entity, templateLayerName);
-        }
-
-        private void ApplyTemplateOverride(EntityObject entity, DxfLayerRole role)
-        {
-            if (_overrides == null)
+            if (entity == null)
             {
                 return;
             }
 
-            var layer = entity.Layer;
-            var templateLayerName = _layerNames.GetTemplateLayerName(role);
-
-            _overrides.Apply(entity, templateLayerName);
-
-            if (layer != null)
+            switch (role)
             {
-                entity.Layer = layer;
+                case DxfStyleRole.Text:
+                    ApplyTextStyle(entity);
+                    break;
+
+                case DxfStyleRole.Dimension:
+                    ApplyDimensionStyle(entity);
+                    break;
             }
         }
 
-        private void ApplyTemplateOverride(EntityObject entity, string templateLayerName)
+        public void ApplyOverride(EntityObject entity, DxfOverrideRole role)
         {
-            if (_overrides == null)
+            if (entity == null)
             {
                 return;
             }
 
-            var layer = entity.Layer;
-
-            _overrides.Apply(entity, templateLayerName);
-
-            if (layer != null)
+            switch (role)
             {
-                entity.Layer = layer;
+                case DxfOverrideRole.Dimension:
+                    _overrides.ApplyDimensionOverride(entity);
+                    break;
             }
+        }
+
+        private Layer GetLayer(DxfLayerRole role)
+        {
+            var layerName = _layerNames.GetLayerName(role);
+
+            if (!string.IsNullOrWhiteSpace(layerName) && _document.Layers.Contains(layerName))
+            {
+                return _document.Layers[layerName];
+            }
+
+            return Layer.Default;
+        }
+
+        private void ApplyTextStyle(EntityObject entity)
+        {
+            var style = GetTextStyle();
+
+            if (entity is Text text)
+            {
+                text.Style = style;
+                return;
+            }
+
+            if (entity is MText mText)
+            {
+                mText.Style = style;
+            }
+        }
+
+        private void ApplyDimensionStyle(EntityObject entity)
+        {
+            var style = GetDimensionStyle();
+
+            if (entity is Dimension dimension)
+            {
+                dimension.Style = style;
+            }
+        }
+
+        private DimensionStyle GetDimensionStyle()
+        {
+            var styleName = _styleNames.GetStyleName(DxfStyleRole.Dimension);
+
+            if (!string.IsNullOrWhiteSpace(styleName) && _document.DimensionStyles.Contains(styleName))
+            {
+                return _document.DimensionStyles[styleName];
+            }
+
+            return DimensionStyle.Default;
+        }
+
+        private TextStyle GetTextStyle()
+        {
+            var styleName = _styleNames.GetStyleName(DxfStyleRole.Text);
+
+            if (!string.IsNullOrWhiteSpace(styleName) && _document.TextStyles.Contains(styleName))
+            {
+                return _document.TextStyles[styleName];
+            }
+
+            return TextStyle.Default;
         }
 
         private Linetype GetRoleLinetype(DxfLayerRole role)

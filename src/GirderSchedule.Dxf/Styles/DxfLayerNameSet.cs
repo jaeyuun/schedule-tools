@@ -12,6 +12,7 @@ namespace GirderSchedule.Dxf.Styles
         public string Rebar { get; set; }
         public string Stirrup { get; set; }
         public string Text { get; set; }
+        public string Dimension { get; set; }
 
         public DxfLayerNameSet()
         {
@@ -22,6 +23,7 @@ namespace GirderSchedule.Dxf.Styles
             Rebar = DxfLayers.Rebar;
             Stirrup = DxfLayers.Rebar;
             Text = DxfLayers.Text;
+            Dimension = DxfLayers.Dim;
         }
 
         public string GetLayerName(DxfLayerRole role)
@@ -42,28 +44,8 @@ namespace GirderSchedule.Dxf.Styles
                     return Stirrup;
                 case DxfLayerRole.Text:
                     return Text;
-                default:
-                    return DxfLayers.Text;
-            }
-        }
-
-        public string GetTemplateLayerName(DxfLayerRole role)
-        {
-            switch (role)
-            {
-                case DxfLayerRole.FormLine:
-                    return DxfLayers.FormLine;
-                case DxfLayerRole.FormText:
-                    return DxfLayers.FormText;
-                case DxfLayerRole.MemberForce:
-                    return DxfLayers.Defpoint;
-                case DxfLayerRole.Girder:
-                    return DxfLayers.RcGir;
-                case DxfLayerRole.Rebar:
-                case DxfLayerRole.Stirrup:
-                    return DxfLayers.Rebar;
-                case DxfLayerRole.Text:
-                    return DxfLayers.Text;
+                case DxfLayerRole.Dimension:
+                    return Dimension;
                 default:
                     return DxfLayers.Text;
             }

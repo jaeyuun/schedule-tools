@@ -1,9 +1,7 @@
 ﻿namespace GirderSchedule.Domain.Models.Settings
 {
-    public enum DxfStyleRole
+    public enum DxfOverrideRole
     {
-        Text,
-        Block,
         Dimension,
     }
 }

@@ -163,10 +163,6 @@
 내보내기 전에 프로젝트를 먼저 저장해야 합니다.
 프로젝트를 저장하시겠습니까?</value>
   </data>
-  <data name="Content_DeleteSelectedFloorWithMembersConfirm" xml:space="preserve">
-    <value>선택한 층과 하위 부재가 모두 삭제됩니다.
-삭제하시겠습니까?</value>
-  </data>
   <data name="Title_FileNotFound" xml:space="preserve">
     <value>파일 없음</value>
   </data>
@@ -224,5 +220,27 @@
   </data>
   <data name="Title_ProjectSaveFailed" xml:space="preserve">
     <value>프로젝트 저장 실패</value>
+  </data>
+  <data name="Title_DxfSetting" xml:space="preserve">
+    <value>DXF 설정</value>
+  </data>
+  <data name="Content_DeleteSelectedFloorWithMembersConfirm" xml:space="preserve">
+    <value>선택한 층과 하위 부재가 모두 삭제됩니다.
+삭제하시겠습니까?</value>
+  </data>
+  <data name="Content_DxfTemplateAddFailed" xml:space="preserve">
+    <value>DXF 템플릿 파일을 추가하지 못했습니다.</value>
+  </data>
+  <data name="Content_DxfTemplateDeleteFailed" xml:space="preserve">
+    <value>기본 DXF 템플릿은 삭제할 수 없습니다.</value>
+  </data>
+  <data name="Content_DxfSettingNameSet" xml:space="preserve">
+    <value>항목 이름을 설정해주세요.</value>
+  </data>
+  <data name="Content_DxfSettingNameError" xml:space="preserve">
+    <value>유효하지 않은 항목 이름이 있습니다.</value>
+  </data>
+  <data name="Content_DxfSettingDeleteFailed" xml:space="preserve">
+    <value>기본 설정은 삭제할 수 없습니다.</value>
   </data>
 </root>

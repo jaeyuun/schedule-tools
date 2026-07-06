@@ -91,7 +91,7 @@ namespace GirderSchedule.Dxf.Drawers.Common
                 return;
             }
 
-            _styler.Apply(entity, role);
+            _styler.ApplyLayer(entity, role);
             _document.Entities.Add(entity);
         }
     }

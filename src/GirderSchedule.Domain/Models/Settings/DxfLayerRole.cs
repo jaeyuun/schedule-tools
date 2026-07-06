@@ -9,5 +9,6 @@
         Rebar,
         Stirrup,
         Text,
+        Dimension,
     }
 }

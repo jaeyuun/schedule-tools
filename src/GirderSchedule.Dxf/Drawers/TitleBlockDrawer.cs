@@ -32,7 +32,7 @@ namespace GirderSchedule.Dxf.Drawers
 
         private void DrawBlock(double x, double y)
         {
-            var blockName = string.IsNullOrWhiteSpace(_styleNames.DrawingBlockName) ? DxfBlocks.TitleBlock : _styleNames.DrawingBlockName;
+            var blockName = string.IsNullOrWhiteSpace(_styleNames.Block) ? DxfBlocks.TitleBlock : _styleNames.Block;
 
             if (!_document.Blocks.Contains(blockName))
             {

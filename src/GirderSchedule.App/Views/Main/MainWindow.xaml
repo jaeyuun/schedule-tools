@@ -68,7 +68,7 @@
                     <Button Style="{StaticResource ModernIconNavButtonStyle}" Margin="0,12,0,0" Command="{Binding EditDxfLayerSettingCommand}">
                         <StackPanel>
                             <TextBlock Text="▧" FontSize="24" HorizontalAlignment="Center"/>
-                            <TextBlock Text="레이어" Margin="0,6,0,0" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                            <TextBlock Text="DXF 설정" Margin="0,6,0,0" FontWeight="SemiBold" HorizontalAlignment="Center"/>
                         </StackPanel>
                     </Button>
                 </StackPanel>
