@@ -88,7 +88,7 @@
                                       RowStyle="{StaticResource ModernDataGridRowStyle}"
                                       CellStyle="{StaticResource ModernDataGridCellStyle}">
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="항목" Width="110" Binding="{Binding DisplayName}" IsReadOnly="True"/>
+                                    <DataGridTextColumn Header="항목" Width="0.5*" Binding="{Binding DisplayName}" IsReadOnly="True"/>
                                     <DataGridTemplateColumn Header="스타일명" Width="*">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
@@ -97,7 +97,7 @@
                                         </DataGridTemplateColumn.CellTemplate>
                                         <DataGridTemplateColumn.CellEditingTemplate>
                                             <DataTemplate>
-                                                <TextBox Style="{StaticResource GridCellTextBoxStyle}" HorizontalContentAlignment="Left" Text="{Binding StyleName, UpdateSourceTrigger=LostFocus}"/>
+                                                <TextBox Style="{StaticResource GridCellTextBoxStyle}" Text="{Binding StyleName, UpdateSourceTrigger=LostFocus}"/>
                                             </DataTemplate>
                                         </DataGridTemplateColumn.CellEditingTemplate>
                                     </DataGridTemplateColumn>
@@ -123,7 +123,7 @@
                                       RowStyle="{StaticResource ModernDataGridRowStyle}"
                                       CellStyle="{StaticResource ModernDataGridCellStyle}">
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="항목" Width="130" Binding="{Binding DisplayName}" IsReadOnly="True"/>
+                                    <DataGridTextColumn Header="항목" Width="0.5*" Binding="{Binding DisplayName}" IsReadOnly="True"/>
                                     <DataGridTemplateColumn Header="레이어명" Width="*">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
@@ -132,7 +132,7 @@
                                         </DataGridTemplateColumn.CellTemplate>
                                         <DataGridTemplateColumn.CellEditingTemplate>
                                             <DataTemplate>
-                                                <TextBox Margin="0,0,16,0" Style="{StaticResource GridCellTextBoxStyle}" HorizontalContentAlignment="Left" Text="{Binding LayerName, UpdateSourceTrigger=LostFocus}"/>
+                                                <TextBox Style="{StaticResource LastGridCellTextBoxStyle}" Text="{Binding LayerName, UpdateSourceTrigger=LostFocus}"/>
                                             </DataTemplate>
                                         </DataGridTemplateColumn.CellEditingTemplate>
                                     </DataGridTemplateColumn>
@@ -143,8 +143,8 @@
                 </Grid>
 
                 <StackPanel Grid.Row="6" Orientation="Horizontal" HorizontalAlignment="Right">
-                    <Button Width="96" Content="기본값" Style="{StaticResource ModernOutlineButtonStyle}" Command="{Binding ResetCommand}"/>
-                    <Button Width="96" Margin="10,0,0,0" Content="닫기" Style="{StaticResource ModernPrimaryButtonStyle}" Command="{Binding CloseCommand}"/>
+                    <Button Content="기본값" Style="{StaticResource ModernOutlineButtonStyle}" Command="{Binding ResetCommand}"/>
+                    <Button Margin="10,0,0,0" Content="닫기" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding CloseCommand}"/>
                 </StackPanel>
             </Grid>
         </Border>

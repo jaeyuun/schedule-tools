@@ -1,4 +1,5 @@
-﻿using GirderSchedule.App.ViewModels.Schedule;
+﻿using GirderSchedule.App.Utils;
+using GirderSchedule.App.ViewModels.Schedule;
 using GirderSchedule.App.ViewModels.Settings;
 using System;
 using System.Windows;
@@ -17,6 +18,12 @@ namespace GirderSchedule.App.Views.Settings
         public FloorSettingWindow()
         {
             InitializeComponent();
+            Loaded += Window_Loaded;
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            WindowSizeHelper.FitToWorkArea(this);
         }
 
         private void FloorGrid_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)

@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using GirderSchedule.App.Utils;
+using System.Windows;
 
 namespace GirderSchedule.App.Views.Common
 {
@@ -25,12 +26,19 @@ namespace GirderSchedule.App.Views.Common
         {
             InitializeComponent();
             DataContext = this;
+            Loaded += Window_Loaded;
         }
 
         public SaveConfirmDialog(string title, string content) : this()
         {
             DialogTitle = title;
             DialogContent = content;
+            Loaded += Window_Loaded;
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            WindowSizeHelper.FitToWorkArea(this);
         }
 
         private void YesButton_Click(object sender, RoutedEventArgs e)

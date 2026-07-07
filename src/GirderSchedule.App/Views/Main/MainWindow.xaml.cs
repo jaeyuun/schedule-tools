@@ -1,6 +1,5 @@
-﻿using GirderSchedule.App.ViewModels.Main;
-using GirderSchedule.App.ViewModels.Settings;
-using GirderSchedule.App.Views.Settings;
+﻿using GirderSchedule.App.Utils;
+using GirderSchedule.App.ViewModels.Main;
 using GirderSchedule.Domain.Models;
 using System.ComponentModel;
 using System.Windows;
@@ -14,6 +13,7 @@ namespace GirderSchedule.App.Views.Main
         {
             InitializeComponent();
             DataContext = new MainWindowViewModel();
+            Loaded += Window_Loaded;
             UpdatePreviewToolbar();
         }
 
@@ -21,7 +21,13 @@ namespace GirderSchedule.App.Views.Main
         {
             InitializeComponent();
             DataContext = new MainWindowViewModel(project, filePath);
+            Loaded += Window_Loaded;
             UpdatePreviewToolbar();
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            WindowSizeHelper.FitToWorkArea(this);
         }
 
         private void Window_Closing(object sender, CancelEventArgs e)

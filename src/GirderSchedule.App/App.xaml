@@ -5,8 +5,42 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="Views/Styles/ModernTheme.xaml"/>
+                <ResourceDictionary Source="Views/Styles/Foundations.xaml"/>
+                <ResourceDictionary Source="Views/Styles/IconStyles.xaml"/>
+                <ResourceDictionary Source="Views/Styles/TextStyles.xaml"/>
+                <ResourceDictionary Source="Views/Styles/ButtonStyles.xaml"/>
+                <ResourceDictionary Source="Views/Styles/InputStyles.xaml"/>
+                <ResourceDictionary Source="Views/Styles/DataGridStyles.xaml"/>
+                <ResourceDictionary Source="Views/Styles/ScrollBarStyles.xaml"/>
+                <ResourceDictionary Source="Views/Styles/WindowStyles.xaml"/>
+                <ResourceDictionary Source="Views/Styles/DialogStyles.xaml"/>
+                <ResourceDictionary Source="Views/Styles/MenuStyles.xaml"/>
+                <ResourceDictionary Source="Views/Styles/LayoutStyles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
+
+            <Style TargetType="{x:Type TextBlock}">
+                <Setter Property="FontSize" Value="{StaticResource DefaultFontSize}"/>
+            </Style>
+
+            <Style TargetType="{x:Type TextBox}">
+                <Setter Property="FontSize" Value="{StaticResource DefaultFontSize}"/>
+            </Style>
+
+            <Style TargetType="{x:Type ComboBox}">
+                <Setter Property="FontSize" Value="{StaticResource DefaultFontSize}"/>
+            </Style>
+
+            <Style TargetType="{x:Type Button}">
+                <Setter Property="FontSize" Value="{StaticResource DefaultFontSize}"/>
+            </Style>
+
+            <Style TargetType="{x:Type CheckBox}">
+                <Setter Property="FontSize" Value="{StaticResource DefaultFontSize}"/>
+            </Style>
+
+            <Style TargetType="{x:Type Label}">
+                <Setter Property="FontSize" Value="{StaticResource DefaultFontSize}"/>
+            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

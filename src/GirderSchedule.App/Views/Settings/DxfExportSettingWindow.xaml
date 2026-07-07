@@ -58,8 +58,8 @@
 
                 <Border Grid.Row="1" Background="White" BorderBrush="{StaticResource LineBrush}" BorderThickness="0,1,0,0" CornerRadius="0,0,12,12">
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,24,0">
-                        <Button Width="96" Content="취소" Style="{StaticResource ModernOutlineButtonStyle}" Command="{Binding CancelCommand}"/>
-                        <Button Width="96" Margin="10,0,0,0" Content="확인" Style="{StaticResource ModernPrimaryButtonStyle}" Command="{Binding OkCommand}"/>
+                        <Button Content="취소" Style="{StaticResource ModernOutlineButtonStyle}" Command="{Binding CancelCommand}"/>
+                        <Button Margin="10,0,0,0" Content="확인" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding OkCommand}"/>
                     </StackPanel>
                 </Border>
             </Grid>

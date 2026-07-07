@@ -114,9 +114,9 @@
                             </TabControl>
 
                             <StackPanel x:Name="PreviewToolbar" Grid.Column="1" Margin="0,0,14,0" Orientation="Horizontal" VerticalAlignment="Center" Visibility="Collapsed">
-                                <Button x:Name="PreviewPrevPageButton" Width="70" Content="이전" Style="{StaticResource ModernOutlineButtonStyle}" Click="PreviewPrevPageButton_Click"/>
-                                <Button x:Name="PreviewNextPageButton" Width="70" Margin="8,0,0,0" Content="다음" Style="{StaticResource ModernOutlineButtonStyle}" Click="PreviewNextPageButton_Click"/>
-                                <Button Width="70" Margin="8,0,0,0" Content="맞춤" Style="{StaticResource ModernOutlineButtonStyle}" Click="PreviewFitButton_Click"/>
+                                <Button x:Name="PreviewPrevPageButton" Content="이전" Style="{StaticResource ModernOutlineButtonStyle}" Click="PreviewPrevPageButton_Click"/>
+                                <Button x:Name="PreviewNextPageButton" Margin="8,0,0,0" Content="다음" Style="{StaticResource ModernOutlineButtonStyle}" Click="PreviewNextPageButton_Click"/>
+                                <Button Margin="8,0,0,0" Content="맞춤" Style="{StaticResource ModernOutlineButtonStyle}" Click="PreviewFitButton_Click"/>
                                 <TextBlock x:Name="PreviewZoomTextBlock" Width="52" Margin="12,0,0,0" Text="100%" Foreground="{StaticResource Ink500Brush}" VerticalAlignment="Center"/>
                                 <TextBlock x:Name="PreviewPageTextBlock" Width="70" Margin="12,0,0,0" Text="1 / 1" Foreground="{StaticResource Ink500Brush}" TextAlignment="Right" VerticalAlignment="Center"/>
                             </StackPanel>

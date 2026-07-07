@@ -8,7 +8,6 @@
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
         Background="{StaticResource AppBackgroundBrush}">
-
     <Window.InputBindings>
         <KeyBinding Key="Enter" Command="{Binding UpdateCommand}"/>
     </Window.InputBindings>
@@ -52,7 +51,7 @@
                             RowStyle="{StaticResource ModernDataGridRowStyle}"
                             CellStyle="{StaticResource ModernDataGridCellStyle}">
                             <DataGrid.Columns>
-                                <DataGridTemplateColumn Header="층 표현" Width="70">
+                                <DataGridTemplateColumn Header="층 표현" Width="0.5*">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <TextBlock Text="{Binding FloorPrefix}" VerticalAlignment="Center"/>
@@ -65,7 +64,7 @@
                                     </DataGridTemplateColumn.CellEditingTemplate>
                                 </DataGridTemplateColumn>
 
-                                <DataGridTemplateColumn Header="층 이름" Width="140">
+                                <DataGridTemplateColumn Header="층 이름" Width="*">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <TextBlock Text="{Binding FloorName}" VerticalAlignment="Center"/>
@@ -73,7 +72,7 @@
                                     </DataGridTemplateColumn.CellTemplate>
                                     <DataGridTemplateColumn.CellEditingTemplate>
                                         <DataTemplate>
-                                            <TextBox Style="{StaticResource GridCellTextBoxStyle}" HorizontalContentAlignment="Left" Text="{Binding FloorName, UpdateSourceTrigger=LostFocus}"/>
+                                            <TextBox Style="{StaticResource GridCellTextBoxStyle}" Text="{Binding FloorName, UpdateSourceTrigger=LostFocus}"/>
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellEditingTemplate>
                                 </DataGridTemplateColumn>
@@ -88,10 +87,10 @@
                                         <DataTemplate>
                                             <Grid Height="26" VerticalAlignment="Center">
                                                 <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="30"/>
+                                                    <ColumnDefinition Width="24"/>
                                                     <ColumnDefinition Width="*"/>
                                                 </Grid.ColumnDefinitions>
-                                                <TextBlock Text="HD" Foreground="{StaticResource Ink500Brush}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                                <TextBlock Text="HD" Foreground="{StaticResource Ink500Brush}" VerticalAlignment="Center"/>
                                                 <TextBox Grid.Column="1" Style="{StaticResource GridCellTextBoxStyle}" Text="{Binding MainRebarDiameterText, UpdateSourceTrigger=LostFocus}"/>
                                             </Grid>
                                         </DataTemplate>
@@ -108,10 +107,10 @@
                                         <DataTemplate>
                                             <Grid Height="26" VerticalAlignment="Center">
                                                 <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="30"/>
+                                                    <ColumnDefinition Width="24"/>
                                                     <ColumnDefinition Width="*"/>
                                                 </Grid.ColumnDefinitions>
-                                                <TextBlock Text="HD" Foreground="{StaticResource Ink500Brush}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                                <TextBlock Text="HD" Foreground="{StaticResource Ink500Brush}" VerticalAlignment="Center"/>
                                                 <TextBox Grid.Column="1" Style="{StaticResource GridCellTextBoxStyle}" Text="{Binding StirrupDiameterText, UpdateSourceTrigger=LostFocus}"/>
                                             </Grid>
                                         </DataTemplate>
@@ -128,11 +127,11 @@
                                         <DataTemplate>
                                             <Grid Height="26" VerticalAlignment="Center">
                                                 <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="30"/>
+                                                    <ColumnDefinition Width="24"/>
                                                     <ColumnDefinition Width="*"/>
                                                 </Grid.ColumnDefinitions>
-                                                <TextBlock Text="HD" Foreground="{StaticResource Ink500Brush}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                                                <TextBox Grid.Column="1" Margin="0,0,16,0" Style="{StaticResource GridCellTextBoxStyle}" Text="{Binding SkinRebarDiameterText, UpdateSourceTrigger=LostFocus}"/>
+                                                <TextBlock Text="HD" Foreground="{StaticResource Ink500Brush}" VerticalAlignment="Center"/>
+                                                <TextBox Grid.Column="1" Style="{StaticResource LastGridCellTextBoxStyle}" Text="{Binding SkinRebarDiameterText, UpdateSourceTrigger=LostFocus}"/>
                                             </Grid>
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellEditingTemplate>
@@ -141,7 +140,7 @@
                         </DataGrid>
                 </Grid>
 
-                <Border Grid.Column="1" Grid.Row="0" Background="#FBFDFF" BorderBrush="{StaticResource LineBrush}" BorderThickness="1,0,0,0" CornerRadius="0,12,0,0" VerticalAlignment="Stretch">
+                <Border Grid.Column="1" Grid.Row="0" Background="{StaticResource AppBackgroundBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="1,0,0,0" CornerRadius="0,12,0,0" VerticalAlignment="Stretch">
                     <StackPanel Margin="22">
                         <TextBlock Text="선택한 층 정보" Style="{StaticResource WindowTitleTextStyle}"/>
                         <TextBlock Text="입력 후 추가 또는 수정 버튼을 누르세요." Margin="0,6,0,16" Style="{StaticResource CaptionTextStyle}"/>
@@ -167,7 +166,7 @@
                         <TextBlock Text="주근 규격" FontWeight="SemiBold" Foreground="{StaticResource Ink700Brush}"/>
                         <Grid Margin="0,6,0,10">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="36"/>
+                                <ColumnDefinition Width="24"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="HD" VerticalAlignment="Center" Foreground="{StaticResource Ink500Brush}"/>
@@ -177,7 +176,7 @@
                         <TextBlock Text="스터럽 규격" FontWeight="SemiBold" Foreground="{StaticResource Ink700Brush}"/>
                         <Grid Margin="0,6,0,10">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="36"/>
+                                <ColumnDefinition Width="24"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="HD" VerticalAlignment="Center" Foreground="{StaticResource Ink500Brush}"/>
@@ -187,7 +186,7 @@
                         <TextBlock Text="표피철근 규격" FontWeight="SemiBold" Foreground="{StaticResource Ink700Brush}"/>
                         <Grid Margin="0,6,0,14">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="36"/>
+                                <ColumnDefinition Width="24"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="HD" VerticalAlignment="Center" Foreground="{StaticResource Ink500Brush}"/>
@@ -210,9 +209,9 @@
                     </StackPanel>
                 </Border>
 
-                <Border Grid.Row="1" Grid.Column="1" Background="#FBFDFF" BorderBrush="{StaticResource LineBrush}" BorderThickness="1,1,0,0" CornerRadius="0,0,12,0">
+                <Border Grid.Row="1" Grid.Column="1" Background="{StaticResource AppBackgroundBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="1,1,0,0" CornerRadius="0,0,12,0">
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,22,0">
-                        <Button Content="닫기" Width="96" Style="{StaticResource ModernPrimaryButtonStyle}" IsCancel="True"/>
+                        <Button Content="닫기" Style="{StaticResource PrimaryButtonStyle}" IsCancel="True"/>
                     </StackPanel>
                 </Border>
             </Grid>

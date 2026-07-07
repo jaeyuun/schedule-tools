@@ -1,0 +1,26 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    
+    <Style x:Key="BaseArrowPathStyle" TargetType="Path">
+        <Setter Property="Width" Value="10"/>
+        <Setter Property="Height" Value="10"/>
+        <Setter Property="Stretch" Value="Uniform"/>
+        <Setter Property="Fill" Value="{StaticResource Ink500Brush}"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+    </Style>
+
+    <Style x:Key="DropDownArrowPathStyle" TargetType="Path" BasedOn="{StaticResource BaseArrowPathStyle}">
+        <Setter Property="Data" Value="M 1 3 L 5 7 L 9 3 Z"/>
+    </Style>
+
+    <Style x:Key="DropUpArrowPathStyle" TargetType="Path" BasedOn="{StaticResource BaseArrowPathStyle}">
+        <Setter Property="Data" Value="M 1 7 L 5 3 L 9 7 Z"/>
+    </Style>
+
+    <Style x:Key="TreeToggleArrowPathStyle" TargetType="Path" BasedOn="{StaticResource BaseArrowPathStyle}">
+        <Setter Property="Data" Value="M 3 1 L 7 5 L 3 9 Z"/>
+    </Style>
+    
+</ResourceDictionary>

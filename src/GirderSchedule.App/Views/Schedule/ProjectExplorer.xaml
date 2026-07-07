@@ -3,19 +3,19 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="clr-namespace:GirderSchedule.App.ViewModels.Schedule">
 
-    <Border Padding="16,18,16,28" Background="White" BorderBrush="{StaticResource LineBrush}" BorderThickness="0,0,1,0">
+    <Border Padding="16,24" Background="White" BorderBrush="{StaticResource LineBrush}" BorderThickness="0,0,1,0">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="18"/>
+                <RowDefinition Height="16"/>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="12"/>
+                <RowDefinition Height="8"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
             <StackPanel Grid.Row="0">
-                <TextBlock Margin="4,0" Text="도면명" Style="{StaticResource WindowTitleTextStyle}"/>
-                <TextBox Margin="0,14,0,0" Style="{StaticResource ModernTextBoxStyle}" Text="{Binding ScheduleTitle, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Margin="2,0,0,8" Text="도면명" Style="{StaticResource SectionTitleTextStyle}"/>
+                <TextBox Style="{StaticResource ModernTextBoxStyle}" Text="{Binding ScheduleTitle, UpdateSourceTrigger=PropertyChanged}"/>
             </StackPanel>
 
             <Grid Grid.Row="2">
@@ -27,9 +27,9 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <TextBlock Margin="4,0" Text="층 / 부재" Style="{StaticResource WindowTitleTextStyle}"/>
-                <Button Grid.Column="2" Height="28" Content="추가" Style="{StaticResource ModernOutlineButtonStyle}" Command="{Binding AddSetCommand}"/>
-                <Button Grid.Column="4" Height="28" Content="삭제" Style="{StaticResource ModernOutlineButtonStyle}" Command="{Binding RemoveSetCommand}"/>
+                <TextBlock Margin="2,0,0,0" Text="층 / 부재" Style="{StaticResource SectionTitleTextStyle}"/>
+                <Button Grid.Column="2" Content="추가" Style="{StaticResource ModernOutlineMiniButtonStyle}" Command="{Binding AddSetCommand}"/>
+                <Button Grid.Column="4" Content="삭제" Style="{StaticResource ModernOutlineMiniButtonStyle}" Command="{Binding RemoveSetCommand}"/>
             </Grid>
 
             <Border Grid.Row="4" Background="White" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="10">
@@ -83,13 +83,13 @@
                                                             <ToggleButton.Template>
                                                                 <ControlTemplate TargetType="{x:Type ToggleButton}">
                                                                     <Border Background="Transparent">
-                                                                        <Path x:Name="Arrow" Width="6" Height="6" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="{StaticResource Ink500Brush}" Data="M 0 0 L 0 6 L 6 3 Z"/>
+                                                                        <Path x:Name="Arrow" Style="{StaticResource TreeToggleArrowPathStyle}"/>
                                                                     </Border>
                                                                     <ControlTemplate.Triggers>
                                                                         <Trigger Property="IsChecked" Value="True">
                                                                             <Setter TargetName="Arrow" Property="RenderTransform">
                                                                                 <Setter.Value>
-                                                                                    <RotateTransform Angle="90" CenterX="3" CenterY="3"/>
+                                                                                    <RotateTransform Angle="90"/>
                                                                                 </Setter.Value>
                                                                             </Setter>
                                                                         </Trigger>
@@ -102,8 +102,8 @@
                                                     </Grid>
                                                 </Border>
 
-                                                <Border x:Name="DropTopLine" Height="2" VerticalAlignment="Top" Background="#2678FF" Visibility="Collapsed"/>
-                                                <Border x:Name="DropBottomLine" Height="2" VerticalAlignment="Bottom" Background="#2678FF" Visibility="Collapsed"/>
+                                                <Border x:Name="DropTopLine" Height="2" VerticalAlignment="Top" Background="{StaticResource DropLineBrush}" Visibility="Collapsed"/>
+                                                <Border x:Name="DropBottomLine" Height="2" VerticalAlignment="Bottom" Background="{StaticResource DropLineBrush}" Visibility="Collapsed"/>
                                             </Grid>
 
                                             <ItemsPresenter x:Name="ItemsHost" Grid.Row="1" Margin="18,0,0,0"/>

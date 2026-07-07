@@ -11,31 +11,29 @@
         Background="Transparent"
         ShowInTaskbar="False">
 
-    <Border Background="White" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="16" SnapsToDevicePixels="True">
-        <Border.Effect>
-            <DropShadowEffect BlurRadius="22" ShadowDepth="8" Opacity="0.16"/>
-        </Border.Effect>
+    <Grid Background="Transparent" Margin="16">
+        <Border Style="{StaticResource WindowOuterBorderStyle}">
+            <Grid Margin="24">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="16"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="20"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
 
-        <Grid Margin="24">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="16"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="20"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0" Text="{Binding DialogTitle}" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource Ink900Brush}" TextWrapping="Wrap"/>
 
-            <TextBlock Grid.Row="0" Text="{Binding DialogTitle}" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource Ink900Brush}" TextWrapping="Wrap"/>
+                <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+                    <TextBlock Text="{Binding DialogContent}" FontSize="13" FontWeight="Normal" Foreground="{StaticResource Ink700Brush}" TextWrapping="Wrap" LineHeight="20"/>
+                </ScrollViewer>
 
-            <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
-                <TextBlock Text="{Binding DialogContent}" FontSize="13" FontWeight="Normal" Foreground="{StaticResource Ink700Brush}" TextWrapping="Wrap" LineHeight="20"/>
-            </ScrollViewer>
-
-            <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
-                <Button Width="86" Content="저장" Margin="0,0,8,0" Style="{StaticResource ModernPrimaryButtonStyle}" IsDefault="True" Click="YesButton_Click"/>
-                <Button Width="96" Content="저장 안 함" Margin="0,0,8,0" Style="{StaticResource ModernOutlineButtonStyle}" Click="NoButton_Click"/>
-                <Button Width="86" Content="취소" Style="{StaticResource ModernOutlineButtonStyle}" IsCancel="True" Click="CancelButton_Click"/>
-            </StackPanel>
-        </Grid>
-    </Border>
+                <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+                    <Button Content="저장" Margin="0,0,8,0" Style="{StaticResource PrimaryButtonStyle}" IsDefault="True" Click="YesButton_Click"/>
+                    <Button Content="저장 안 함" Margin="0,0,8,0" Style="{StaticResource ModernOutlineButtonStyle}" Click="NoButton_Click"/>
+                    <Button Content="취소" Style="{StaticResource ModernOutlineButtonStyle}" IsCancel="True" Click="CancelButton_Click"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
 </Window>

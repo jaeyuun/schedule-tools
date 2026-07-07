@@ -1,4 +1,5 @@
-﻿using GirderSchedule.App.ViewModels.Settings;
+﻿using GirderSchedule.App.Utils;
+using GirderSchedule.App.ViewModels.Settings;
 using System;
 using System.Windows;
 
@@ -9,7 +10,13 @@ namespace GirderSchedule.App.Views.Settings
         public DxfExportSettingWindow()
         {
             InitializeComponent();
+            Loaded += Window_Loaded;
             DataContextChanged += DxfExportSettingWindow_DataContextChanged;
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            WindowSizeHelper.FitToWorkArea(this);
         }
 
         private void DxfExportSettingWindow_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)

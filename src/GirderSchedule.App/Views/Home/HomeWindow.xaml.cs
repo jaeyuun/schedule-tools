@@ -1,4 +1,5 @@
-﻿using GirderSchedule.App.ViewModels.Home;
+﻿using GirderSchedule.App.Utils;
+using GirderSchedule.App.ViewModels.Home;
 using System.Windows;
 
 namespace GirderSchedule.App.Views.Home
@@ -9,6 +10,12 @@ namespace GirderSchedule.App.Views.Home
         {
             InitializeComponent();
             DataContext = new HomeWindowViewModel();
+            Loaded += Window_Loaded;
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            WindowSizeHelper.FitToWorkArea(this);
         }
     }
 }
