@@ -1,5 +1,4 @@
 ﻿using System.Collections.ObjectModel;
-using GirderSchedule.App.ViewModels;
 
 namespace GirderSchedule.App.ViewModels.Home
 {

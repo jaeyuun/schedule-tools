@@ -1,13 +1,13 @@
 ﻿using System;
 using System.IO;
 using GirderSchedule.App.Models;
-using GirderSchedule.App.ViewModels;
 
 namespace GirderSchedule.App.ViewModels.Home
 {
     public sealed class RecentProjectViewModel : ViewModelBase
     {
         private readonly RecentProjectInfo _model;
+        private bool _isSelected;
 
         public RecentProjectInfo Model
         {
@@ -37,6 +37,21 @@ namespace GirderSchedule.App.ViewModels.Home
         public string DisplayTime
         {
             get { return _model.LastOpenedAt.ToString("yyyy.MM.dd tt hh:mm"); }
+        }
+
+        public bool IsSelected
+        {
+            get { return _isSelected; }
+            set
+            {
+                if (_isSelected == value)
+                {
+                    return;
+                }
+
+                _isSelected = value;
+                OnPropertyChanged(nameof(IsSelected));
+            }
         }
 
         public RecentProjectViewModel(RecentProjectInfo model)

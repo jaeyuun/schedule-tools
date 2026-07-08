@@ -227,7 +227,7 @@
 
     <Style x:Key="ModernCheckBoxStyle" TargetType="CheckBox">
         <Setter Property="Foreground" Value="{StaticResource Ink700Brush}"/>
-        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="FontSize" Value="{StaticResource DefaultFontSize}"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="Template">

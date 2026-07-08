@@ -84,9 +84,9 @@
                 </Grid.RowDefinitions>
 
                 <StackPanel Grid.Row="0" Orientation="Horizontal">
-                    <TextBlock Text="{Binding Editor.FloorName}" Style="{StaticResource WindowTitleTextStyle}"/>
-                    <TextBlock Text=" / " Margin="4,0" Style="{StaticResource WindowTitleTextStyle}"/>
-                    <TextBlock Text="{Binding Editor.MemberName}" Style="{StaticResource WindowTitleTextStyle}"/>
+                    <TextBlock Text="{Binding Editor.FloorName}" Style="{StaticResource TitleTextStyle}"/>
+                    <TextBlock Text=" / " Margin="4,0" Style="{StaticResource TitleTextStyle}"/>
+                    <TextBlock Text="{Binding Editor.MemberName}" Style="{StaticResource TitleTextStyle}"/>
                 </StackPanel>
 
                 <Grid Grid.Row="2">

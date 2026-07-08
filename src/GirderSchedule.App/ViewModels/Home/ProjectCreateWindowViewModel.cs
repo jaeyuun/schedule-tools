@@ -6,7 +6,6 @@ using GirderSchedule.App.Services.Settings;
 using GirderSchedule.App.ViewModels.Main;
 using GirderSchedule.App.Views.Main;
 using GirderSchedule.Domain.Models;
-using System;
 using System.IO;
 using System.Linq;
 using System.Windows;
@@ -20,13 +19,9 @@ namespace GirderSchedule.App.ViewModels.Home
         private readonly AppSettingService _settingService = new AppSettingService();
         private readonly ProjectFileService _projectFileService = new ProjectFileService();
         private readonly RecentProjectService _recentProjectService = new RecentProjectService();
-        private readonly bool _openMainWindowAfterCreate;
 
         private string _projectName;
         private string _folderPath;
-
-        public Action BackRequested { get; set; }
-        public Action ProjectCreated { get; set; }
 
         public ScheduleProject CreatedProject { get; private set; }
         public string CreatedFilePath { get; private set; }
@@ -65,14 +60,8 @@ namespace GirderSchedule.App.ViewModels.Home
         public ICommand CreateCommand { get; private set; }
         public ICommand BackCommand { get; private set; }
 
-        public ProjectCreateWindowViewModel() : this(true)
+        public ProjectCreateWindowViewModel()
         {
-        }
-
-        public ProjectCreateWindowViewModel(bool openMainWindowAfterCreate)
-        {
-            _openMainWindowAfterCreate = openMainWindowAfterCreate;
-
             var setting = _settingService.Load();
 
             ProjectName = string.Empty;
@@ -145,24 +134,12 @@ namespace GirderSchedule.App.ViewModels.Home
             CreatedProject = project;
             CreatedFilePath = filePath;
 
-            if (_openMainWindowAfterCreate)
-            {
-                var mainWindow = new MainWindow(project, filePath);
-                ShowMainWindowOnly(mainWindow);
-                return;
-            }
-
-            ProjectCreated?.Invoke();
+            var mainWindow = new MainWindow(project, filePath);
+            ShowMainWindowOnly(mainWindow);
         }
 
         private void CloseWindow()
         {
-            if (!_openMainWindowAfterCreate)
-            {
-                BackRequested?.Invoke();
-                return;
-            }
-
             var window = Application.Current.Windows.OfType<Window>().SingleOrDefault(x => x.DataContext == this);
 
             if (window == null)

@@ -3,8 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="clr-namespace:GirderSchedule.App.ViewModels.Schedule">
 
-    <Border Padding="16,24" Background="White" BorderBrush="{StaticResource LineBrush}" BorderThickness="0,0,1,0">
-        <Grid>
+    <Grid Margin="{StaticResource DefaultWindowGridMargin}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="16"/>
@@ -202,5 +201,4 @@
                 </TreeView>
             </Border>
         </Grid>
-    </Border>
 </UserControl>

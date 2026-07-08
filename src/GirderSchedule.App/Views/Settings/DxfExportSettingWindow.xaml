@@ -1,68 +1,57 @@
 ﻿<Window x:Class="GirderSchedule.App.Views.Settings.DxfExportSettingWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="DXF 내보내기 설정"
-        Width="720"
-        Height="590"
-        WindowStyle="SingleBorderWindow"
-        AllowsTransparency="False"
+        Title="DXF 내보내기"
+        MinHeight="480"
         WindowStartupLocation="CenterOwner"
-        ResizeMode="NoResize"
-        Background="{StaticResource AppBackgroundBrush}">
+        Style="{StaticResource SettingWindowStyle}">
 
     <Window.InputBindings>
         <KeyBinding Key="Enter" Command="{Binding OkCommand}"/>
         <KeyBinding Key="Escape" Command="{Binding CancelCommand}"/>
     </Window.InputBindings>
 
-    <Grid>
-        <Border Style="{StaticResource CardBorderStyle}">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="72"/>
-                </Grid.RowDefinitions>
+    <Grid Margin="{StaticResource DefaultWindowGridMargin}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="{StaticResource GridRowGapMedium}"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="{StaticResource GridRowGapSmall}"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
 
-                <StackPanel Grid.Row="0" Margin="30">
-                    <TextBlock Text="내보내기 옵션" Style="{StaticResource WindowTitleTextStyle}"/>
-                    <TextBlock Text="DXF 출력 방식과 한 줄에 배치할 폼 개수를 설정합니다." Margin="0,6,0,22" Style="{StaticResource CaptionTextStyle}"/>
-
-                    <Border Background="White" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="12" Padding="18" Margin="0,0,0,16">
-                        <StackPanel>
-                            <TextBlock Text="층 출력 방식" Style="{StaticResource SectionTitleTextStyle}"/>
-                            <CheckBox Content="층 구분 없이 이어서 출력" Margin="0,14,0,0" Style="{StaticResource ModernCheckBoxStyle}" IsChecked="{Binding ContinueAcrossFloors, Mode=TwoWay}"/>
-                            <TextBlock Text="체크하면 층이 바뀌어도 이어서 출력하고, 해제하면 층이 바뀔 때 다음 줄부터 출력합니다." Margin="0,12,0,0" Style="{StaticResource CaptionTextStyle}" TextWrapping="Wrap"/>
-                        </StackPanel>
-                    </Border>
-
-                    <Border Background="White" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="12" Padding="18">
-                        <StackPanel>
-                            <TextBlock Text="도면 배치" Style="{StaticResource SectionTitleTextStyle}"/>
-                            <Grid Margin="0,16,0,0">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="100"/>
-                                    <ColumnDefinition Width="90"/>
-                                    <ColumnDefinition Width="28"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-
-                                <TextBlock Grid.Column="0" Text="도면 가로 개수" Foreground="{StaticResource Ink700Brush}" VerticalAlignment="Center"/>
-                                <TextBox Grid.Column="1" Style="{StaticResource ModernTextBoxStyle}" Text="{Binding FormColumnCountText, UpdateSourceTrigger=LostFocus}"/>
-                                <TextBlock Grid.Column="2" Text="개" Margin="8,0,0,0" Foreground="{StaticResource Ink700Brush}" VerticalAlignment="Center"/>
-                                <TextBlock Grid.Column="3" Text="기본값: 3" Margin="18,0,0,0" Style="{StaticResource CaptionTextStyle}" VerticalAlignment="Center"/>
-                            </Grid>
-                            <TextBlock Text="도면 1개는 부재 9세트 기준입니다. 예: 4 입력 시 도면1 도면2 도면3 도면4 / 도면5 도면6 ..." Margin="0,12,0,0" Style="{StaticResource CaptionTextStyle}" TextWrapping="Wrap"/>
-                        </StackPanel>
-                    </Border>
+        <StackPanel Grid.Row="0">
+            <TextBlock Text="내보내기 옵션" Margin="{StaticResource VerMarginSamll}" Style="{StaticResource TitleTextStyle}"/>
+            <TextBlock Text="DXF 출력 방식과 한 줄에 배치할 도면 개수를 설정합니다." Style="{StaticResource CaptionTextStyle}"/>
+        </StackPanel>
+        
+        <StackPanel Grid.Row="2">
+            <Border Margin="{StaticResource VerMarginMedium}" Style="{StaticResource SectionCardBorderStyle}">
+                <StackPanel>
+                    <TextBlock Text="층 출력 방식" Margin="{StaticResource VerMarginMedium}" Style="{StaticResource SectionTitleTextStyle}"/>
+                    <CheckBox Content="층 구분 없이 이어서 출력" Margin="{StaticResource VerMarginSamll}" Style="{StaticResource ModernCheckBoxStyle}" IsChecked="{Binding ContinueAcrossFloors, Mode=TwoWay}"/>
+                    <TextBlock Text="체크하면 층이 바뀌어도 이어서 출력하고, 해제하면 층이 바뀔 때 다음 줄부터 출력합니다." Style="{StaticResource CaptionTextStyle}" TextWrapping="Wrap"/>
                 </StackPanel>
+            </Border>
 
-                <Border Grid.Row="1" Background="White" BorderBrush="{StaticResource LineBrush}" BorderThickness="0,1,0,0" CornerRadius="0,0,12,12">
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,24,0">
-                        <Button Content="취소" Style="{StaticResource ModernOutlineButtonStyle}" Command="{Binding CancelCommand}"/>
-                        <Button Margin="10,0,0,0" Content="확인" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding OkCommand}"/>
+            <Border Style="{StaticResource SectionCardBorderStyle}">
+                <StackPanel Margin="{StaticResource VerMarginSamll}">
+                    <TextBlock Text="도면 배치" Margin="{StaticResource VerMarginMedium}" Style="{StaticResource SectionTitleTextStyle}"/>
+                    <StackPanel Orientation="Horizontal" Margin="{StaticResource VerMarginSamll}">
+                        <TextBlock Grid.Column="0" Text="도면 가로 개수" Margin="{StaticResource HorMarginMedium}" Style="{StaticResource DefaultTextStyle}"/>
+                        <TextBox Grid.Column="1" Width="60" Margin="{StaticResource HorMarginSamll}" Style="{StaticResource ModernTextBoxStyle}" Text="{Binding FormColumnCountText, UpdateSourceTrigger=LostFocus}"/>
+                        <TextBlock Grid.Column="2" Text="개" Margin="{StaticResource HorMarginMedium}" Style="{StaticResource DefaultTextStyle}"/>
+                        <TextBlock Grid.Column="3" Text="(기본값: 3)" Style="{StaticResource CaptionTextStyle}"/>
                     </StackPanel>
-                </Border>
-            </Grid>
-        </Border>
+                    <TextBlock Text="도면 1개는 부재 9세트 기준입니다. 예: 4 입력 시 도면1 도면2 도면3 도면4 / 도면5 도면6 ..." Style="{StaticResource CaptionTextStyle}" TextWrapping="Wrap"/>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+
+        <StackPanel Grid.Row="6" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="취소" Margin="{StaticResource HorMarginMedium}" Style="{StaticResource ModernOutlineButtonStyle}" Command="{Binding CancelCommand}"/>
+            <Button Content="확인" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding OkCommand}"/>
+        </StackPanel>
     </Grid>
 </Window>

@@ -2,6 +2,7 @@
 using GirderSchedule.App.Constants;
 using GirderSchedule.App.Services;
 using GirderSchedule.App.Services.Project;
+using GirderSchedule.App.Views.Home;
 using GirderSchedule.App.Views.Main;
 using Microsoft.Win32;
 using System;
@@ -15,7 +16,6 @@ namespace GirderSchedule.App.ViewModels.Home
 {
     public sealed class HomeStartViewModel : ViewModelBase
     {
-        private readonly Action _showProjectSetting;
         private readonly ProjectFileService _projectFileService = new ProjectFileService();
         private readonly RecentProjectService _recentProjectService = new RecentProjectService();
 
@@ -50,7 +50,15 @@ namespace GirderSchedule.App.ViewModels.Home
                     return;
                 }
 
+                ClearRecentProjectSelection();
+
                 _selectedRecentProject = value;
+
+                if (_selectedRecentProject != null)
+                {
+                    _selectedRecentProject.IsSelected = true;
+                }
+
                 OnPropertyChanged(nameof(SelectedRecentProject));
                 CommandManager.InvalidateRequerySuggested();
             }
@@ -62,9 +70,8 @@ namespace GirderSchedule.App.ViewModels.Home
         public ICommand StartSelectedProjectCommand { get; private set; }
         public ICommand CheckRecentProjectsCommand { get; private set; }
 
-        public HomeStartViewModel(Action showProjectSetting)
+        public HomeStartViewModel()
         {
-            _showProjectSetting = showProjectSetting;
             RecentGroups = new ObservableCollection<RecentProjectGroupViewModel>();
 
             CreateProjectCommand = new RelayCommand(p => CreateProject());
@@ -91,7 +98,11 @@ namespace GirderSchedule.App.ViewModels.Home
 
         private void CreateProject()
         {
-            _showProjectSetting?.Invoke();
+            var window = new ProjectCreateWindow();
+            window.Owner = Application.Current.Windows.OfType<Window>().SingleOrDefault(x => x.IsActive);
+            window.ShowDialog();
+
+            LoadRecentProjects();
         }
 
         private void OpenProject()
@@ -194,6 +205,19 @@ namespace GirderSchedule.App.ViewModels.Home
             if (old.Items.Count > 0)
             {
                 RecentGroups.Add(old);
+            }
+        }
+
+        private void ClearRecentProjectSelection()
+        {
+            for (var groupIndex = 0; groupIndex < RecentGroups.Count; groupIndex++)
+            {
+                var group = RecentGroups[groupIndex];
+
+                for (var itemIndex = 0; itemIndex < group.Items.Count; itemIndex++)
+                {
+                    group.Items[itemIndex].IsSelected = false;
+                }
             }
         }
 
