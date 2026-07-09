@@ -50,22 +50,22 @@
             </Grid.ColumnDefinitions>
 
             <Border Grid.Column="0" Background="White" BorderBrush="{StaticResource LineBrush}" BorderThickness="0,0,1,0">
-                <StackPanel Margin="0,18,0,0">
-                    <Button Style="{StaticResource ModernIconNavButtonStyle}" Command="{Binding NewProjectCommand}">
+                <StackPanel>
+                    <Button Style="{StaticResource ModernSquareButtonStyle}" Command="{Binding NewProjectCommand}">
                         <StackPanel>
                             <TextBlock Text="▤" FontSize="24" Foreground="{StaticResource Blue500Brush}" HorizontalAlignment="Center"/>
                             <TextBlock Text="새 일람표" Margin="0,6,0,0" FontWeight="SemiBold" Foreground="{StaticResource Blue500Brush}" HorizontalAlignment="Center"/>
                         </StackPanel>
                     </Button>
 
-                    <Button Style="{StaticResource ModernIconNavButtonStyle}" Margin="0,12,0,0" Command="{Binding EditFloorSettingCommand}">
+                    <Button Style="{StaticResource ModernSquareButtonStyle}" Command="{Binding EditFloorSettingCommand}">
                         <StackPanel>
                             <TextBlock Text="▥" FontSize="24" HorizontalAlignment="Center"/>
                             <TextBlock Text="층 설정" Margin="0,6,0,0" FontWeight="SemiBold" HorizontalAlignment="Center"/>
                         </StackPanel>
                     </Button>
 
-                    <Button Style="{StaticResource ModernIconNavButtonStyle}" Margin="0,12,0,0" Command="{Binding EditDxfLayerSettingCommand}">
+                    <Button Style="{StaticResource ModernSquareButtonStyle}" Command="{Binding EditDxfLayerSettingCommand}">
                         <StackPanel>
                             <TextBlock Text="▧" FontSize="24" HorizontalAlignment="Center"/>
                             <TextBlock Text="DXF 설정" Margin="0,6,0,0" FontWeight="SemiBold" HorizontalAlignment="Center"/>
@@ -90,7 +90,7 @@
                 </StackPanel>
 
                 <Grid Grid.Row="2">
-                    <Border x:Name="TabAreaMask" Background="White" CornerRadius="14" IsHitTestVisible="False"/>
+                    <Border x:Name="TabAreaMask" Background="White" CornerRadius="{StaticResource SectionCornerRadius}" IsHitTestVisible="False"/>
 
                     <Grid Background="{StaticResource SurfaceBrush}">
                         <Grid.OpacityMask>
@@ -135,7 +135,7 @@
                         </Grid>
                     </Grid>
 
-                    <Border BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="14" IsHitTestVisible="False" Panel.ZIndex="99"/>
+                    <Border BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="{StaticResource SectionCornerRadius}" IsHitTestVisible="False" Panel.ZIndex="99"/>
                 </Grid>
             </Grid>
         </Grid>

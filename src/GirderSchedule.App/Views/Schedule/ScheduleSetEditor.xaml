@@ -145,7 +145,7 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <Border Background="White" CornerRadius="0,0,14,14" ClipToBounds="True">
+    <Border Background="White" CornerRadius="{StaticResource SectionCornerRadius}" ClipToBounds="True">
         <Grid Background="White">
             <Viewbox Stretch="Fill">
                 <Grid Width="830" Height="576" Background="White">

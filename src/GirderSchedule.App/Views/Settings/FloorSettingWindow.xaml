@@ -4,211 +4,234 @@
         Title="층 설정"
         WindowStartupLocation="CenterOwner"
         Style="{StaticResource SettingWindowStyle}">
-    
+
     <Window.InputBindings>
         <KeyBinding Key="Enter" Command="{Binding UpdateCommand}"/>
     </Window.InputBindings>
 
-    <Grid>
+    <Window.Resources>
+        <Style x:Key="FloorGridCellTextBlockStyle" TargetType="TextBlock">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+
+        <Style x:Key="RebarInputGridStyle" TargetType="Grid">
+            <Setter Property="Height" Value="26"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="{StaticResource WindowMargin}">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="{StaticResource GridRowGapLarge}"/>
             <ColumnDefinition Width="0.6*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="72"/>
+            <RowDefinition Height="{StaticResource GridRowGapMedium}"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-    
-        <Grid Grid.Column="0" Grid.RowSpan="2" Margin="22">
+
+        <Grid Grid.Row="0" Grid.Column="0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="12"/>
+                <RowDefinition Height="{StaticResource GridRowGapMedium}"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-    
+
             <StackPanel Grid.Row="0">
-                <TextBlock Text="층 목록" Style="{StaticResource TitleTextStyle}"/>
-                <TextBlock Text="도면에 출력할 층 이름과 층별 기본 철근 규격을 관리합니다." Margin="0,6,0,0" Style="{StaticResource CaptionTextStyle}"/>
+                <TextBlock Text="층 목록" Margin="{StaticResource VerMarginSmall}" Style="{StaticResource TitleTextStyle}"/>
+                <TextBlock Text="도면에 출력할 층 이름과 층별 기본 철근 규격을 관리합니다." Style="{StaticResource CaptionTextStyle}"/>
             </StackPanel>
-    
+
             <DataGrid Grid.Row="2"
-                    x:Name="FloorGrid"
-                    ItemsSource="{Binding Floors}"
-                    SelectedItem="{Binding SelectedFloor, Mode=TwoWay}"
-                    AllowDrop="True"
-                    PreviewMouseLeftButtonDown="FloorGrid_PreviewMouseLeftButtonDown"
-                    MouseMove="FloorGrid_MouseMove"
-                    DragOver="FloorGrid_DragOver"
-                    DragLeave="FloorGrid_DragLeave"
-                    Drop="FloorGrid_Drop"
-                    Style="{StaticResource ModernDataGridStyle}"
-                    ColumnHeaderStyle="{StaticResource ModernDataGridColumnHeaderStyle}"
-                    RowStyle="{StaticResource ModernDataGridRowStyle}"
-                    CellStyle="{StaticResource ModernDataGridCellStyle}">
-                    <DataGrid.Columns>
-                        <DataGridTemplateColumn Header="층 표현" Width="0.5*">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding FloorPrefix}" VerticalAlignment="Center"/>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                            <DataGridTemplateColumn.CellEditingTemplate>
-                                <DataTemplate>
-                                    <TextBox Style="{StaticResource GridCellTextBoxStyle}" Text="{Binding FloorPrefix, UpdateSourceTrigger=LostFocus}"/>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellEditingTemplate>
-                        </DataGridTemplateColumn>
-    
-                        <DataGridTemplateColumn Header="층 이름" Width="*">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding FloorName}" VerticalAlignment="Center"/>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                            <DataGridTemplateColumn.CellEditingTemplate>
-                                <DataTemplate>
-                                    <TextBox Style="{StaticResource GridCellTextBoxStyle}" Text="{Binding FloorName, UpdateSourceTrigger=LostFocus}"/>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellEditingTemplate>
-                        </DataGridTemplateColumn>
-    
-                        <DataGridTemplateColumn Header="주근 규격" Width="*">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding MainRebarText}" VerticalAlignment="Center"/>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                            <DataGridTemplateColumn.CellEditingTemplate>
-                                <DataTemplate>
-                                    <Grid Height="26" VerticalAlignment="Center">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="24"/>
-                                            <ColumnDefinition Width="*"/>
-                                        </Grid.ColumnDefinitions>
-                                        <TextBlock Text="HD" Foreground="{StaticResource Ink500Brush}" VerticalAlignment="Center"/>
-                                        <TextBox Grid.Column="1" Style="{StaticResource GridCellTextBoxStyle}" Text="{Binding MainRebarDiameterText, UpdateSourceTrigger=LostFocus}"/>
-                                    </Grid>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellEditingTemplate>
-                        </DataGridTemplateColumn>
-    
-                        <DataGridTemplateColumn Header="스터럽 규격" Width="*">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding StirrupText}" VerticalAlignment="Center"/>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                            <DataGridTemplateColumn.CellEditingTemplate>
-                                <DataTemplate>
-                                    <Grid Height="26" VerticalAlignment="Center">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="24"/>
-                                            <ColumnDefinition Width="*"/>
-                                        </Grid.ColumnDefinitions>
-                                        <TextBlock Text="HD" Foreground="{StaticResource Ink500Brush}" VerticalAlignment="Center"/>
-                                        <TextBox Grid.Column="1" Style="{StaticResource GridCellTextBoxStyle}" Text="{Binding StirrupDiameterText, UpdateSourceTrigger=LostFocus}"/>
-                                    </Grid>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellEditingTemplate>
-                        </DataGridTemplateColumn>
-    
-                        <DataGridTemplateColumn Header="표피철근 규격" Width="1.14*">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding SkinRebarText}" VerticalAlignment="Center"/>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                            <DataGridTemplateColumn.CellEditingTemplate>
-                                <DataTemplate>
-                                    <Grid Height="26" VerticalAlignment="Center">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="24"/>
-                                            <ColumnDefinition Width="*"/>
-                                        </Grid.ColumnDefinitions>
-                                        <TextBlock Text="HD" Foreground="{StaticResource Ink500Brush}" VerticalAlignment="Center"/>
-                                        <TextBox Grid.Column="1" Style="{StaticResource LastGridCellTextBoxStyle}" Text="{Binding SkinRebarDiameterText, UpdateSourceTrigger=LostFocus}"/>
-                                    </Grid>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellEditingTemplate>
-                        </DataGridTemplateColumn>
-                    </DataGrid.Columns>
-                </DataGrid>
+                      x:Name="FloorGrid"
+                      ItemsSource="{Binding Floors}"
+                      SelectedItem="{Binding SelectedFloor, Mode=TwoWay}"
+                      AllowDrop="True"
+                      PreviewMouseLeftButtonDown="FloorGrid_PreviewMouseLeftButtonDown"
+                      MouseMove="FloorGrid_MouseMove"
+                      DragOver="FloorGrid_DragOver"
+                      DragLeave="FloorGrid_DragLeave"
+                      Drop="FloorGrid_Drop"
+                      Style="{StaticResource ModernDataGridStyle}"
+                      ColumnHeaderStyle="{StaticResource ModernDataGridColumnHeaderStyle}"
+                      RowStyle="{StaticResource ModernDataGridRowStyle}"
+                      CellStyle="{StaticResource ModernDataGridCellStyle}">
+                <DataGrid.Columns>
+                    <DataGridTemplateColumn Header="층 표현" Width="0.5*">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding FloorPrefix}" Style="{StaticResource DefaultTextStyle}"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                        <DataGridTemplateColumn.CellEditingTemplate>
+                            <DataTemplate>
+                                <TextBox Style="{StaticResource GridCellTextBoxStyle}" Text="{Binding FloorPrefix, UpdateSourceTrigger=LostFocus}"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellEditingTemplate>
+                    </DataGridTemplateColumn>
+
+                    <DataGridTemplateColumn Header="층 이름" Width="*">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding FloorName}" Style="{StaticResource DefaultTextStyle}"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                        <DataGridTemplateColumn.CellEditingTemplate>
+                            <DataTemplate>
+                                <TextBox Style="{StaticResource GridCellTextBoxStyle}" Text="{Binding FloorName, UpdateSourceTrigger=LostFocus}"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellEditingTemplate>
+                    </DataGridTemplateColumn>
+
+                    <DataGridTemplateColumn Header="주근 규격" Width="*">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding MainRebarText}" Style="{StaticResource DefaultTextStyle}"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                        <DataGridTemplateColumn.CellEditingTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="HD" Margin="{StaticResource HorMarginSamll}" Style="{StaticResource DefaultTextStyle}"/>
+                                    <TextBox Grid.Column="1" Style="{StaticResource GridCellTextBoxStyle}" Text="{Binding MainRebarDiameterText, UpdateSourceTrigger=LostFocus}"/>
+                                </Grid>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellEditingTemplate>
+                    </DataGridTemplateColumn>
+
+                    <DataGridTemplateColumn Header="스터럽 규격" Width="*">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding StirrupText}" Style="{StaticResource DefaultTextStyle}"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                        <DataGridTemplateColumn.CellEditingTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="HD" Margin="{StaticResource HorMarginSamll}" Style="{StaticResource DefaultTextStyle}"/>
+                                    <TextBox Grid.Column="1" Style="{StaticResource GridCellTextBoxStyle}" Text="{Binding StirrupDiameterText, UpdateSourceTrigger=LostFocus}"/>
+                                </Grid>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellEditingTemplate>
+                    </DataGridTemplateColumn>
+
+                    <DataGridTemplateColumn Header="표피철근 규격" Width="1.14*">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding SkinRebarText}" Style="{StaticResource DefaultTextStyle}"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                        <DataGridTemplateColumn.CellEditingTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="HD" Margin="{StaticResource HorMarginSamll}" Style="{StaticResource DefaultTextStyle}"/>
+                                    <TextBox Grid.Column="1" Style="{StaticResource LastGridCellTextBoxStyle}" Text="{Binding SkinRebarDiameterText, UpdateSourceTrigger=LostFocus}"/>
+                                </Grid>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellEditingTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
         </Grid>
-    
-        <Border Grid.Column="1" Grid.Row="0" Background="{StaticResource AppBackgroundBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="1,0,0,0" CornerRadius="0,12,0,0" VerticalAlignment="Stretch">
-            <StackPanel Margin="22">
-                <TextBlock Text="선택한 층 정보" Style="{StaticResource TitleTextStyle}"/>
-                <TextBlock Text="입력 후 추가 또는 수정 버튼을 누르세요." Margin="0,6,0,16" Style="{StaticResource CaptionTextStyle}"/>
-    
-                <Grid Margin="0,0,0,10">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="90"/>
-                        <ColumnDefinition Width="10"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="7"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-    
-                    <TextBlock Grid.Row="0" Grid.Column="0" Text="층 표현" FontWeight="SemiBold" Foreground="{StaticResource Ink700Brush}"/>
-                    <TextBlock Grid.Row="0" Grid.Column="2" Text="층 이름" FontWeight="SemiBold" Foreground="{StaticResource Ink700Brush}"/>
-                    <TextBox Grid.Row="2" Grid.Column="0" Style="{StaticResource ModernTextBoxStyle}" Text="{Binding InputFloorPrefix, UpdateSourceTrigger=LostFocus}"/>
-                    <TextBox Grid.Row="2" Grid.Column="2" Style="{StaticResource ModernTextBoxStyle}" Text="{Binding InputFloorName, UpdateSourceTrigger=LostFocus}"/>
-                </Grid>
-    
-                <TextBlock Text="주근 규격" FontWeight="SemiBold" Foreground="{StaticResource Ink700Brush}"/>
-                <Grid Margin="0,6,0,10">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="24"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Text="HD" VerticalAlignment="Center" Foreground="{StaticResource Ink500Brush}"/>
-                    <TextBox Grid.Column="1" Style="{StaticResource ModernTextBoxStyle}" Text="{Binding InputMainRebarDiameter, UpdateSourceTrigger=LostFocus}"/>
-                </Grid>
-    
-                <TextBlock Text="스터럽 규격" FontWeight="SemiBold" Foreground="{StaticResource Ink700Brush}"/>
-                <Grid Margin="0,6,0,10">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="24"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Text="HD" VerticalAlignment="Center" Foreground="{StaticResource Ink500Brush}"/>
-                    <TextBox Grid.Column="1" Style="{StaticResource ModernTextBoxStyle}" Text="{Binding InputStirrupDiameter, UpdateSourceTrigger=LostFocus}"/>
-                </Grid>
-    
-                <TextBlock Text="표피철근 규격" FontWeight="SemiBold" Foreground="{StaticResource Ink700Brush}"/>
-                <Grid Margin="0,6,0,14">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="24"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Text="HD" VerticalAlignment="Center" Foreground="{StaticResource Ink500Brush}"/>
-                    <TextBox Grid.Column="1" Style="{StaticResource ModernTextBoxStyle}" Text="{Binding InputSkinRebarDiameter, UpdateSourceTrigger=LostFocus}"/>
-                </Grid>
-    
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="8"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="8"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-    
-                    <Button Grid.Column="0" Content="추가" Style="{StaticResource ModernOutlineButtonStyle}" Command="{Binding AddCommand}"/>
-                    <Button Grid.Column="2" Content="수정" Style="{StaticResource ModernOutlineButtonStyle}" Command="{Binding UpdateCommand}"/>
-                    <Button Grid.Column="4" Content="삭제" Style="{StaticResource ModernOutlineButtonStyle}" Command="{Binding RemoveCommand}"/>
-                </Grid>
-            </StackPanel>
+
+        <Border Grid.Row="0" Grid.Column="2">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="{StaticResource GridRowGapMedium}"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <StackPanel Grid.Row="0">
+                    <TextBlock Text="선택한 층 정보" Margin="{StaticResource VerMarginSmall}" Style="{StaticResource TitleTextStyle}"/>
+                    <TextBlock Text="입력 후 추가 또는 수정 버튼을 누르세요." Margin="{StaticResource VerMarginMedium}" Style="{StaticResource CaptionTextStyle}"/>
+                </StackPanel>
+
+                <StackPanel Grid.Row="2" VerticalAlignment="Top">
+                    <Grid Margin="{StaticResource VerMarginMedium}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="0.5*"/>
+                            <ColumnDefinition Width="{StaticResource GridRowGapMedium}"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="{StaticResource GridRowGapMedium}"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="층 표현" Style="{StaticResource SectionTitleTextStyle}"/>
+                        <TextBlock Grid.Row="0" Grid.Column="2" Text="층 이름" Style="{StaticResource SectionTitleTextStyle}"/>
+                        <TextBox Grid.Row="2" Grid.Column="0" Style="{StaticResource ModernTextBoxStyle}" Text="{Binding InputFloorPrefix, UpdateSourceTrigger=LostFocus}"/>
+                        <TextBox Grid.Row="2" Grid.Column="2" Style="{StaticResource ModernTextBoxStyle}" Text="{Binding InputFloorName, UpdateSourceTrigger=LostFocus}"/>
+                    </Grid>
+
+                    <TextBlock Text="주근 규격" Margin="{StaticResource VerMarginSmall}" Style="{StaticResource SectionTitleTextStyle}"/>
+                    <Grid Margin="{StaticResource VerMarginMedium}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="HD" Margin="{StaticResource HorMarginMedium}" Style="{StaticResource CaptionTextStyle}"/>
+                        <TextBox Grid.Column="1" Style="{StaticResource ModernTextBoxStyle}" Text="{Binding InputMainRebarDiameter, UpdateSourceTrigger=LostFocus}"/>
+                    </Grid>
+
+                    <TextBlock Text="스터럽 규격" Margin="{StaticResource VerMarginSmall}" Style="{StaticResource SectionTitleTextStyle}"/>
+                    <Grid Margin="{StaticResource VerMarginMedium}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="HD" Margin="{StaticResource HorMarginMedium}" Style="{StaticResource CaptionTextStyle}"/>
+                        <TextBox Grid.Column="1" Style="{StaticResource ModernTextBoxStyle}" Text="{Binding InputStirrupDiameter, UpdateSourceTrigger=LostFocus}"/>
+                    </Grid>
+
+                    <TextBlock Text="표피철근 규격" Margin="{StaticResource VerMarginSmall}" Style="{StaticResource SectionTitleTextStyle}"/>
+                    <Grid Margin="{StaticResource VerMarginMedium}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="HD" Margin="{StaticResource HorMarginMedium}" Style="{StaticResource CaptionTextStyle}"/>
+                        <TextBox Grid.Column="1" Style="{StaticResource ModernTextBoxStyle}" Text="{Binding InputSkinRebarDiameter, UpdateSourceTrigger=LostFocus}"/>
+                    </Grid>
+
+                    <Grid HorizontalAlignment="Right">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="{StaticResource GridRowGapMedium}"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="{StaticResource GridRowGapMedium}"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Button Grid.Column="0" Content="추가" Style="{StaticResource PrimaryMiniButtonStyle}" Command="{Binding AddCommand}"/>
+                        <Button Grid.Column="2" Content="수정" Style="{StaticResource ModernOutlineMiniButtonStyle}" Command="{Binding UpdateCommand}"/>
+                        <Button Grid.Column="4" Content="삭제" Style="{StaticResource ModernOutlineMiniButtonStyle}" Command="{Binding RemoveCommand}"/>
+                    </Grid>
+                </StackPanel>
+            </Grid>
         </Border>
-    
-        <Border Grid.Row="1" Grid.Column="1" Background="{StaticResource AppBackgroundBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="1,1,0,0" CornerRadius="0,0,12,0">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,22,0">
+
+        <Border Grid.Row="2" Grid.Column="2">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                 <Button Content="닫기" Style="{StaticResource PrimaryButtonStyle}" IsCancel="True"/>
             </StackPanel>
         </Border>
     </Grid>
-    
+
 </Window>

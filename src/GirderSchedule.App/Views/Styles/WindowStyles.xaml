@@ -13,9 +13,9 @@
 
     <Style x:Key="SettingWindowStyle" TargetType="Window">
         <Setter Property="Width" Value="800"/>
-        <Setter Property="Height" Value="500"/>
-        <Setter Property="MinWidth" Value="480"/>
-        <Setter Property="MinHeight" Value="400"/>
+        <Setter Property="Height" Value="600"/>
+        <Setter Property="MinWidth" Value="640"/>
+        <Setter Property="MinHeight" Value="480"/>
         <Setter Property="Background" Value="{StaticResource AppBackgroundBrush}"/>
     </Style>
 

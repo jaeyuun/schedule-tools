@@ -5,25 +5,24 @@
         WindowStartupLocation="CenterOwner"
         Style="{StaticResource SettingWindowStyle}">
 
-    <Grid Margin="{StaticResource DefaultWindowGridMargin}">
+    <Grid Margin="{StaticResource WindowMargin}">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="{StaticResource GridRowGapSmall}"/>
+            <RowDefinition Height="{StaticResource GridRowGapMedium}"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <Grid Grid.Row="0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="{StaticResource GridRowGapLarge}"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="{StaticResource GridRowGapSmall}"/>
+                <RowDefinition Height="{StaticResource GridRowGapXLarge}"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="{StaticResource GridRowGapMedium}"/>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="{StaticResource GridRowGapSmall}"/>
+                <RowDefinition Height="{StaticResource GridRowGapLarge}"/>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
+                <RowDefinition Height="{StaticResource GridRowGapMedium}"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
             <TextBlock Grid.Row="0" Text="프로젝트 정보" Style="{StaticResource TitleTextStyle}"/>
@@ -35,7 +34,7 @@
             <Grid Grid.Row="8">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="{StaticResource GridRowGapSmall}"/>
+                    <ColumnDefinition Width="{StaticResource GridRowGapMedium}"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
@@ -44,9 +43,9 @@
             </Grid>
         </Grid>
 
-        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-            <Button Content="취소" Style="{StaticResource ModernOutlineButtonStyle}" Command="{Binding BackCommand}" IsCancel="True"/>
-            <Button Margin="10,0,0,0" Content="만들기" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding CreateCommand}"/>
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="취소" Margin="{StaticResource HorMarginMedium}" Style="{StaticResource ModernOutlineButtonStyle}" Command="{Binding BackCommand}" IsCancel="True"/>
+            <Button Content="만들기" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding CreateCommand}"/>
         </StackPanel>
     </Grid>
 </Window>

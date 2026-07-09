@@ -25,7 +25,7 @@
                             <ToggleButton x:Name="HeaderSite" Grid.Row="0" Background="Transparent" BorderThickness="0" Cursor="Hand" Focusable="False" IsChecked="{Binding IsExpanded, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}">
                                 <ToggleButton.Template>
                                     <ControlTemplate TargetType="{x:Type ToggleButton}">
-                                        <Border x:Name="HeaderBorder" Background="Transparent" CornerRadius="{StaticResource DefaultCornerRadius}" Padding="0,4">
+                                        <Border x:Name="HeaderBorder" Background="Transparent" CornerRadius="{StaticResource SectionCornerRadius}" Padding="0,4">
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="18"/>
@@ -72,19 +72,19 @@
         </Style>
     </Window.Resources>
 
-    <Grid Margin="{StaticResource DefaultWindowGridMargin}">
+    <Grid Margin="{StaticResource WindowMargin}">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="{StaticResource GridRowGapLarge}"/>
+            <ColumnDefinition Width="{StaticResource GridRowGapXLarge}"/>
             <ColumnDefinition Width="360"/>
         </Grid.ColumnDefinitions>
 
         <Grid Grid.Column="0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="{StaticResource GridRowGapLarge}"/>
+                <RowDefinition Height="{StaticResource GridRowGapXLarge}"/>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="{StaticResource GridRowGapMedium}"/>
+                <RowDefinition Height="{StaticResource GridRowGapLarge}"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
@@ -93,13 +93,13 @@
             <Grid Grid.Row="2">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="12"/>
+                    <ColumnDefinition Width="{StaticResource GridRowGapMedium}"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
                 <Grid Grid.Column="0">
                     <TextBox x:Name="SearchTextBox" Style="{StaticResource ModernTextBoxStyle}" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"/>
-                    <Button Width="28" Height="28" Margin="0,0,6,0" HorizontalAlignment="Right" VerticalAlignment="Center" Click="ClearSearchButton_Click">
+                    <Button HorizontalAlignment="Right" VerticalAlignment="Center" Click="ClearSearchButton_Click">
                         <Button.Style>
                             <Style TargetType="Button">
                                 <Setter Property="Background" Value="Transparent"/>
@@ -119,21 +119,21 @@
                                 </Setter>
                             </Style>
                         </Button.Style>
-                        <TextBlock FontSize="13" Foreground="{StaticResource Ink500Brush}" Text="{Binding Text, ElementName=SearchTextBox, Converter={StaticResource SearchIconTextConverter}}"/>
+                        <TextBlock Margin="8,0" Style="{StaticResource CaptionTextStyle}" Text="{Binding Text, ElementName=SearchTextBox, Converter={StaticResource SearchIconTextConverter}}"/>
                     </Button>
                 </Grid>
 
                 <Button Grid.Column="2" Content="새로고침" Style="{StaticResource ModernOutlineButtonStyle}" Command="{Binding CheckRecentProjectsCommand}"/>
             </Grid>
 
-            <Border Grid.Row="4" Style="{StaticResource SectionCardBorderStyle}">
+            <Border Grid.Row="4" Style="{StaticResource PanelBorderStyle}">
                 <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                     <ItemsControl ItemsSource="{Binding RecentGroups}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Expander IsExpanded="{Binding IsExpanded, Mode=TwoWay}" Margin="16,12,16,0" Style="{StaticResource HomeRecentExpanderStyle}">
+                                <Expander IsExpanded="{Binding IsExpanded, Mode=TwoWay}" Margin="18,18,18,0" Style="{StaticResource HomeRecentExpanderStyle}">
                                     <Expander.Header>
-                                        <TextBlock Text="{Binding Title}" FontWeight="SemiBold" Foreground="{StaticResource Ink900Brush}"/>
+                                        <TextBlock Text="{Binding Title}" Style="{StaticResource SectionTitleTextStyle}"/>
                                     </Expander.Header>
 
                                     <ListBox ItemsSource="{Binding Items}"
@@ -149,14 +149,14 @@
                                         <ListBox.ItemContainerStyle>
                                             <Style TargetType="ListBoxItem">
                                                 <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}"/>
-                                                <Setter Property="MinHeight" Value="48"/>
                                                 <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
                                                 <Setter Property="Background" Value="Transparent"/>
                                                 <Setter Property="BorderThickness" Value="0"/>
+                                                <Setter Property="Margin" Value="0,0,0,2"/>
                                                 <Setter Property="Template">
                                                     <Setter.Value>
                                                         <ControlTemplate TargetType="ListBoxItem">
-                                                            <Border x:Name="Bd" Background="{TemplateBinding Background}" CornerRadius="6" Padding="8,4">
+                                                            <Border x:Name="Bd" Background="{TemplateBinding Background}" CornerRadius="{StaticResource SectionCornerRadius}" Padding="8">
                                                                 <ContentPresenter HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
                                                             </Border>
 
@@ -179,16 +179,16 @@
                                                 <Grid>
                                                     <Grid.ColumnDefinitions>
                                                         <ColumnDefinition Width="*"/>
-                                                        <ColumnDefinition Width="160"/>
-                                                        <ColumnDefinition Width="20"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="Auto"/>
                                                     </Grid.ColumnDefinitions>
 
                                                     <StackPanel Grid.Column="0" MinWidth="0">
-                                                        <TextBlock Text="{Binding FileName}" FontWeight="SemiBold" Foreground="{StaticResource Ink900Brush}" TextTrimming="CharacterEllipsis"/>
-                                                        <TextBlock Text="{Binding FilePath}" Foreground="{StaticResource Ink500Brush}" TextTrimming="CharacterEllipsis" FontSize="11"/>
+                                                        <TextBlock Text="{Binding FileName}" TextTrimming="CharacterEllipsis" Style="{StaticResource SectionTitleTextStyle}"/>
+                                                        <TextBlock Text="{Binding FilePath}" TextTrimming="CharacterEllipsis" Style="{StaticResource DefaultTextStyle}"/>
                                                     </StackPanel>
-                                                    <TextBlock Grid.Column="1" Text="{Binding DisplayTime}" Foreground="{StaticResource Ink500Brush}" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                                                    <TextBlock Grid.Column="2" Text="›" Foreground="{StaticResource Ink500Brush}" FontSize="18" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                                    <TextBlock Grid.Column="1" Text="{Binding DisplayTime}" HorizontalAlignment="Right" Style="{StaticResource DefaultTextStyle}"/>
+                                                    <TextBlock Grid.Column="2" Text=" ›" FontSize="18" HorizontalAlignment="Right" Style="{StaticResource CaptionTextStyle}"/>
                                                 </Grid>
                                             </DataTemplate>
                                         </ListBox.ItemTemplate>
@@ -204,16 +204,16 @@
         <StackPanel Grid.Column="2">
             <TextBlock Text="프로젝트 시작" Margin="{StaticResource VerMarginXLarge}" Style="{StaticResource TitleTextStyle}"/>
 
-            <Button Height="120" Style="{StaticResource ModernButtonStyle}" Command="{Binding OpenProjectCommand}">
+            <Button Height="120" Margin="{StaticResource VerMarginMedium}" Style="{StaticResource ModernButtonStyle}" Command="{Binding OpenProjectCommand}">
                 <StackPanel VerticalAlignment="Center">
-                    <TextBlock Text="기존 프로젝트 가져오기" Margin="{StaticResource VerMarginSamll}" Style="{StaticResource TitleTextStyle}"/>
+                    <TextBlock Text="기존 프로젝트 가져오기" Margin="{StaticResource VerMarginSmall}" Style="{StaticResource TitleTextStyle}"/>
                     <TextBlock Text="저장된 프로젝트를 이어서 작업합니다." Style="{StaticResource CaptionTextStyle}"/>
                 </StackPanel>
             </Button>
 
-            <Button Height="120" Margin="0,16,0,0" Style="{StaticResource ModernButtonStyle}" Command="{Binding CreateProjectCommand}">
+            <Button Height="120" Style="{StaticResource ModernButtonStyle}" Command="{Binding CreateProjectCommand}">
                 <StackPanel VerticalAlignment="Center">
-                    <TextBlock Text="새 프로젝트 시작하기" Margin="{StaticResource VerMarginSamll}" Style="{StaticResource TitleTextStyle}"/>
+                    <TextBlock Text="새 프로젝트 시작하기" Margin="{StaticResource VerMarginSmall}" Style="{StaticResource TitleTextStyle}"/>
                     <TextBlock Text="새 프로젝트 이름과 도면명을 설정합니다." Style="{StaticResource CaptionTextStyle}"/>
                 </StackPanel>
             </Button>

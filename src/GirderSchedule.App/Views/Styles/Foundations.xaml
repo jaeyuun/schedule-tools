@@ -2,22 +2,31 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
-    <!-- Margin, Padding -->
+    <!-- Size, Margin, Padding -->
     <sys:Double x:Key="DefaultFontSize">12</sys:Double>
-    <GridLength x:Key="GridRowGapSmall">10</GridLength>
-    <GridLength x:Key="GridRowGapMedium">16</GridLength>
-    <GridLength x:Key="GridRowGapLarge">24</GridLength>
-    <Thickness x:Key="DefaultWindowGridMargin">32</Thickness>
-    <Thickness x:Key="DefaultSectionGridMargin">32</Thickness>
+    <sys:Double x:Key="DefaultHeight">32</sys:Double>
+    
+    <GridLength x:Key="GridRowGapSmall">4</GridLength>
+    <GridLength x:Key="GridRowGapMedium">10</GridLength>
+    <GridLength x:Key="GridRowGapLarge">16</GridLength>
+    <GridLength x:Key="GridRowGapXLarge">24</GridLength>
+
     <Thickness x:Key="HorMarginSamll">0,0,4,0</Thickness>
     <Thickness x:Key="HorMarginMedium">0,0,10,0</Thickness>
     <Thickness x:Key="HorMarginLarge">0,0,16,0</Thickness>
     <Thickness x:Key="HorMarginXLarge">0,0,24,0</Thickness>
-    <Thickness x:Key="VerMarginSamll">0,0,0,4</Thickness>
+    <Thickness x:Key="VerMarginSmall">0,0,0,4</Thickness>
     <Thickness x:Key="VerMarginMedium">0,0,0,10</Thickness>
     <Thickness x:Key="VerMarginLarge">0,0,0,16</Thickness>
     <Thickness x:Key="VerMarginXLarge">0,0,0,24</Thickness>
-    <CornerRadius x:Key="DefaultCornerRadius">10</CornerRadius>
+
+    <Thickness x:Key="WindowMargin">32</Thickness>
+    <Thickness x:Key="SectionGridMargin">16</Thickness>
+    <Thickness x:Key="WindowEffectMargin">16</Thickness>
+
+    <CornerRadius x:Key="DefaultCornerRadius">16</CornerRadius>
+    <CornerRadius x:Key="SectionCornerRadius">8</CornerRadius>
+    <CornerRadius x:Key="MiniCornerRadius">4</CornerRadius>
 
     <!-- Color -->
     <Color x:Key="PrimaryColor">#2563EB</Color>

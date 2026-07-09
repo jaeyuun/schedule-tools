@@ -5,7 +5,7 @@
         <Setter Property="Background" Value="{StaticResource AppBackgroundBrush}"/>
         <Setter Property="BorderBrush" Value="{StaticResource LineBrush}"/>
         <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="CornerRadius" Value="16"/>
+        <Setter Property="CornerRadius" Value="{StaticResource DefaultCornerRadius}"/>
         <Setter Property="SnapsToDevicePixels" Value="True"/>
         <Setter Property="Effect">
             <Setter.Value>
@@ -14,21 +14,18 @@
         </Setter>
     </Style>
 
-    <Style x:Key="CardBorderStyle" TargetType="Border">
+    <Style x:Key="ItemListBorderStyle" TargetType="Border">
         <Setter Property="Background" Value="{StaticResource SurfaceBrush}"/>
         <Setter Property="BorderBrush" Value="{StaticResource LineBrush}"/>
         <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="CornerRadius" Value="10"/>
-        <Setter Property="SnapsToDevicePixels" Value="True"/>
-        <Setter Property="Margin" Value="24"/>
-        <Setter Property="Padding" Value="24"/>
+        <Setter Property="CornerRadius" Value="{StaticResource DefaultCornerRadius}"/>
     </Style>
 
-    <Style x:Key="SectionCardBorderStyle" TargetType="Border">
+    <Style x:Key="SectionBorderStyle" TargetType="Border">
         <Setter Property="Background" Value="{StaticResource SurfaceBrush}"/>
         <Setter Property="BorderBrush" Value="{StaticResource LineBrush}"/>
         <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="CornerRadius" Value="10"/>
+        <Setter Property="CornerRadius" Value="{StaticResource DefaultCornerRadius}"/>
         <Setter Property="Padding" Value="18"/>
         <Setter Property="SnapsToDevicePixels" Value="True"/>
     </Style>
@@ -37,7 +34,7 @@
         <Setter Property="Background" Value="{StaticResource SurfaceBrush}"/>
         <Setter Property="BorderBrush" Value="{StaticResource LineBrush}"/>
         <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="CornerRadius" Value="10"/>
+        <Setter Property="CornerRadius" Value="{StaticResource DefaultCornerRadius}"/>
         <Setter Property="SnapsToDevicePixels" Value="True"/>
     </Style>
 

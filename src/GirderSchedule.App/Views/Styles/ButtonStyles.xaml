@@ -1,20 +1,58 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <Thickness x:Key="DefaultButtonPadding">12,4</Thickness>
+
     <Style x:Key="ModernButtonStyle" TargetType="Button">
-        <Setter Property="Height" Value="36"/>
-        <Setter Property="Padding" Value="10,0"/>
+        <Setter Property="Height" Value="{StaticResource DefaultHeight}"/>
+        <Setter Property="Padding" Value="{StaticResource DefaultButtonPadding}"/>
         <Setter Property="Foreground" Value="{StaticResource Ink700Brush}"/>
         <Setter Property="Background" Value="{StaticResource SurfaceBrush}"/>
         <Setter Property="BorderBrush" Value="{StaticResource LineBrush}"/>
         <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="FontSize" Value="13"/>
-        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="FontSize" Value="{StaticResource DefaultFontSize}"/>
+        <Setter Property="FontWeight" Value="Normal"/>
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
-                    <Border x:Name="ButtonBorder" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="10">
+                    <Border x:Name="ButtonBorder" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{StaticResource DefaultCornerRadius}">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="{TemplateBinding Padding}"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="ButtonBorder" Property="Background" Value="{StaticResource SurfaceMutedBrush}"/>
+                            <Setter TargetName="ButtonBorder" Property="BorderBrush" Value="{StaticResource PrimaryBorderBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="ButtonBorder" Property="Background" Value="{StaticResource PrimaryLightBrush}"/>
+                            <Setter TargetName="ButtonBorder" Property="BorderBrush" Value="{StaticResource PrimaryBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" Value="{StaticResource Ink300Brush}"/>
+                            <Setter TargetName="ButtonBorder" Property="Background" Value="{StaticResource SurfaceMutedBrush}"/>
+                            <Setter TargetName="ButtonBorder" Property="BorderBrush" Value="{StaticResource LineBrush}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="ModernSquareButtonStyle" TargetType="Button">
+        <Setter Property="Padding" Value="12"/>
+        <Setter Property="Foreground" Value="{StaticResource Ink700Brush}"/>
+        <Setter Property="Background" Value="{StaticResource SurfaceBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource LineBrush}"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="FontSize" Value="{StaticResource DefaultFontSize}"/>
+        <Setter Property="FontWeight" Value="Normal"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="ButtonBorder" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{StaticResource SectionCornerRadius}">
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="{TemplateBinding Padding}"/>
                     </Border>
                     <ControlTemplate.Triggers>
@@ -38,19 +76,19 @@
     </Style>
 
     <Style x:Key="ModernPrimaryButtonStyle" TargetType="Button">
-        <Setter Property="Height" Value="36"/>
-        <Setter Property="Padding" Value="14,0"/>
-        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="Height" Value="{StaticResource DefaultHeight}"/>
+        <Setter Property="Padding" Value="{StaticResource DefaultButtonPadding}"/>
+        <Setter Property="Foreground" Value="{StaticResource SurfaceBrush}"/>
         <Setter Property="Background" Value="{StaticResource PrimaryBrush}"/>
         <Setter Property="BorderBrush" Value="{StaticResource PrimaryBrush}"/>
         <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="FontSize" Value="13"/>
-        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="FontSize" Value="{StaticResource DefaultFontSize}"/>
+        <Setter Property="FontWeight" Value="Normal"/>
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
-                    <Border x:Name="ButtonBorder" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="10">
+                    <Border x:Name="ButtonBorder" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{StaticResource DefaultCornerRadius}">
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="{TemplateBinding Padding}"/>
                     </Border>
                     <ControlTemplate.Triggers>
@@ -74,26 +112,19 @@
     </Style>
 
     <Style x:Key="ModernOutlineButtonStyle" TargetType="Button" BasedOn="{StaticResource ModernButtonStyle}">
-        <Setter Property="Width" Value="80"/>
+        <Setter Property="MinWidth" Value="64"/>
     </Style>
 
     <Style x:Key="ModernOutlineMiniButtonStyle" TargetType="Button" BasedOn="{StaticResource ModernButtonStyle}">
-        <Setter Property="Width" Value="60"/>
-    </Style>
-
-    <Style x:Key="ModernIconNavButtonStyle" TargetType="Button" BasedOn="{StaticResource ModernButtonStyle}">
-        <Setter Property="Width" Value="60"/>
-        <Setter Property="Height" Value="60"/>
-        <Setter Property="Padding" Value="0"/>
-        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="MinWidth" Value="32"/>
     </Style>
 
     <Style x:Key="PrimaryButtonStyle" TargetType="Button" BasedOn="{StaticResource ModernPrimaryButtonStyle}">
-        <Setter Property="Width" Value="80"/>
+        <Setter Property="MinWidth" Value="64"/>
     </Style>
 
     <Style x:Key="PrimaryMiniButtonStyle" TargetType="Button" BasedOn="{StaticResource ModernPrimaryButtonStyle}">
-        <Setter Property="Width" Value="60"/>
+        <Setter Property="MinWidth" Value="32"/>
     </Style>
 
 </ResourceDictionary>
