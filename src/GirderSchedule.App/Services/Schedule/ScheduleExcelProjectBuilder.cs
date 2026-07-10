@@ -7,7 +7,7 @@ namespace GirderSchedule.App.Services.Schedule
 {
     public sealed class ScheduleExcelProjectBuilder
     {
-        private readonly ScheduleMemberNameDisplayService _displayService = new ScheduleMemberNameDisplayService();
+        private readonly ScheduleDisplayService _displayService = new ScheduleDisplayService();
         private readonly ScheduleSetCopyService _copyService = new ScheduleSetCopyService();
 
         public ScheduleProject Build(ScheduleProject sourceProject, ObservableCollection<FloorNodeViewModel> floors)
@@ -48,7 +48,7 @@ namespace GirderSchedule.App.Services.Schedule
                     }
 
                     var exportSet = _copyService.Clone(setNode.Model);
-                    exportSet.MemberName = _displayService.Format(floorNode.FloorPrefix, setNode.Model.MemberName);
+                    exportSet.MemberName = _displayService.GetMemberName(floorNode.FloorPrefix, setNode.Model.MemberName);
 
                     exportFloor.Sets.Add(exportSet);
                 }

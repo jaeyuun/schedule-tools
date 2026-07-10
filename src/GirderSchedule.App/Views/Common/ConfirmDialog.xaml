@@ -23,7 +23,7 @@
                 </ScrollViewer>
 
                 <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
-                    <Button Content="예" Margin="{StaticResource HorMarginSamll}" Style="{StaticResource PrimaryButtonStyle}" IsDefault="True" Click="YesButton_Click"/>
+                    <Button Content="예" Margin="{StaticResource HorMarginSmall}" Style="{StaticResource PrimaryButtonStyle}" IsDefault="True" Click="YesButton_Click"/>
                     <Button Content="아니오" Style="{StaticResource ModernOutlineButtonStyle}" IsCancel="True" Click="NoButton_Click"/>
                 </StackPanel>
             </Grid>

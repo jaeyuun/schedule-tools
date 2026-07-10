@@ -72,20 +72,22 @@
         </Setter>
     </Style>
 
-    <Style x:Key="ScheduleCellTextBoxStyle" TargetType="TextBox" BasedOn="{StaticResource GridCellTextBoxStyle}">
-        <Setter Property="HorizontalContentAlignment" Value="Center"/>
-    </Style>
-
-    <Style x:Key="ScheduleSmallTextBoxStyle" TargetType="TextBox" BasedOn="{StaticResource ModernTextBoxStyle}">
-        <Setter Property="Width" Value="44"/>
-        <Setter Property="Margin" Value="1,0"/>
+    <Style x:Key="ScheduleTextBoxStyle" TargetType="TextBox" BasedOn="{StaticResource ModernTextBoxStyle}">
+        <Setter Property="MinWidth" Value="128"/>
     </Style>
 
     <Style x:Key="ScheduleMediumTextBoxStyle" TargetType="TextBox" BasedOn="{StaticResource ModernTextBoxStyle}">
-        <Setter Property="Width" Value="46"/>
-        <Setter Property="Margin" Value="1,0"/>
+        <Setter Property="Width" Value="64"/>
     </Style>
 
+    <Style x:Key="ScheduleSmallTextBoxStyle" TargetType="TextBox" BasedOn="{StaticResource ModernTextBoxStyle}">
+        <Setter Property="Width" Value="48"/>
+    </Style>
+
+    <Style x:Key="ScheduleCellTextBoxStyle" TargetType="TextBox" BasedOn="{StaticResource GridCellTextBoxStyle}">
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+    </Style>
+    
     <Style x:Key="ScheduleWideTextBoxStyle" TargetType="TextBox" BasedOn="{StaticResource ModernTextBoxStyle}">
         <Setter Property="Margin" Value="1,0"/>
     </Style>
@@ -209,10 +211,10 @@
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <Border x:Name="CheckBorder" Width="16" Height="16" Background="White" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="{StaticResource MiniCornerRadius}" VerticalAlignment="Center">
+                        <Border x:Name="CheckBorder" Margin="{StaticResource HorMarginSmall}" Width="16" Height="16" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="{StaticResource MiniCornerRadius}" VerticalAlignment="Center">
                             <Path x:Name="CheckMark" Width="9" Height="7" Data="M1,3.5 L3.5,6 L8,1" Stroke="White" StrokeThickness="1.8" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Visibility="Collapsed"/>
                         </Border>
-                        <ContentPresenter Grid.Column="1" Margin="6,0,0,0" VerticalAlignment="Center" RecognizesAccessKey="True"/>
+                        <ContentPresenter Grid.Column="1" VerticalAlignment="Center" RecognizesAccessKey="True"/>
                     </Grid>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">

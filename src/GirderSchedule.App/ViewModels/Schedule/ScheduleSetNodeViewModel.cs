@@ -5,7 +5,7 @@ namespace GirderSchedule.App.ViewModels.Schedule
 {
     public sealed class ScheduleSetNodeViewModel : ViewModelBase
     {
-        private readonly ScheduleMemberNameDisplayService _displayService = new ScheduleMemberNameDisplayService();
+        private readonly ScheduleDisplayService _displayService = new ScheduleDisplayService();
         private readonly ScheduleSet _model;
         private FloorNodeViewModel _parent;
         private bool _isChecked = true;
@@ -58,7 +58,7 @@ namespace GirderSchedule.App.ViewModels.Schedule
                     return MemberName;
                 }
 
-                return _displayService.Format(Parent.FloorPrefix, MemberName);
+                return _displayService.GetMemberName(Parent.FloorPrefix, MemberName);
             }
         }
 

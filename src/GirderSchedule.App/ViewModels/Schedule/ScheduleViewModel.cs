@@ -1,4 +1,5 @@
 ﻿using GirderSchedule.App.Commands;
+using GirderSchedule.App.Services.Schedule;
 using GirderSchedule.Domain.Models;
 using System;
 using System.Windows.Input;
@@ -7,6 +8,8 @@ namespace GirderSchedule.App.ViewModels.Schedule
 {
     public sealed class ScheduleViewModel : ViewModelBase
     {
+        private readonly ScheduleDisplayService _displayService = new ScheduleDisplayService();
+
         private ScheduleFloor _floor;
         private ScheduleSet _set;
         private bool _isApplyingSectionPositions;
@@ -37,6 +40,11 @@ namespace GirderSchedule.App.ViewModels.Schedule
 
                 return _floor.Setting.Prefix;
             }
+        }
+
+        public string DisplayFloorPrefix
+        {
+            get { return _displayService.GetFloorPrefix(FloorPrefix); }
         }
 
         public string FloorName

@@ -3,17 +3,17 @@
     public sealed class DxfStyleSetting
     {
         public DxfStyleRole Role { get; set; }
-        public string DisplayName { get; set; } = string.Empty;
+        public string RoleName { get; set; } = string.Empty;
         public string StyleName { get; set; } = string.Empty;
 
         public DxfStyleSetting()
         {
         }
 
-        public DxfStyleSetting(DxfStyleRole role, string displayName, string styleName)
+        public DxfStyleSetting(DxfStyleRole role, string roleName, string styleName)
         {
             Role = role;
-            DisplayName = displayName;
+            RoleName = roleName;
             StyleName = styleName;
         }
     }

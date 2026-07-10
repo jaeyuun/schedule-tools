@@ -13,7 +13,7 @@ namespace GirderSchedule.App.ViewModels.Main
         private readonly ScheduleSetFactory _setFactory = new ScheduleSetFactory();
         private readonly ScheduleExportService _exportService = new ScheduleExportService();
         private readonly ScheduleTreeMoveService _scheduleTreeMoveService = new ScheduleTreeMoveService();
-        private readonly ProjectDisplayNameService _projectDisplayNameService = new ProjectDisplayNameService();
+        private readonly ProjectDisplayService _projectDisplayNameService = new ProjectDisplayService();
 
         private ProjectService _projectService;
         private FloorSettingEditService _floorSettingEditService;

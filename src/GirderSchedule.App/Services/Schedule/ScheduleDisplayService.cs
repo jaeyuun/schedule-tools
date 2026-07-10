@@ -1,8 +1,8 @@
 ﻿namespace GirderSchedule.App.Services.Schedule
 {
-    public sealed class ScheduleMemberNameDisplayService
+    public sealed class ScheduleDisplayService
     {
-        public string Format(string floorPrefix, string memberName)
+        public string GetMemberName(string floorPrefix, string memberName)
         {
             if (string.IsNullOrWhiteSpace(memberName))
             {
@@ -31,6 +31,16 @@
             }
 
             return result;
+        }
+
+        public string GetFloorPrefix(string floorPrefix)
+        {
+            if (string.IsNullOrWhiteSpace(floorPrefix))
+            {
+                return string.Empty;
+            }
+
+            return $"[{floorPrefix}]";
         }
     }
 }

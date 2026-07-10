@@ -23,8 +23,8 @@
                 </ScrollViewer>
 
                 <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
-                    <Button Content="저장" Margin="{StaticResource HorMarginSamll}" Style="{StaticResource PrimaryButtonStyle}" IsDefault="True" Click="YesButton_Click"/>
-                    <Button Content="저장 안 함" Margin="{StaticResource HorMarginSamll}" Style="{StaticResource ModernOutlineButtonStyle}" Click="NoButton_Click"/>
+                    <Button Content="저장" Margin="{StaticResource HorMarginSmall}" Style="{StaticResource PrimaryButtonStyle}" IsDefault="True" Click="YesButton_Click"/>
+                    <Button Content="저장 안 함" Margin="{StaticResource HorMarginSmall}" Style="{StaticResource ModernOutlineButtonStyle}" Click="NoButton_Click"/>
                     <Button Content="취소" Style="{StaticResource ModernOutlineButtonStyle}" IsCancel="True" Click="CancelButton_Click"/>
                 </StackPanel>
             </Grid>

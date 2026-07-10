@@ -3,33 +3,23 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="clr-namespace:GirderSchedule.App.ViewModels.Schedule">
 
-    <Grid Margin="{StaticResource WindowMargin}">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="{StaticResource GridRowGapMedium}"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="{StaticResource GridRowGapLarge}"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
+    <Grid Margin="{StaticResource SectionGridMargin}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="{StaticResource GridRowGapLarge}"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="{StaticResource GridRowGapMedium}"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="{StaticResource GridRowGapMedium}"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
 
-            <StackPanel Grid.Row="0">
-                <TextBlock Margin="{StaticResource VerMarginMedium}" Text="도면명" Style="{StaticResource SectionTitleTextStyle}"/>
-                <TextBox Style="{StaticResource ModernTextBoxStyle}" Text="{Binding ScheduleTitle, UpdateSourceTrigger=PropertyChanged}"/>
-            </StackPanel>
+        <StackPanel Grid.Row="0">
+            <TextBlock Margin="{StaticResource VerMarginMedium}" Text="도면명" Style="{StaticResource SectionTitleTextStyle}"/>
+            <TextBox Style="{StaticResource ModernTextBoxStyle}" Text="{Binding ScheduleTitle, UpdateSourceTrigger=PropertyChanged}"/>
+        </StackPanel>
 
-            <Grid Grid.Row="2">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="{StaticResource GridRowGapMedium}"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="{StaticResource GridRowGapMedium}"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-
-                <TextBlock Text="층 / 부재" Style="{StaticResource SectionTitleTextStyle}"/>
-                <Button Grid.Column="2" Padding="0" Content="➕" Style="{StaticResource PrimaryMiniButtonStyle}" Command="{Binding AddSetCommand}"/>
-                <Button Grid.Column="4" Padding="0" Content="➖" Style="{StaticResource ModernOutlineMiniButtonStyle}" Command="{Binding RemoveSetCommand}"/>
-            </Grid>
+        <TextBlock Grid.Row="2" Text="층 / 부재" VerticalAlignment="Bottom" Style="{StaticResource SectionTitleTextStyle}"/>
 
         <Border Grid.Row="4" Style="{StaticResource ItemListBorderStyle}">
                 <TreeView x:Name="ProjectTreeView" Focusable="True" ItemsSource="{Binding Floors}" Background="Transparent" BorderThickness="0" AllowDrop="True" Padding="8" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
@@ -200,5 +190,10 @@
                     </TreeView.ItemContainerStyle>
                 </TreeView>
             </Border>
-        </Grid>
+
+        <StackPanel Grid.Row="6" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Grid.Column="2" Padding="0" Content="➕" Margin="{StaticResource HorMarginSmall}" Style="{StaticResource PrimaryMiniButtonStyle}" Command="{Binding AddSetCommand}"/>
+            <Button Grid.Column="4" Padding="0" Content="➖" Style="{StaticResource ModernOutlineMiniButtonStyle}" Command="{Binding RemoveSetCommand}"/>
+        </StackPanel>
+    </Grid>
 </UserControl>

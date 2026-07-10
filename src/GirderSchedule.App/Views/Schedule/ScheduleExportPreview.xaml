@@ -7,7 +7,7 @@
         <Grid Background="{StaticResource SubBackgroundBrush}">
             <ScrollViewer x:Name="PreviewScrollViewer" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
                 <Grid x:Name="PreviewHost" Background="{StaticResource SubBackgroundBrush}">
-                    <Canvas x:Name="PreviewCanvas" Width="1100" Height="800" Background="White">
+                    <Canvas x:Name="PreviewCanvas" Width="1100" Height="800" Background="{StaticResource SurfaceBrush}">
                         <Canvas.LayoutTransform>
                             <ScaleTransform x:Name="PreviewScaleTransform" ScaleX="1" ScaleY="1"/>
                         </Canvas.LayoutTransform>

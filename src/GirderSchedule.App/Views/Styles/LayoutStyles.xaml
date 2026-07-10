@@ -9,7 +9,7 @@
         <Setter Property="SnapsToDevicePixels" Value="True"/>
         <Setter Property="Effect">
             <Setter.Value>
-                <DropShadowEffect BlurRadius="22" ShadowDepth="8" Opacity="0.16"/>
+                <DropShadowEffect BlurRadius="16" ShadowDepth="8" Opacity="0.16"/>
             </Setter.Value>
         </Setter>
     </Style>
@@ -38,6 +38,17 @@
         <Setter Property="SnapsToDevicePixels" Value="True"/>
     </Style>
 
+    <Style x:Key="ScheduleBorderStyle" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource SurfaceBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource LineBrush}"/>
+        <Setter Property="SnapsToDevicePixels" Value="True"/>
+    </Style>
+
+    <Style x:Key="ScheduleHeaderBorderStyle" TargetType="Border" BasedOn="{StaticResource ScheduleBorderStyle}">
+        <Setter Property="Background" Value="{StaticResource SubBackgroundBrush}"/>
+        <Setter Property="Padding" Value="{StaticResource SectionGridMargin}"/>
+    </Style>
+    
     <Style x:Key="ModernTabControlStyle" TargetType="TabControl">
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="BorderThickness" Value="0"/>
@@ -70,5 +81,6 @@
             </Setter.Value>
         </Setter>
     </Style>
+    
     
 </ResourceDictionary>

@@ -45,13 +45,9 @@
         <Setter Property="TextAlignment" Value="Center"/>
     </Style>
 
-    <Style x:Key="ScheduleLabelTextBlockStyle" TargetType="TextBlock">
+    <Style x:Key="ScheduleLabelStyle" TargetType="TextBlock" BasedOn="{StaticResource SectionTitleTextStyle}">
         <Setter Property="HorizontalAlignment" Value="Center"/>
-        <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="TextAlignment" Value="Center"/>
-        <Setter Property="Foreground" Value="{StaticResource Ink700Brush}"/>
-        <Setter Property="FontSize" Value="14"/>
-        <Setter Property="FontWeight" Value="SemiBold"/>
     </Style>
 
 </ResourceDictionary>

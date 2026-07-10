@@ -11,7 +11,7 @@
     <GridLength x:Key="GridRowGapLarge">16</GridLength>
     <GridLength x:Key="GridRowGapXLarge">24</GridLength>
 
-    <Thickness x:Key="HorMarginSamll">0,0,4,0</Thickness>
+    <Thickness x:Key="HorMarginSmall">0,0,4,0</Thickness>
     <Thickness x:Key="HorMarginMedium">0,0,10,0</Thickness>
     <Thickness x:Key="HorMarginLarge">0,0,16,0</Thickness>
     <Thickness x:Key="HorMarginXLarge">0,0,24,0</Thickness>
@@ -21,7 +21,7 @@
     <Thickness x:Key="VerMarginXLarge">0,0,0,24</Thickness>
 
     <Thickness x:Key="WindowMargin">32</Thickness>
-    <Thickness x:Key="SectionGridMargin">16</Thickness>
+    <Thickness x:Key="SectionGridMargin">20</Thickness>
     <Thickness x:Key="WindowEffectMargin">16</Thickness>
 
     <CornerRadius x:Key="DefaultCornerRadius">16</CornerRadius>

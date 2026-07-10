@@ -3,17 +3,17 @@
     public sealed class DxfLayerSetting
     {
         public DxfLayerRole Role { get; set; }
-        public string DisplayName { get; set; } = string.Empty;
+        public string RoleName { get; set; } = string.Empty;
         public string LayerName { get; set; } = string.Empty;
 
         public DxfLayerSetting()
         {
         }
 
-        public DxfLayerSetting(DxfLayerRole role, string displayName, string layerName)
+        public DxfLayerSetting(DxfLayerRole role, string roleName, string layerName)
         {
             Role = role;
-            DisplayName = displayName;
+            RoleName = roleName;
             LayerName = layerName;
         }
     }

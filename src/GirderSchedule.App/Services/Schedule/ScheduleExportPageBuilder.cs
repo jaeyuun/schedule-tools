@@ -13,7 +13,7 @@ namespace GirderSchedule.App.Services.Schedule
         private const int SetsPerPage = 9;
         private const int SetsPerRow = 3;
 
-        private readonly ScheduleMemberNameDisplayService _displayService = new ScheduleMemberNameDisplayService();
+        private readonly ScheduleDisplayService _displayService = new ScheduleDisplayService();
         private readonly ScheduleSetCopyService _copyService = new ScheduleSetCopyService();
 
         public List<ScheduleExportPage> Build(string scheduleTitle, ObservableCollection<FloorNodeViewModel> floors, DxfExportSetting setting)
@@ -92,7 +92,7 @@ namespace GirderSchedule.App.Services.Schedule
                 }
 
                 var exportSet = _copyService.Clone(setNode.Model);
-                exportSet.MemberName = _displayService.Format(floor.FloorPrefix, setNode.Model.MemberName);
+                exportSet.MemberName = _displayService.GetMemberName(floor.FloorPrefix, setNode.Model.MemberName);
 
                 sets.Add(exportSet);
             }

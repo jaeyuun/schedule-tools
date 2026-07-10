@@ -227,7 +227,7 @@ namespace GirderSchedule.App.ViewModels.Settings
             {
                 foreach (var style in profile.StyleSettings)
                 {
-                    Styles.Add(new DxfStyleItemViewModel(style.Role, style.DisplayName, style.StyleName));
+                    Styles.Add(new DxfStyleItemViewModel(style.Role, style.RoleName, style.StyleName));
                 }
             }
 
@@ -237,7 +237,7 @@ namespace GirderSchedule.App.ViewModels.Settings
             {
                 foreach (var layer in profile.LayerSettings)
                 {
-                    Layers.Add(new DxfLayerItemViewModel(layer.Role, layer.DisplayName, layer.LayerName));
+                    Layers.Add(new DxfLayerItemViewModel(layer.Role, layer.RoleName, layer.LayerName));
                 }
             }
 
@@ -424,7 +424,7 @@ namespace GirderSchedule.App.ViewModels.Settings
                     return true;
                 }
 
-                if (!string.Equals(original[i].DisplayName, current[i].DisplayName, StringComparison.Ordinal))
+                if (!string.Equals(original[i].RoleName, current[i].RoleName, StringComparison.Ordinal))
                 {
                     return true;
                 }
@@ -457,7 +457,7 @@ namespace GirderSchedule.App.ViewModels.Settings
                     return true;
                 }
 
-                if (!string.Equals(original[i].DisplayName, current[i].DisplayName, StringComparison.Ordinal))
+                if (!string.Equals(original[i].RoleName, current[i].RoleName, StringComparison.Ordinal))
                 {
                     return true;
                 }
@@ -540,7 +540,7 @@ namespace GirderSchedule.App.ViewModels.Settings
             {
                 foreach (var style in profile.StyleSettings)
                 {
-                    snapshot.StyleSettings.Add(new DxfStyleSetting(style.Role, style.DisplayName, style.StyleName));
+                    snapshot.StyleSettings.Add(new DxfStyleSetting(style.Role, style.RoleName, style.StyleName));
                 }
             }
 
@@ -550,7 +550,7 @@ namespace GirderSchedule.App.ViewModels.Settings
             {
                 foreach (var layer in profile.LayerSettings)
                 {
-                    snapshot.LayerSettings.Add(new DxfLayerSetting(layer.Role, layer.DisplayName, layer.LayerName));
+                    snapshot.LayerSettings.Add(new DxfLayerSetting(layer.Role, layer.RoleName, layer.LayerName));
                 }
             }
 

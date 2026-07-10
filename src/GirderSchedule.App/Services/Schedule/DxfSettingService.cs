@@ -331,7 +331,7 @@ namespace GirderSchedule.App.Services.Schedule
             {
                 if (!ContainsDxfStyle(document, style))
                 {
-                    result.InvalidStyles.Add(style.DisplayName);
+                    result.InvalidStyles.Add(style.RoleName);
                 }
             }
         }
@@ -342,7 +342,7 @@ namespace GirderSchedule.App.Services.Schedule
             {
                 if (string.IsNullOrWhiteSpace(layer.LayerName) || !document.Layers.Contains(layer.LayerName))
                 {
-                    result.InvalidLayers.Add(layer.DisplayName);
+                    result.InvalidLayers.Add(layer.RoleName);
                 }
             }
         }
@@ -436,9 +436,9 @@ namespace GirderSchedule.App.Services.Schedule
                 return;
             }
 
-            if (string.IsNullOrWhiteSpace(style.DisplayName))
+            if (string.IsNullOrWhiteSpace(style.RoleName))
             {
-                style.DisplayName = defaultStyle.DisplayName;
+                style.RoleName = defaultStyle.RoleName;
             }
 
             if (string.IsNullOrWhiteSpace(style.StyleName))
@@ -478,9 +478,9 @@ namespace GirderSchedule.App.Services.Schedule
                 return;
             }
 
-            if (string.IsNullOrWhiteSpace(layer.DisplayName))
+            if (string.IsNullOrWhiteSpace(layer.RoleName))
             {
-                layer.DisplayName = defaultLayer.DisplayName;
+                layer.RoleName = defaultLayer.RoleName;
             }
 
             if (string.IsNullOrWhiteSpace(layer.LayerName))

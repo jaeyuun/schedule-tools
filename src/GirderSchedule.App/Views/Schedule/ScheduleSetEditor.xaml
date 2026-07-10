@@ -6,33 +6,6 @@
     <UserControl.Resources>
         <ResourceDictionary>
             
-            <Style TargetType="TextBlock">
-                <Setter Property="FontWeight" Value="Normal"/>
-                <Setter Property="VerticalAlignment" Value="Center"/>
-            </Style>
-
-            <Style x:Key="ScheduleSmallTextBoxStyle" TargetType="TextBox" BasedOn="{StaticResource ModernTextBoxStyle}">
-                <Setter Property="Height" Value="24"/>
-                <Setter Property="Width" Value="44"/>
-                <Setter Property="MinHeight" Value="18"/>
-                <Setter Property="Margin" Value="1,0"/>
-                <Setter Property="FontSize" Value="11"/>
-                <Setter Property="FontWeight" Value="Normal"/>
-                <Setter Property="HorizontalContentAlignment" Value="Left"/>
-                <Setter Property="VerticalContentAlignment" Value="Center"/>
-            </Style>
-
-            <Style x:Key="ScheduleMediumTextBoxStyle" TargetType="TextBox" BasedOn="{StaticResource ModernTextBoxStyle}">
-                <Setter Property="Height" Value="24"/>
-                <Setter Property="Width" Value="46"/>
-                <Setter Property="MinHeight" Value="18"/>
-                <Setter Property="Margin" Value="1,0"/>
-                <Setter Property="FontSize" Value="11"/>
-                <Setter Property="FontWeight" Value="Normal"/>
-                <Setter Property="HorizontalContentAlignment" Value="Left"/>
-                <Setter Property="VerticalContentAlignment" Value="Center"/>
-            </Style>
-
             <Style x:Key="ScheduleWideTextBoxStyle" TargetType="TextBox" BasedOn="{StaticResource ModernTextBoxStyle}">
                 <Setter Property="Height" Value="24"/>
                 <Setter Property="MinHeight" Value="20"/>
@@ -145,210 +118,207 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <Border Background="White" CornerRadius="{StaticResource SectionCornerRadius}" ClipToBounds="True">
-        <Grid Background="White">
-            <Viewbox Stretch="Fill">
-                <Grid Width="830" Height="576" Background="White">
+    <Grid Background="{StaticResource SurfaceBrush}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="320"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0" Grid.Column="0" BorderThickness="1" Style="{StaticResource ScheduleHeaderBorderStyle}">
+            <StackPanel VerticalAlignment="Center">
+                <TextBlock Text="부 재 명" Style="{StaticResource ScheduleLabelStyle}"/>
+                <TextBlock Text="( B × H )" Style="{StaticResource ScheduleLabelStyle}"/>
+            </StackPanel>
+        </Border>
+
+        <Border Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="3" BorderThickness="0,1,1,1" BorderBrush="{StaticResource LineBrush}">
+            <Grid VerticalAlignment="Center">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="{StaticResource GridRowGapSmall}"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="{StaticResource GridRowGapSmall}"/>
+                </Grid.RowDefinitions>
+
+                <Grid Grid.Row="1" HorizontalAlignment="Center" Margin="{StaticResource VerMarginSmall}">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="110"/>
-                        <ColumnDefinition Width="240"/>
-                        <ColumnDefinition Width="240"/>
-                        <ColumnDefinition Width="240"/>
+                        <ColumnDefinition Width="60"/>
+                        <ColumnDefinition Width="200"/>
+                        <ColumnDefinition Width="60"/>
                     </Grid.ColumnDefinitions>
 
+                    <TextBlock Grid.Column="0" Margin="{StaticResource HorMarginSmall}" HorizontalAlignment="Right" Text="{Binding DisplayFloorPrefix}" Style="{StaticResource CaptionTextStyle}"/>
+                    <TextBox Grid.Column="1" Style="{StaticResource ScheduleTextBoxStyle}" Text="{Binding MemberName, UpdateSourceTrigger=LostFocus}"/>
+                </Grid>
+
+                <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
+                    <TextBlock Text="(" Margin="{StaticResource HorMarginSmall}" Style="{StaticResource DefaultTextStyle}"/>
+                    <TextBox Margin="{StaticResource HorMarginSmall}" Style="{StaticResource ScheduleMediumTextBoxStyle}" behaviors:NumericTextBoxBehavior.PropertyName="WidthValue" behaviors:NumericTextBoxBehavior.AllowNegative="False" behaviors:NumericTextBoxBehavior.UpdateSourceOnTextChanged="True"/>
+                    <TextBlock Text="×" Margin="{StaticResource HorMarginSmall}" Style="{StaticResource DefaultTextStyle}"/>
+                    <CheckBox Content="이상" Margin="{StaticResource HorMarginSmall}" Style="{StaticResource ModernCheckBoxStyle}" IsChecked="{Binding IsHeightOver, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBox Margin="{StaticResource HorMarginSmall}"  Style="{StaticResource ScheduleMediumTextBoxStyle}" behaviors:NumericTextBoxBehavior.PropertyName="HeightValue" behaviors:NumericTextBoxBehavior.AllowNegative="False" behaviors:NumericTextBoxBehavior.UpdateSourceOnTextChanged="True"/>
+                    <TextBlock Text=")" Style="{StaticResource DefaultTextStyle}"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="1" Grid.Column="0" BorderThickness="1,0,1,1" Style="{StaticResource ScheduleHeaderBorderStyle}">
+            <TextBlock Text="단    면" Style="{StaticResource ScheduleLabelStyle}"/>
+        </Border>
+        <Border Grid.Row="2" Grid.Column="0" BorderThickness="1,0,1,1" Style="{StaticResource ScheduleHeaderBorderStyle}">
+            <TextBlock Text="상 부 근" Style="{StaticResource ScheduleLabelStyle}"/>
+        </Border>
+        <Border Grid.Row="3" Grid.Column="0" BorderThickness="1,0,1,1" Style="{StaticResource ScheduleHeaderBorderStyle}">
+            <TextBlock Text="하 부 근" Style="{StaticResource ScheduleLabelStyle}"/>
+        </Border>
+        <Border Grid.Row="4" Grid.Column="0" BorderThickness="1,0,1,1" Style="{StaticResource ScheduleHeaderBorderStyle}">
+            <TextBlock Text="스 터 럽" Style="{StaticResource ScheduleLabelStyle}"/>
+        </Border>
+        <Border Grid.Row="5" Grid.Column="0" BorderThickness="1,0,1,1" Style="{StaticResource ScheduleHeaderBorderStyle}">
+            <TextBlock Text="표피철근(X)" Style="{StaticResource ScheduleLabelStyle}"/>
+        </Border>
+
+        <Grid Grid.Row="1" Grid.RowSpan="5" Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Border Grid.Row="0" BorderBrush="{StaticResource ScheduleTableLineBrush}" BorderThickness="0,0,1,1">
+                <Grid>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="60"/>
-                        <RowDefinition Height="320"/>
-                        <RowDefinition Height="56"/>
-                        <RowDefinition Height="56"/>
-                        <RowDefinition Height="28"/>
-                        <RowDefinition Height="56"/>
+                        <RowDefinition Height="{StaticResource GridRowGapSmall}"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="{StaticResource GridRowGapSmall}"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="{StaticResource GridRowGapSmall}"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="{StaticResource GridRowGapSmall}"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
-                    <Border Grid.Row="0" Grid.Column="0" BorderBrush="{StaticResource ScheduleTableLineBrush}" BorderThickness="1" Background="{StaticResource ScheduleTableHeaderBrush}">
-                        <StackPanel VerticalAlignment="Center">
-                            <TextBlock Text="부 재 명" HorizontalAlignment="Center" FontSize="14" FontWeight="SemiBold" Foreground="{StaticResource Ink700Brush}"/>
-                            <TextBlock Text="( B × H )" HorizontalAlignment="Center" Margin="0,6,0,0" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource Ink500Brush}"/>
-                        </StackPanel>
-                    </Border>
+                    <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
+                        <CheckBox Style="{StaticResource ModernCheckBoxStyle}" IsChecked="{Binding Left.IsSectionEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox Style="{StaticResource ScheduleTextBoxStyle}" IsEnabled="{Binding Left.IsSectionEnabled}" Text="{Binding Left.Position, UpdateSourceTrigger=LostFocus}"/>
+                    </StackPanel>
 
-                    <Border Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="3" BorderBrush="{StaticResource ScheduleTableLineBrush}" BorderThickness="0,1,1,1" Background="White">
-                        <Grid VerticalAlignment="Center">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="24"/>
-                                <RowDefinition Height="30"/>
-                            </Grid.RowDefinitions>
-
-                            <Grid Grid.Row="0" HorizontalAlignment="Center" Width="330">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="58"/>
-                                    <ColumnDefinition Width="214"/>
-                                    <ColumnDefinition Width="58"/>
-                                </Grid.ColumnDefinitions>
-
-                                <TextBlock Grid.Column="0" Margin="0,0,4,0" HorizontalAlignment="Right" VerticalAlignment="Center" TextAlignment="Right" Text="{Binding FloorPrefix}" Foreground="{StaticResource Ink500Brush}"/>
-                                <TextBox Grid.Column="1" Width="210" Margin="0" Style="{StaticResource ScheduleWideTextBoxStyle}" Text="{Binding MemberName, UpdateSourceTrigger=LostFocus}"/>
-                            </Grid>
-
-                            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,5,0,0">
-                                <TextBlock VerticalAlignment="Center" Margin="4,0" Text="(" FontSize="16" Foreground="{StaticResource Ink700Brush}"/>
-                                <TextBox Width="54" Margin="2,0" Style="{StaticResource ScheduleSmallTextBoxStyle}" behaviors:NumericTextBoxBehavior.PropertyName="WidthValue" behaviors:NumericTextBoxBehavior.AllowNegative="False" behaviors:NumericTextBoxBehavior.UpdateSourceOnTextChanged="True"/>
-                                <TextBlock VerticalAlignment="Center" Margin="4,0" Text="×" FontSize="15" Foreground="{StaticResource Ink700Brush}"/>
-                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                    <CheckBox VerticalAlignment="Center" Style="{StaticResource ModernCheckBoxStyle}" IsChecked="{Binding IsHeightOver, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                                    <TextBlock Text="이상" VerticalAlignment="Center" Foreground="{StaticResource Ink700Brush}"/>
-                                </StackPanel>
-                                <TextBox Width="54" Margin="4,0" Style="{StaticResource ScheduleSmallTextBoxStyle}" behaviors:NumericTextBoxBehavior.PropertyName="HeightValue" behaviors:NumericTextBoxBehavior.AllowNegative="False" behaviors:NumericTextBoxBehavior.UpdateSourceOnTextChanged="True"/>
-                                <TextBlock VerticalAlignment="Center" Margin="4,0" Text=")" FontSize="16" Foreground="{StaticResource Ink700Brush}"/>
-                            </StackPanel>
-                        </Grid>
-                    </Border>
-
-                    <Border Grid.Row="1" Grid.Column="0" BorderBrush="{StaticResource ScheduleTableLineBrush}" BorderThickness="1,0,1,1" Background="{StaticResource ScheduleTableHeaderBrush}">
-                        <TextBlock Text="단    면" Style="{StaticResource ScheduleLabelTextBlockStyle}"/>
-                    </Border>
-                    <Border Grid.Row="2" Grid.Column="0" BorderBrush="{StaticResource ScheduleTableLineBrush}" BorderThickness="1,0,1,1" Background="{StaticResource ScheduleTableHeaderBrush}">
-                        <TextBlock Text="상 부 근" Style="{StaticResource ScheduleLabelTextBlockStyle}"/>
-                    </Border>
-                    <Border Grid.Row="3" Grid.Column="0" BorderBrush="{StaticResource ScheduleTableLineBrush}" BorderThickness="1,0,1,1" Background="{StaticResource ScheduleTableHeaderBrush}">
-                        <TextBlock Text="하 부 근" Style="{StaticResource ScheduleLabelTextBlockStyle}"/>
-                    </Border>
-                    <Border Grid.Row="4" Grid.Column="0" BorderBrush="{StaticResource ScheduleTableLineBrush}" BorderThickness="1,0,1,1" Background="{StaticResource ScheduleTableHeaderBrush}">
-                        <TextBlock Text="스 터 럽" Style="{StaticResource ScheduleLabelTextBlockStyle}"/>
-                    </Border>
-                    <Border Grid.Row="5" Grid.Column="0" BorderBrush="{StaticResource ScheduleTableLineBrush}" BorderThickness="1,0,1,1" Background="{StaticResource ScheduleTableHeaderBrush}">
-                        <TextBlock Text="표피철근(X)" Style="{StaticResource ScheduleLabelTextBlockStyle}"/>
-                    </Border>
-
-                    <Grid Grid.Row="1" Grid.RowSpan="5" Grid.Column="1">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="320"/>
-                            <RowDefinition Height="56"/>
-                            <RowDefinition Height="56"/>
-                            <RowDefinition Height="28"/>
-                            <RowDefinition Height="56"/>
-                        </Grid.RowDefinitions>
-
-                        <Border Grid.Row="0" BorderBrush="{StaticResource ScheduleTableLineBrush}" BorderThickness="0,0,1,1">
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="30"/>
-                                    <RowDefinition Height="30"/>
-                                    <RowDefinition Height="*"/>
-                                    <RowDefinition Height="30"/>
-                                </Grid.RowDefinitions>
-
-                                <StackPanel Grid.Row="0" Margin="12,5,12,1" Orientation="Horizontal" HorizontalAlignment="Center">
-                                    <CheckBox VerticalAlignment="Center" Style="{StaticResource ModernCheckBoxStyle}" IsChecked="{Binding Left.IsSectionEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                                    <TextBox Width="170" Style="{StaticResource ScheduleWideTextBoxStyle}" IsEnabled="{Binding Left.IsSectionEnabled}" Text="{Binding Left.Position, UpdateSourceTrigger=LostFocus}"/>
-                                </StackPanel>
-
-                                <ContentControl Grid.Row="1" IsEnabled="{Binding Left.IsSectionEnabled}" Content="{Binding Left}" ContentTemplate="{StaticResource MemberForceInputTemplate}"/>
-                                <Canvas x:Name="LeftCanvas" Grid.Row="2" Width="200" Height="240" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                <TextBox Grid.Row="3" IsEnabled="{Binding Left.IsSectionEnabled}" Style="{StaticResource ScheduleSectionNoteTextBoxStyle}" Text="{Binding Left.SectionNote, UpdateSourceTrigger=LostFocus}"/>
-                            </Grid>
-                        </Border>
-
-                        <Border Grid.Row="1" BorderBrush="{StaticResource ScheduleTableLineBrush}" BorderThickness="0,0,1,1" IsEnabled="{Binding Left.IsSectionEnabled}">
-                            <ContentControl Content="{Binding Left}" ContentTemplate="{StaticResource RebarInputTemplate}"/>
-                        </Border>
-                        <Border Grid.Row="2" BorderBrush="{StaticResource ScheduleTableLineBrush}" BorderThickness="0,0,1,1" IsEnabled="{Binding Left.IsSectionEnabled}">
-                            <ContentControl Content="{Binding Left}" ContentTemplate="{StaticResource BottomRebarInputTemplate}"/>
-                        </Border>
-                        <Border Grid.Row="3" BorderBrush="{StaticResource ScheduleTableLineBrush}" BorderThickness="0,0,1,1" IsEnabled="{Binding Left.IsSectionEnabled}">
-                            <ContentControl Content="{Binding Left}" ContentTemplate="{StaticResource StirrupInputTemplate}"/>
-                        </Border>
-                        <Border Grid.Row="4" BorderBrush="{StaticResource ScheduleTableLineBrush}" BorderThickness="0,0,1,1" IsEnabled="{Binding Left.IsSectionEnabled}">
-                            <ContentControl Content="{Binding Left}" ContentTemplate="{StaticResource SkinRebarInputTemplate}"/>
-                        </Border>
-                    </Grid>
-
-                    <Grid Grid.Row="1" Grid.RowSpan="5" Grid.Column="2">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="320"/>
-                            <RowDefinition Height="56"/>
-                            <RowDefinition Height="56"/>
-                            <RowDefinition Height="28"/>
-                            <RowDefinition Height="56"/>
-                        </Grid.RowDefinitions>
-
-                        <Border Grid.Row="0" BorderBrush="{StaticResource ScheduleTableLineBrush}" BorderThickness="0,0,1,1">
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="30"/>
-                                    <RowDefinition Height="30"/>
-                                    <RowDefinition Height="*"/>
-                                    <RowDefinition Height="30"/>
-                                </Grid.RowDefinitions>
-
-                                <StackPanel Grid.Row="0" Margin="12,5,12,1" Orientation="Horizontal" HorizontalAlignment="Center">
-                                    <TextBox Width="170" Style="{StaticResource ScheduleWideTextBoxStyle}" Text="{Binding Center.Position, UpdateSourceTrigger=LostFocus}"/>
-                                </StackPanel>
-
-                                <ContentControl Grid.Row="1" Content="{Binding Center}" ContentTemplate="{StaticResource MemberForceInputTemplate}"/>
-                                <Canvas x:Name="CenterCanvas" Grid.Row="2" Width="200" Height="240" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                <TextBox Grid.Row="3" IsEnabled="{Binding Center.IsSectionEnabled}" Style="{StaticResource ScheduleSectionNoteTextBoxStyle}" Text="{Binding Center.SectionNote, UpdateSourceTrigger=LostFocus}"/>
-                            </Grid>
-                        </Border>
-
-                        <Border Grid.Row="1" BorderBrush="{StaticResource ScheduleTableLineBrush}" BorderThickness="0,0,1,1">
-                            <ContentControl Content="{Binding Center}" ContentTemplate="{StaticResource RebarInputTemplate}"/>
-                        </Border>
-                        <Border Grid.Row="2" BorderBrush="{StaticResource ScheduleTableLineBrush}" BorderThickness="0,0,1,1">
-                            <ContentControl Content="{Binding Center}" ContentTemplate="{StaticResource BottomRebarInputTemplate}"/>
-                        </Border>
-                        <Border Grid.Row="3" BorderBrush="{StaticResource ScheduleTableLineBrush}" BorderThickness="0,0,1,1">
-                            <ContentControl Content="{Binding Center}" ContentTemplate="{StaticResource StirrupInputTemplate}"/>
-                        </Border>
-                        <Border Grid.Row="4" BorderBrush="{StaticResource ScheduleTableLineBrush}" BorderThickness="0,0,1,1">
-                            <ContentControl Content="{Binding Center}" ContentTemplate="{StaticResource SkinRebarInputTemplate}"/>
-                        </Border>
-                    </Grid>
-
-                    <Grid Grid.Row="1" Grid.RowSpan="5" Grid.Column="3">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="320"/>
-                            <RowDefinition Height="56"/>
-                            <RowDefinition Height="56"/>
-                            <RowDefinition Height="28"/>
-                            <RowDefinition Height="56"/>
-                        </Grid.RowDefinitions>
-
-                        <Border Grid.Row="0" BorderBrush="{StaticResource ScheduleTableLineBrush}" BorderThickness="0,0,1,1">
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="30"/>
-                                    <RowDefinition Height="30"/>
-                                    <RowDefinition Height="*"/>
-                                    <RowDefinition Height="30"/>
-                                </Grid.RowDefinitions>
-
-                                <StackPanel Grid.Row="0" Margin="12,5,12,1" Orientation="Horizontal" HorizontalAlignment="Center">
-                                    <CheckBox VerticalAlignment="Center" Style="{StaticResource ModernCheckBoxStyle}" IsChecked="{Binding Right.IsSectionEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                                    <TextBox Width="170" Style="{StaticResource ScheduleWideTextBoxStyle}" IsEnabled="{Binding Right.IsSectionEnabled}" Text="{Binding Right.Position, UpdateSourceTrigger=LostFocus}"/>
-                                </StackPanel>
-
-                                <ContentControl Grid.Row="1" IsEnabled="{Binding Right.IsSectionEnabled}" Content="{Binding Right}" ContentTemplate="{StaticResource MemberForceInputTemplate}"/>
-                                <Canvas x:Name="RightCanvas" Grid.Row="2" Width="200" Height="240" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                <TextBox Grid.Row="3" IsEnabled="{Binding Right.IsSectionEnabled}" Style="{StaticResource ScheduleSectionNoteTextBoxStyle}" Text="{Binding Right.SectionNote, UpdateSourceTrigger=LostFocus}"/>
-                            </Grid>
-                        </Border>
-
-                        <Border Grid.Row="1" BorderBrush="{StaticResource ScheduleTableLineBrush}" BorderThickness="0,0,1,1" IsEnabled="{Binding Right.IsSectionEnabled}">
-                            <ContentControl Content="{Binding Right}" ContentTemplate="{StaticResource RebarInputTemplate}"/>
-                        </Border>
-                        <Border Grid.Row="2" BorderBrush="{StaticResource ScheduleTableLineBrush}" BorderThickness="0,0,1,1" IsEnabled="{Binding Right.IsSectionEnabled}">
-                            <ContentControl Content="{Binding Right}" ContentTemplate="{StaticResource BottomRebarInputTemplate}"/>
-                        </Border>
-                        <Border Grid.Row="3" BorderBrush="{StaticResource ScheduleTableLineBrush}" BorderThickness="0,0,1,1" IsEnabled="{Binding Right.IsSectionEnabled}">
-                            <ContentControl Content="{Binding Right}" ContentTemplate="{StaticResource StirrupInputTemplate}"/>
-                        </Border>
-                        <Border Grid.Row="4" BorderBrush="{StaticResource ScheduleTableLineBrush}" BorderThickness="0,0,1,1" IsEnabled="{Binding Right.IsSectionEnabled}">
-                            <ContentControl Content="{Binding Right}" ContentTemplate="{StaticResource SkinRebarInputTemplate}"/>
-                        </Border>
-                    </Grid>
+                    <ContentControl Grid.Row="3" IsEnabled="{Binding Left.IsSectionEnabled}" Content="{Binding Left}" ContentTemplate="{StaticResource MemberForceInputTemplate}"/>
+                    <Canvas x:Name="LeftCanvas" Grid.Row="5" Width="200" Height="240" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <TextBox Grid.Row="7" IsEnabled="{Binding Left.IsSectionEnabled}" Style="{StaticResource ScheduleSectionNoteTextBoxStyle}" Text="{Binding Left.SectionNote, UpdateSourceTrigger=LostFocus}"/>
                 </Grid>
-            </Viewbox>
+            </Border>
+
+            <Border Grid.Row="1" BorderBrush="{StaticResource ScheduleTableLineBrush}" BorderThickness="0,0,1,1" IsEnabled="{Binding Left.IsSectionEnabled}">
+                <ContentControl Content="{Binding Left}" ContentTemplate="{StaticResource RebarInputTemplate}"/>
+            </Border>
+            <Border Grid.Row="2" BorderBrush="{StaticResource ScheduleTableLineBrush}" BorderThickness="0,0,1,1" IsEnabled="{Binding Left.IsSectionEnabled}">
+                <ContentControl Content="{Binding Left}" ContentTemplate="{StaticResource BottomRebarInputTemplate}"/>
+            </Border>
+            <Border Grid.Row="3" BorderBrush="{StaticResource ScheduleTableLineBrush}" BorderThickness="0,0,1,1" IsEnabled="{Binding Left.IsSectionEnabled}">
+                <ContentControl Content="{Binding Left}" ContentTemplate="{StaticResource StirrupInputTemplate}"/>
+            </Border>
+            <Border Grid.Row="4" BorderBrush="{StaticResource ScheduleTableLineBrush}" BorderThickness="0,0,1,1" IsEnabled="{Binding Left.IsSectionEnabled}">
+                <ContentControl Content="{Binding Left}" ContentTemplate="{StaticResource SkinRebarInputTemplate}"/>
+            </Border>
         </Grid>
-    </Border>
+
+        <Grid Grid.Row="1" Grid.RowSpan="5" Grid.Column="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="320"/>
+                <RowDefinition Height="56"/>
+                <RowDefinition Height="56"/>
+                <RowDefinition Height="28"/>
+                <RowDefinition Height="56"/>
+            </Grid.RowDefinitions>
+
+            <Border Grid.Row="0" BorderBrush="{StaticResource ScheduleTableLineBrush}" BorderThickness="0,0,1,1">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="30"/>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Grid.Row="0" Margin="12,5,12,1" Orientation="Horizontal" HorizontalAlignment="Center">
+                        <TextBox Width="170" Style="{StaticResource ScheduleWideTextBoxStyle}" Text="{Binding Center.Position, UpdateSourceTrigger=LostFocus}"/>
+                    </StackPanel>
+
+                    <ContentControl Grid.Row="1" Content="{Binding Center}" ContentTemplate="{StaticResource MemberForceInputTemplate}"/>
+                    <Canvas x:Name="CenterCanvas" Grid.Row="2" Width="200" Height="240" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <TextBox Grid.Row="3" IsEnabled="{Binding Center.IsSectionEnabled}" Style="{StaticResource ScheduleSectionNoteTextBoxStyle}" Text="{Binding Center.SectionNote, UpdateSourceTrigger=LostFocus}"/>
+                </Grid>
+            </Border>
+
+            <Border Grid.Row="1" BorderBrush="{StaticResource ScheduleTableLineBrush}" BorderThickness="0,0,1,1">
+                <ContentControl Content="{Binding Center}" ContentTemplate="{StaticResource RebarInputTemplate}"/>
+            </Border>
+            <Border Grid.Row="2" BorderBrush="{StaticResource ScheduleTableLineBrush}" BorderThickness="0,0,1,1">
+                <ContentControl Content="{Binding Center}" ContentTemplate="{StaticResource BottomRebarInputTemplate}"/>
+            </Border>
+            <Border Grid.Row="3" BorderBrush="{StaticResource ScheduleTableLineBrush}" BorderThickness="0,0,1,1">
+                <ContentControl Content="{Binding Center}" ContentTemplate="{StaticResource StirrupInputTemplate}"/>
+            </Border>
+            <Border Grid.Row="4" BorderBrush="{StaticResource ScheduleTableLineBrush}" BorderThickness="0,0,1,1">
+                <ContentControl Content="{Binding Center}" ContentTemplate="{StaticResource SkinRebarInputTemplate}"/>
+            </Border>
+        </Grid>
+
+        <Grid Grid.Row="1" Grid.RowSpan="5" Grid.Column="3">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="320"/>
+                <RowDefinition Height="56"/>
+                <RowDefinition Height="56"/>
+                <RowDefinition Height="28"/>
+                <RowDefinition Height="56"/>
+            </Grid.RowDefinitions>
+
+            <Border Grid.Row="0" BorderBrush="{StaticResource ScheduleTableLineBrush}" BorderThickness="0,0,1,1">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="30"/>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Grid.Row="0" Margin="12,5,12,1" Orientation="Horizontal" HorizontalAlignment="Center">
+                        <CheckBox VerticalAlignment="Center" Style="{StaticResource ModernCheckBoxStyle}" IsChecked="{Binding Right.IsSectionEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox Width="170" Style="{StaticResource ScheduleWideTextBoxStyle}" IsEnabled="{Binding Right.IsSectionEnabled}" Text="{Binding Right.Position, UpdateSourceTrigger=LostFocus}"/>
+                    </StackPanel>
+
+                    <ContentControl Grid.Row="1" IsEnabled="{Binding Right.IsSectionEnabled}" Content="{Binding Right}" ContentTemplate="{StaticResource MemberForceInputTemplate}"/>
+                    <Canvas x:Name="RightCanvas" Grid.Row="2" Width="200" Height="240" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <TextBox Grid.Row="3" IsEnabled="{Binding Right.IsSectionEnabled}" Style="{StaticResource ScheduleSectionNoteTextBoxStyle}" Text="{Binding Right.SectionNote, UpdateSourceTrigger=LostFocus}"/>
+                </Grid>
+            </Border>
+
+            <Border Grid.Row="1" BorderBrush="{StaticResource ScheduleTableLineBrush}" BorderThickness="0,0,1,1" IsEnabled="{Binding Right.IsSectionEnabled}">
+                <ContentControl Content="{Binding Right}" ContentTemplate="{StaticResource RebarInputTemplate}"/>
+            </Border>
+            <Border Grid.Row="2" BorderBrush="{StaticResource ScheduleTableLineBrush}" BorderThickness="0,0,1,1" IsEnabled="{Binding Right.IsSectionEnabled}">
+                <ContentControl Content="{Binding Right}" ContentTemplate="{StaticResource BottomRebarInputTemplate}"/>
+            </Border>
+            <Border Grid.Row="3" BorderBrush="{StaticResource ScheduleTableLineBrush}" BorderThickness="0,0,1,1" IsEnabled="{Binding Right.IsSectionEnabled}">
+                <ContentControl Content="{Binding Right}" ContentTemplate="{StaticResource StirrupInputTemplate}"/>
+            </Border>
+            <Border Grid.Row="4" BorderBrush="{StaticResource ScheduleTableLineBrush}" BorderThickness="0,0,1,1" IsEnabled="{Binding Right.IsSectionEnabled}">
+                <ContentControl Content="{Binding Right}" ContentTemplate="{StaticResource SkinRebarInputTemplate}"/>
+            </Border>
+        </Grid>
+    </Grid>
 </UserControl>

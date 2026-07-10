@@ -2,7 +2,7 @@
 
 namespace GirderSchedule.App.Services.Project
 {
-    public sealed class ProjectDisplayNameService
+    public sealed class ProjectDisplayService
     {
         private const string DefaultScheduleTitle = "보 일람표";
         private const string DefaultProjectName = "새 프로젝트";
