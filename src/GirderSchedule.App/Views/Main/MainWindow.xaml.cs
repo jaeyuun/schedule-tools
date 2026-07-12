@@ -78,23 +78,38 @@ namespace GirderSchedule.App.Views.Main
             UpdatePreviewToolbar();
         }
 
-        private void UpdatePreviewToolbar()
-        {
-            if (PreviewToolbar == null || PreviewControl == null)
-            {
-                return;
-            }
+		private void UpdatePreviewToolbar()
+		{
+			if (EditorToolbar == null ||
+				PreviewToolbar == null ||
+				PreviewControl == null ||
+				MainTabControl == null)
+			{
+				return;
+			}
 
-            var isPreviewSelected = ReferenceEquals(MainTabControl.SelectedItem, PreviewTabItem);
+			var isPreviewSelected = ReferenceEquals(MainTabControl.SelectedItem, PreviewTabItem);
 
-            PreviewToolbar.Visibility = isPreviewSelected ? Visibility.Visible : Visibility.Collapsed;
-            EditorTabContent.Visibility = isPreviewSelected ? Visibility.Collapsed : Visibility.Visible;
-            PreviewTabContent.Visibility = isPreviewSelected ? Visibility.Visible : Visibility.Collapsed;
+			EditorToolbar.Visibility = isPreviewSelected
+				? Visibility.Collapsed
+				: Visibility.Visible;
 
-            PreviewPrevPageButton.IsEnabled = PreviewControl.CanGoPreviousPage;
-            PreviewNextPageButton.IsEnabled = PreviewControl.CanGoNextPage;
-            PreviewZoomTextBlock.Text = PreviewControl.ZoomText;
-            PreviewPageTextBlock.Text = PreviewControl.PageText;
-        }
-    }
+			PreviewToolbar.Visibility = isPreviewSelected
+				? Visibility.Visible
+				: Visibility.Collapsed;
+
+			EditorTabContent.Visibility = isPreviewSelected
+				? Visibility.Collapsed
+				: Visibility.Visible;
+
+			PreviewTabContent.Visibility = isPreviewSelected
+				? Visibility.Visible
+				: Visibility.Collapsed;
+
+			PreviewPrevPageButton.IsEnabled = PreviewControl.CanGoPreviousPage;
+			PreviewNextPageButton.IsEnabled = PreviewControl.CanGoNextPage;
+			PreviewZoomTextBlock.Text = PreviewControl.ZoomText;
+			PreviewPageTextBlock.Text = PreviewControl.PageText;
+		}
+	}
 }

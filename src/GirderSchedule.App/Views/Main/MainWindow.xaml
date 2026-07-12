@@ -3,21 +3,15 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:views="clr-namespace:GirderSchedule.App.Views.Schedule"
         Title="{Binding WindowTitle}"
-        Width="1480"
-        Height="900"
-        MinWidth="1280"
-        MinHeight="760"
-        WindowStyle="SingleBorderWindow"
-        AllowsTransparency="False"
         WindowStartupLocation="CenterScreen"
-        Background="White"
+        Style="{StaticResource AppWindowStyle}"
         Closing="Window_Closing">
 
     <Window.InputBindings>
         <KeyBinding Key="S" Modifiers="Control" Command="{Binding SaveProjectCommand}"/>
     </Window.InputBindings>
 
-    <Grid Background="White">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -49,7 +43,7 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <Border Grid.Column="0" Background="White" BorderBrush="{StaticResource LineBrush}" BorderThickness="0,0,1,0">
+            <Border Grid.Column="0" BorderBrush="{StaticResource LineBrush}" BorderThickness="0,0,1,0">
                 <StackPanel>
                     <Button Style="{StaticResource ModernSquareButtonStyle}" Command="{Binding NewProjectCommand}">
                         <StackPanel>
@@ -76,44 +70,44 @@
 
             <views:ProjectExplorer Grid.Column="1"/>
 
-            <Grid Grid.Column="2" Margin="18">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="12"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
+            <Grid Grid.Column="2" Margin="{StaticResource SectionGridMargin}">
+                <Border x:Name="TabAreaMask" Background="White" CornerRadius="{StaticResource SectionCornerRadius}" IsHitTestVisible="False"/>
 
-                <StackPanel Grid.Row="0" Orientation="Horizontal">
-                    <TextBlock Text="{Binding Editor.FloorName}" Style="{StaticResource TitleTextStyle}"/>
-                    <TextBlock Text=" / " Margin="4,0" Style="{StaticResource TitleTextStyle}"/>
-                    <TextBlock Text="{Binding Editor.MemberName}" Style="{StaticResource TitleTextStyle}"/>
-                </StackPanel>
+                <Grid Background="{StaticResource SurfaceBrush}">
+                    <Grid.OpacityMask>
+                        <VisualBrush Visual="{Binding ElementName=TabAreaMask}"/>
+                    </Grid.OpacityMask>
 
-                <Grid Grid.Row="2">
-                    <Border x:Name="TabAreaMask" Background="White" CornerRadius="{StaticResource SectionCornerRadius}" IsHitTestVisible="False"/>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="48"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
 
-                    <Grid Background="{StaticResource SurfaceBrush}">
-                        <Grid.OpacityMask>
-                            <VisualBrush Visual="{Binding ElementName=TabAreaMask}"/>
-                        </Grid.OpacityMask>
+                    <Grid Grid.Row="0" Background="{StaticResource SurfaceBrush}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
 
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="48"/>
-                            <RowDefinition Height="*"/>
-                        </Grid.RowDefinitions>
+                        <TabControl x:Name="MainTabControl"
+                                    Grid.Column="0"
+                                    Background="Transparent"
+                                    BorderThickness="0"
+                                    Style="{StaticResource ModernTabControlStyle}"
+                                    ItemContainerStyle="{StaticResource ModernTabItemStyle}"
+                                    SelectionChanged="MainTabControl_SelectionChanged">
+                            <TabItem x:Name="EditorTabItem" Header="부재 설정"/>
+                            <TabItem x:Name="PreviewTabItem" Header="미리보기 (DXF)"/>
+                        </TabControl>
 
-                        <Grid Grid.Row="0" Background="{StaticResource SurfaceBrush}">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
+                        <Grid Grid.Column="1" Margin="0,0,14,0" VerticalAlignment="Center">
+                            <StackPanel x:Name="EditorToolbar" Orientation="Horizontal" VerticalAlignment="Center" Cursor="">
+                                <TextBlock Text="{Binding Editor.FloorName}" Style="{StaticResource SectionTitleTextStyle}"/>
+                                <TextBlock Text=" / " Style="{StaticResource SectionTitleTextStyle}"/>
+                                <TextBlock Text="{Binding Editor.MemberName}" Style="{StaticResource SectionTitleTextStyle}"/>
+                            </StackPanel>
 
-                            <TabControl x:Name="MainTabControl" Grid.Column="0" Background="Transparent" BorderThickness="0" Style="{StaticResource ModernTabControlStyle}" ItemContainerStyle="{StaticResource ModernTabItemStyle}" SelectionChanged="MainTabControl_SelectionChanged">
-                                <TabItem Header="부재 설정"/>
-                                <TabItem x:Name="PreviewTabItem" Header="미리보기 (DXF)"/>
-                            </TabControl>
-
-                            <StackPanel x:Name="PreviewToolbar" Grid.Column="1" Margin="0,0,14,0" Orientation="Horizontal" VerticalAlignment="Center" Visibility="Collapsed">
+                            <StackPanel x:Name="PreviewToolbar" Orientation="Horizontal" VerticalAlignment="Center" Visibility="Collapsed">
                                 <Button x:Name="PreviewPrevPageButton" Content="이전" Style="{StaticResource ModernOutlineButtonStyle}" Click="PreviewPrevPageButton_Click"/>
                                 <Button x:Name="PreviewNextPageButton" Margin="8,0,0,0" Content="다음" Style="{StaticResource ModernOutlineButtonStyle}" Click="PreviewNextPageButton_Click"/>
                                 <Button Margin="8,0,0,0" Content="맞춤" Style="{StaticResource ModernOutlineButtonStyle}" Click="PreviewFitButton_Click"/>
@@ -121,22 +115,25 @@
                                 <TextBlock x:Name="PreviewPageTextBlock" Width="70" Margin="12,0,0,0" Text="1 / 1" Foreground="{StaticResource Ink500Brush}" TextAlignment="Right" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Grid>
-
-                        <Grid Grid.Row="1" Background="{StaticResource SurfaceBrush}">
-                            <Border x:Name="EditorTabContent" Padding="28" Background="{StaticResource SurfaceBrush}">
-                                <Viewbox Stretch="Uniform">
-                                    <views:ScheduleSetEditor Width="980" Height="680" DataContext="{Binding Editor}"/>
-                                </Viewbox>
-                            </Border>
-
-                            <Border x:Name="PreviewTabContent" Padding="0" Background="Transparent" Visibility="Collapsed">
-                                <views:ScheduleExportPreview x:Name="PreviewControl" Floors="{Binding Floors}" ScheduleTitle="{Binding ScheduleTitle}" PreviewStateChanged="PreviewControl_PreviewStateChanged"/>
-                            </Border>
-                        </Grid>
                     </Grid>
 
-                    <Border BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="{StaticResource SectionCornerRadius}" IsHitTestVisible="False" Panel.ZIndex="99"/>
+                    <Grid Grid.Row="1" Background="{StaticResource SurfaceBrush}">
+                        <Border x:Name="EditorTabContent" Background="{StaticResource SurfaceBrush}">
+                            <Viewbox Stretch="Uniform">
+                                <views:ScheduleSetEditor DataContext="{Binding Editor}"/>
+                            </Viewbox>
+                        </Border>
+
+                        <Border x:Name="PreviewTabContent" Padding="0" Background="Transparent" Visibility="Collapsed">
+                            <views:ScheduleExportPreview x:Name="PreviewControl"
+                                                         Floors="{Binding Floors}"
+                                                         ScheduleTitle="{Binding ScheduleTitle}"
+                                                         PreviewStateChanged="PreviewControl_PreviewStateChanged"/>
+                        </Border>
+                    </Grid>
                 </Grid>
+
+                <Border BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="{StaticResource SectionCornerRadius}" IsHitTestVisible="False" Panel.ZIndex="99"/>
             </Grid>
         </Grid>
     </Grid>
