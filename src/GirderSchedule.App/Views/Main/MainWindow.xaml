@@ -4,6 +4,8 @@
         xmlns:views="clr-namespace:GirderSchedule.App.Views.Schedule"
         Title="{Binding WindowTitle}"
         WindowStartupLocation="CenterScreen"
+        Width="1340"
+        Height="920"
         Style="{StaticResource AppWindowStyle}"
         Closing="Window_Closing">
 
@@ -17,7 +19,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Border Grid.Row="0" Background="White" BorderBrush="{StaticResource LineBrush}" BorderThickness="0,0,0,1">
+        <Border Grid.Row="0" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="0,0,0,1">
             <DockPanel LastChildFill="True">
                 <Menu DockPanel.Dock="Left" Style="{StaticResource ModernMenuBarStyle}">
                     <MenuItem Header="파일(_F)" Style="{StaticResource ModernTopMenuItemStyle}">
@@ -32,6 +34,11 @@
                         <MenuItem Header="DXF 내보내기" Command="{Binding ExportCurrentSetCommand}" Style="{StaticResource ModernSubMenuItemStyle}"/>
                         <MenuItem Header="Excel 내보내기" Command="{Binding ExportExcelCommand}" Style="{StaticResource ModernSubMenuItemStyle}"/>
                     </MenuItem>
+
+                    <MenuItem Header="도움말(_H)" Style="{StaticResource ModernTopMenuItemStyle}">
+                        <MenuItem Header="사용 방법" Command="{Binding HelpCommand}" Style="{StaticResource ModernSubMenuItemStyle}"/>
+                        <MenuItem Header="정보" Command="{Binding InfoCommand}" Style="{StaticResource ModernSubMenuItemStyle}"/>
+                    </MenuItem>
                 </Menu>
             </DockPanel>
         </Border>
@@ -43,7 +50,7 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <Border Grid.Column="0" BorderBrush="{StaticResource LineBrush}" BorderThickness="0,0,1,0">
+            <Border Grid.Column="0" Background="{StaticResource AppBackgroundBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="0,0,1,0">
                 <StackPanel>
                     <Button Style="{StaticResource ModernSquareButtonStyle}" Command="{Binding NewProjectCommand}">
                         <StackPanel>
@@ -68,10 +75,10 @@
                 </StackPanel>
             </Border>
 
-            <views:ProjectExplorer Grid.Column="1"/>
+            <views:ProjectExplorer Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
 
-            <Grid Grid.Column="2" Margin="{StaticResource SectionGridMargin}">
-                <Border x:Name="TabAreaMask" Background="White" CornerRadius="{StaticResource SectionCornerRadius}" IsHitTestVisible="False"/>
+            <Grid Grid.Column="2" MinWidth="0" MinHeight="0" Margin="{StaticResource SectionGridMargin}">
+                <Border x:Name="TabAreaMask" Background="{StaticResource SurfaceBrush}" CornerRadius="{StaticResource SectionCornerRadius}" IsHitTestVisible="False"/>
 
                 <Grid Background="{StaticResource SurfaceBrush}">
                     <Grid.OpacityMask>
@@ -83,10 +90,10 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <Grid Grid.Row="0" Background="{StaticResource SurfaceBrush}">
+                    <Grid Grid.Row="0" MinWidth="0" Background="{StaticResource SurfaceBrush}">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
 
                         <TabControl x:Name="MainTabControl"
@@ -100,28 +107,36 @@
                             <TabItem x:Name="PreviewTabItem" Header="미리보기 (DXF)"/>
                         </TabControl>
 
-                        <Grid Grid.Column="1" Margin="0,0,14,0" VerticalAlignment="Center">
-                            <StackPanel x:Name="EditorToolbar" Orientation="Horizontal" VerticalAlignment="Center" Cursor="">
-                                <TextBlock Text="{Binding Editor.FloorName}" Style="{StaticResource SectionTitleTextStyle}"/>
-                                <TextBlock Text=" / " Style="{StaticResource SectionTitleTextStyle}"/>
-                                <TextBlock Text="{Binding Editor.MemberName}" Style="{StaticResource SectionTitleTextStyle}"/>
-                            </StackPanel>
+                        <Grid Grid.Column="1" MinWidth="0" Margin="8,0,14,0" VerticalAlignment="Center">
+                            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                                <Grid HorizontalAlignment="Right">
+                                    <StackPanel x:Name="EditorToolbar" Orientation="Horizontal" VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding Editor.FloorName}" Style="{StaticResource SectionTitleTextStyle}"/>
+                                        <TextBlock Text=" / " Style="{StaticResource SectionTitleTextStyle}"/>
+                                        <TextBlock Text="{Binding Editor.MemberName}" Style="{StaticResource SectionTitleTextStyle}"/>
+                                    </StackPanel>
 
-                            <StackPanel x:Name="PreviewToolbar" Orientation="Horizontal" VerticalAlignment="Center" Visibility="Collapsed">
-                                <Button x:Name="PreviewPrevPageButton" Content="이전" Style="{StaticResource ModernOutlineButtonStyle}" Click="PreviewPrevPageButton_Click"/>
-                                <Button x:Name="PreviewNextPageButton" Margin="8,0,0,0" Content="다음" Style="{StaticResource ModernOutlineButtonStyle}" Click="PreviewNextPageButton_Click"/>
-                                <Button Margin="8,0,0,0" Content="맞춤" Style="{StaticResource ModernOutlineButtonStyle}" Click="PreviewFitButton_Click"/>
-                                <TextBlock x:Name="PreviewZoomTextBlock" Width="52" Margin="12,0,0,0" Text="100%" Foreground="{StaticResource Ink500Brush}" VerticalAlignment="Center"/>
-                                <TextBlock x:Name="PreviewPageTextBlock" Width="70" Margin="12,0,0,0" Text="1 / 1" Foreground="{StaticResource Ink500Brush}" TextAlignment="Right" VerticalAlignment="Center"/>
-                            </StackPanel>
+                                    <StackPanel x:Name="PreviewToolbar" Orientation="Horizontal" VerticalAlignment="Center" Visibility="Collapsed">
+                                        <Button x:Name="PreviewPrevPageButton" Content="이전" Style="{StaticResource ModernOutlineButtonStyle}" Click="PreviewPrevPageButton_Click"/>
+                                        <Button x:Name="PreviewNextPageButton" Margin="8,0,0,0" Content="다음" Style="{StaticResource ModernOutlineButtonStyle}" Click="PreviewNextPageButton_Click"/>
+                                        <Button Margin="8,0,0,0" Content="맞춤" Style="{StaticResource ModernOutlineButtonStyle}" Click="PreviewFitButton_Click"/>
+                                        <TextBlock x:Name="PreviewZoomTextBlock" Width="52" Margin="12,0,0,0" Text="100%" Foreground="{StaticResource Ink500Brush}" TextAlignment="Right" VerticalAlignment="Center"/>
+                                        <TextBlock x:Name="PreviewPageTextBlock" Width="70" Margin="12,0,0,0" Text="1 / 1" Foreground="{StaticResource Ink500Brush}" TextAlignment="Right" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Grid>
+                            </ScrollViewer>
                         </Grid>
                     </Grid>
 
-                    <Grid Grid.Row="1" Background="{StaticResource SurfaceBrush}">
+                    <Grid Grid.Row="1" MinWidth="0" MinHeight="0" Background="{StaticResource SurfaceBrush}">
                         <Border x:Name="EditorTabContent" Background="{StaticResource SurfaceBrush}">
-                            <Viewbox Stretch="Uniform">
-                                <views:ScheduleSetEditor DataContext="{Binding Editor}"/>
-                            </Viewbox>
+                            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" CanContentScroll="False" PanningMode="Both">
+                                <Viewbox Stretch="Uniform" StretchDirection="UpOnly" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <Grid Width="900" Height="720">
+                                        <views:ScheduleSetEditor DataContext="{Binding Editor}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                                    </Grid>
+                                </Viewbox>
+                            </ScrollViewer>
                         </Border>
 
                         <Border x:Name="PreviewTabContent" Padding="0" Background="Transparent" Visibility="Collapsed">

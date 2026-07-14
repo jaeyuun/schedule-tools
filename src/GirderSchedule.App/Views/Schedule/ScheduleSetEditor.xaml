@@ -21,15 +21,15 @@
                 <Setter Property="Padding" Value="4"/>
             </Style>
 
-            <Style x:Key="ScheduleTextBoxStyle" TargetType="TextBox" BasedOn="{StaticResource ModernTextBoxStyle}">
+            <Style x:Key="ScheduleTextBoxStyle" TargetType="TextBox" BasedOn="{StaticResource ScheduleTextBoxStyle}">
                 <Setter Property="Width" Value="152"/>
             </Style>
 
-            <Style x:Key="ScheduleMediumTextBoxStyle" TargetType="TextBox" BasedOn="{StaticResource ModernTextBoxStyle}">
+            <Style x:Key="ScheduleMediumTextBoxStyle" TargetType="TextBox" BasedOn="{StaticResource ScheduleTextBoxStyle}">
                 <Setter Property="Width" Value="64"/>
             </Style>
 
-            <Style x:Key="ScheduleSmallTextBoxStyle" TargetType="TextBox" BasedOn="{StaticResource ModernTextBoxStyle}">
+            <Style x:Key="ScheduleSmallTextBoxStyle" TargetType="TextBox" BasedOn="{StaticResource ScheduleTextBoxStyle}">
                 <Setter Property="Width" Value="48"/>
             </Style>
 
@@ -226,7 +226,7 @@
                 </StackPanel>
 
                 <ContentControl Grid.Row="2" IsEnabled="{Binding Left.IsSectionEnabled}" Content="{Binding Left}" ContentTemplate="{StaticResource MemberForceInputTemplate}"/>
-                <Canvas x:Name="LeftCanvas" Grid.Row="4" Width="200" MinHeight="240" HorizontalAlignment="Center" VerticalAlignment="Stretch"/>
+                <Canvas x:Name="LeftCanvas" Grid.Row="4" MinWidth="200" MinHeight="240" HorizontalAlignment="Center" VerticalAlignment="Stretch"/>
                 <TextBox Grid.Row="6" Style="{StaticResource ScheduleTextBoxStyle}" IsEnabled="{Binding Left.IsSectionEnabled}" Text="{Binding Left.SectionNote, UpdateSourceTrigger=LostFocus}"/>
             </Grid>
         </Border>

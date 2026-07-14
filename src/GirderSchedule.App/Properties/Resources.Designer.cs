@@ -186,6 +186,15 @@ namespace GirderSchedule.App.Properties {
         }
         
         /// <summary>
+        ///   프로그램 버전: {0}과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string Content_Info {
+            get {
+                return ResourceManager.GetString("Content_Info", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   층 이름을 입력해 주세요.과(와) 유사한 지역화된 문자열을 찾습니다.
         /// </summary>
         public static string Content_InputFloorName {
@@ -360,6 +369,15 @@ namespace GirderSchedule.App.Properties {
         public static string Title_Help {
             get {
                 return ResourceManager.GetString("Title_Help", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   정보과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string Title_Info {
+            get {
+                return ResourceManager.GetString("Title_Info", resourceCulture);
             }
         }
         

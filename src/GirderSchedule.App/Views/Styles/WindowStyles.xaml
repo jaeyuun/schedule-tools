@@ -8,6 +8,8 @@
         <Setter Property="MinHeight" Value="460"/>
         <Setter Property="WindowStyle" Value="SingleBorderWindow"/>
         <Setter Property="AllowsTransparency" Value="False"/>
+        <Setter Property="SnapsToDevicePixels" Value="True"/>
+        <Setter Property="UseLayoutRounding" Value="True"/>
         <Setter Property="Background" Value="{StaticResource AppBackgroundBrush}"/>
     </Style>
 

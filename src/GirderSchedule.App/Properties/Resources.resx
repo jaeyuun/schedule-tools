@@ -243,4 +243,10 @@
   <data name="Content_DxfSettingDeleteFailed" xml:space="preserve">
     <value>기본 설정은 삭제할 수 없습니다.</value>
   </data>
+  <data name="Title_Info" xml:space="preserve">
+    <value>정보</value>
+  </data>
+  <data name="Content_Info" xml:space="preserve">
+    <value>프로그램 버전: {0}</value>
+  </data>
 </root>

@@ -5,6 +5,7 @@ using GirderSchedule.App.ViewModels.Schedule;
 using GirderSchedule.App.ViewModels.Settings;
 using GirderSchedule.App.Views.Settings;
 using System;
+using System.Reflection;
 using System.Windows;
 
 namespace GirderSchedule.App.ViewModels.Main
@@ -24,6 +25,7 @@ namespace GirderSchedule.App.ViewModels.Main
             ExportCurrentSetCommand = new RelayCommand(p => ExportProjectDxf());
             ExportExcelCommand = new RelayCommand(p => ExportProjectExcel());
             HelpCommand = new RelayCommand(p => ShowHelp());
+            InfoCommand = new RelayCommand(p => ShowInfo());
             CopyScheduleSetCommand = new RelayCommand(p => CopyScheduleSet(), p => CanCopyScheduleSet());
             PasteScheduleSetCommand = new RelayCommand(p => PasteScheduleSet(), p => CanPasteScheduleSet());
         }
@@ -248,6 +250,15 @@ namespace GirderSchedule.App.ViewModels.Main
             AppDialogService.ShowNotice(
                 Properties.Resources.Title_Help,
                 Properties.Resources.Title_Help);
+        }
+
+        private void ShowInfo()
+        {
+            var version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "버전 정보 없음";
+
+            AppDialogService.ShowNotice(
+                Properties.Resources.Title_Info,
+                string.Format(Properties.Resources.Content_Info, version));
         }
     }
 }
