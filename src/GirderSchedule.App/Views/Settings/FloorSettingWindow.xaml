@@ -59,7 +59,7 @@
                       RowStyle="{StaticResource ModernDataGridRowStyle}"
                       CellStyle="{StaticResource ModernDataGridCellStyle}">
                 <DataGrid.Columns>
-                    <DataGridTemplateColumn Header="층 표현" Width="0.5*">
+                    <DataGridTemplateColumn Header="층 표현" Width="0.6*">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding FloorPrefix}" Style="{StaticResource DefaultTextStyle}"/>

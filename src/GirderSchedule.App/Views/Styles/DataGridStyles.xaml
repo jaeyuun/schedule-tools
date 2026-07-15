@@ -5,13 +5,15 @@
         <Setter Property="Background" Value="{StaticResource SurfaceMutedBrush}"/>
         <Setter Property="Foreground" Value="{StaticResource Ink700Brush}"/>
         <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="FontSize" Value="{DynamicResource DefaultFontSize}"/>
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
         <Setter Property="BorderBrush" Value="{StaticResource LineBrush}"/>
         <Setter Property="BorderThickness" Value="0,0,1,1"/>
     </Style>
 
     <Style x:Key="ModernDataGridRowStyle" TargetType="DataGridRow">
-        <Setter Property="Background" Value="White"/>
+        <Setter Property="Background" Value="{StaticResource SurfaceBrush}"/>
+        <Setter Property="FontSize" Value="{DynamicResource DefaultFontSize}"/>
         <Setter Property="Foreground" Value="{StaticResource Ink700Brush}"/>
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
@@ -28,6 +30,7 @@
         <Setter Property="Padding" Value="8,0"/>
         <Setter Property="BorderBrush" Value="{StaticResource LineBrush}"/>
         <Setter Property="BorderThickness" Value="0,0,1,0"/>
+        <Setter Property="FontSize" Value="{DynamicResource DefaultFontSize}"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Setter Property="Template">
             <Setter.Value>
@@ -47,7 +50,8 @@
     </Style>
 
     <Style x:Key="ModernDataGridStyle" TargetType="{x:Type DataGrid}">
-        <Setter Property="Background" Value="White"/>
+        <Setter Property="FontSize" Value="{DynamicResource DefaultFontSize}"/>
+        <Setter Property="Background" Value="{StaticResource SurfaceBrush}"/>
         <Setter Property="ColumnHeaderStyle" Value="{StaticResource ModernDataGridColumnHeaderStyle}"/>
         <Setter Property="RowStyle" Value="{StaticResource ModernDataGridRowStyle}"/>
         <Setter Property="CellStyle" Value="{StaticResource ModernDataGridCellStyle}"/>

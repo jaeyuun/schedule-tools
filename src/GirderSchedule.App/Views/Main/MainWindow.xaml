@@ -13,6 +13,39 @@
         <KeyBinding Key="S" Modifiers="Control" Command="{Binding SaveProjectCommand}"/>
     </Window.InputBindings>
 
+    <Window.Resources>
+        <Style x:Key="ProjectExplorerSplitterStyle" TargetType="GridSplitter">
+            <Setter Property="Width" Value="8"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="VerticalAlignment" Value="Stretch"/>
+            <Setter Property="ResizeDirection" Value="Columns"/>
+            <Setter Property="ResizeBehavior" Value="PreviousAndNext"/>
+            <Setter Property="ShowsPreview" Value="False"/>
+            <Setter Property="Cursor" Value="SizeWE"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="GridSplitter">
+                        <Border x:Name="SplitterBackground" Background="{TemplateBinding Background}">
+                            <Border x:Name="SplitterLine"
+                                    Width="1"
+                                    HorizontalAlignment="Center"
+                                    Background="{StaticResource LineBrush}"/>
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="SplitterBackground" Property="Background" Value="{StaticResource AppBackgroundBrush}"/>
+                                <Setter TargetName="SplitterLine" Property="Width" Value="2"/>
+                                <Setter TargetName="SplitterLine" Property="Background" Value="{StaticResource Blue500Brush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -35,6 +68,10 @@
                         <MenuItem Header="Excel 내보내기" Command="{Binding ExportExcelCommand}" Style="{StaticResource ModernSubMenuItemStyle}"/>
                     </MenuItem>
 
+                    <MenuItem Header="설정(_S)" Style="{StaticResource ModernTopMenuItemStyle}">
+                        <MenuItem Header="환경 설정" Command="{Binding EditAppSettingCommand}" Style="{StaticResource ModernSubMenuItemStyle}"/>
+                    </MenuItem>
+
                     <MenuItem Header="도움말(_H)" Style="{StaticResource ModernTopMenuItemStyle}">
                         <MenuItem Header="사용 방법" Command="{Binding HelpCommand}" Style="{StaticResource ModernSubMenuItemStyle}"/>
                         <MenuItem Header="정보" Command="{Binding InfoCommand}" Style="{StaticResource ModernSubMenuItemStyle}"/>
@@ -45,31 +82,32 @@
 
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="80"/>
-                <ColumnDefinition Width="280"/>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="320" MinWidth="220" MaxWidth="560"/>
+                <ColumnDefinition Width="8"/>
+                <ColumnDefinition Width="*" MinWidth="0"/>
             </Grid.ColumnDefinitions>
 
             <Border Grid.Column="0" Background="{StaticResource AppBackgroundBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="0,0,1,0">
                 <StackPanel>
                     <Button Style="{StaticResource ModernSquareButtonStyle}" Command="{Binding NewProjectCommand}">
                         <StackPanel>
-                            <TextBlock Text="▤" FontSize="24" Foreground="{StaticResource Blue500Brush}" HorizontalAlignment="Center"/>
-                            <TextBlock Text="새 일람표" Margin="0,6,0,0" FontWeight="SemiBold" Foreground="{StaticResource Blue500Brush}" HorizontalAlignment="Center"/>
+                            <TextBlock Text="▤" Margin="{StaticResource VerMarginSmall}" FontSize="{DynamicResource IconFontSize}" Foreground="{StaticResource Blue500Brush}" HorizontalAlignment="Center"/>
+                            <TextBlock Text="새 일람표" FontWeight="SemiBold" Foreground="{StaticResource Blue500Brush}" HorizontalAlignment="Center"/>
                         </StackPanel>
                     </Button>
 
                     <Button Style="{StaticResource ModernSquareButtonStyle}" Command="{Binding EditFloorSettingCommand}">
                         <StackPanel>
-                            <TextBlock Text="▥" FontSize="24" HorizontalAlignment="Center"/>
-                            <TextBlock Text="층 설정" Margin="0,6,0,0" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                            <TextBlock Text="▥" Margin="{StaticResource VerMarginSmall}" FontSize="{DynamicResource IconFontSize}" HorizontalAlignment="Center"/>
+                            <TextBlock Text="층 설정" FontWeight="SemiBold" HorizontalAlignment="Center"/>
                         </StackPanel>
                     </Button>
 
                     <Button Style="{StaticResource ModernSquareButtonStyle}" Command="{Binding EditDxfLayerSettingCommand}">
                         <StackPanel>
-                            <TextBlock Text="▧" FontSize="24" HorizontalAlignment="Center"/>
-                            <TextBlock Text="DXF 설정" Margin="0,6,0,0" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                            <TextBlock Text="▧" Margin="{StaticResource VerMarginSmall}" FontSize="{DynamicResource IconFontSize}" HorizontalAlignment="Center"/>
+                            <TextBlock Text="DXF 설정" FontWeight="SemiBold" HorizontalAlignment="Center"/>
                         </StackPanel>
                     </Button>
                 </StackPanel>
@@ -77,7 +115,9 @@
 
             <views:ProjectExplorer Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
 
-            <Grid Grid.Column="2" MinWidth="0" MinHeight="0" Margin="{StaticResource SectionGridMargin}">
+            <GridSplitter Grid.Column="2" Style="{StaticResource ProjectExplorerSplitterStyle}"/>
+
+            <Grid Grid.Column="3" MinWidth="0" MinHeight="0" Margin="{StaticResource SectionGridMargin}">
                 <Border x:Name="TabAreaMask" Background="{StaticResource SurfaceBrush}" CornerRadius="{StaticResource SectionCornerRadius}" IsHitTestVisible="False"/>
 
                 <Grid Background="{StaticResource SurfaceBrush}">
@@ -130,8 +170,19 @@
 
                     <Grid Grid.Row="1" MinWidth="0" MinHeight="0" Background="{StaticResource SurfaceBrush}">
                         <Border x:Name="EditorTabContent" Background="{StaticResource SurfaceBrush}">
-                            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" CanContentScroll="False" PanningMode="Both">
-                                <Viewbox Stretch="Uniform" StretchDirection="UpOnly" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <ScrollViewer x:Name="EditorScrollViewer"
+                                          HorizontalScrollBarVisibility="Auto"
+                                          VerticalScrollBarVisibility="Auto"
+                                          CanContentScroll="False"
+                                          PanningMode="Both">
+                                <Viewbox MinWidth="900"
+                                         MinHeight="720"
+                                         Width="{Binding ActualWidth, ElementName=EditorScrollViewer}"
+                                         Height="{Binding ActualHeight, ElementName=EditorScrollViewer}"
+                                         Stretch="Uniform"
+                                         StretchDirection="UpOnly"
+                                         HorizontalAlignment="Center"
+                                         VerticalAlignment="Top">
                                     <Grid Width="900" Height="720">
                                         <views:ScheduleSetEditor DataContext="{Binding Editor}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
                                     </Grid>

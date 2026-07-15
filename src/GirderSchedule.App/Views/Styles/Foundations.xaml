@@ -4,6 +4,9 @@
 
     <!-- Size, Margin, Padding -->
     <sys:Double x:Key="DefaultFontSize">12</sys:Double>
+    <sys:Double x:Key="SectionFontSize">14</sys:Double>
+    <sys:Double x:Key="TitleFontSize">18</sys:Double>
+    <sys:Double x:Key="IconFontSize">24</sys:Double>
     <sys:Double x:Key="DefaultHeight">32</sys:Double>
     
     <GridLength x:Key="GridRowGapSmall">4</GridLength>

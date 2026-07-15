@@ -20,6 +20,7 @@ namespace GirderSchedule.App.ViewModels.Main
             SaveAsProjectCommand = new RelayCommand(p => SaveAsProject());
             EditFloorSettingCommand = new RelayCommand(p => EditFloorSetting());
             EditDxfLayerSettingCommand = new RelayCommand(p => EditDxfLayerSetting());
+            EditAppSettingCommand = new RelayCommand(p => EditAppSetting());
             AddSetCommand = new RelayCommand(p => AddSet(), p => SelectedFloor != null);
             RemoveSetCommand = new RelayCommand(p => RemoveSet(), p => SelectedFloor != null && SelectedSet != null);
             ExportCurrentSetCommand = new RelayCommand(p => ExportProjectDxf());
@@ -95,6 +96,15 @@ namespace GirderSchedule.App.ViewModels.Main
             {
                 IsDirty = true;
             }
+        }
+
+        private void EditAppSetting()
+        {
+            var viewModel = new AppSettingWindowViewModel();
+            var window = new AppSettingWindow();
+            window.Owner = Application.Current.MainWindow;
+            window.DataContext = viewModel;
+            window.ShowDialog();
         }
 
         private void FloorSettingWindow_FloorSettingChanged(object sender, EventArgs e)

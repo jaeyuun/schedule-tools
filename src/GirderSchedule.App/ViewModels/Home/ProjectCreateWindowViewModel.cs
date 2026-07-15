@@ -76,9 +76,12 @@ namespace GirderSchedule.App.ViewModels.Home
 
         private void Browse()
         {
-            var dialog = new Forms.FolderBrowserDialog();
-            dialog.Description = Properties.Resources.Description_SelectProjectSaveFolder;
-            dialog.SelectedPath = FolderPath;
+            using var dialog = new Forms.FolderBrowserDialog
+            {
+                Description = Properties.Resources.Description_SelectProjectSaveFolder,
+                SelectedPath = Directory.Exists(FolderPath) ? FolderPath : string.Empty,
+                ShowNewFolderButton = true
+            };
 
             if (dialog.ShowDialog() != Forms.DialogResult.OK)
             {
@@ -126,10 +129,6 @@ namespace GirderSchedule.App.ViewModels.Home
             var project = MainWindowViewModel.CreateNewProject(ProjectName);
             _projectFileService.Save(filePath, project);
             _recentProjectService.AddOrUpdate(filePath, project.ProjectName);
-
-            var setting = _settingService.Load();
-            setting.DefaultProjectFolder = FolderPath;
-            _settingService.Save(setting);
 
             CreatedProject = project;
             CreatedFilePath = filePath;

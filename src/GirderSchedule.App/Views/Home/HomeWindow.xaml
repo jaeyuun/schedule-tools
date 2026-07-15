@@ -188,7 +188,7 @@
                                                         <TextBlock Text="{Binding FilePath}" TextTrimming="CharacterEllipsis" Style="{StaticResource DefaultTextStyle}"/>
                                                     </StackPanel>
                                                     <TextBlock Grid.Column="1" Text="{Binding DisplayTime}" HorizontalAlignment="Right" Style="{StaticResource DefaultTextStyle}"/>
-                                                    <TextBlock Grid.Column="2" Text=" ›" FontSize="18" HorizontalAlignment="Right" Style="{StaticResource CaptionTextStyle}"/>
+                                                    <TextBlock Grid.Column="2" Text=" ›" HorizontalAlignment="Right" Style="{StaticResource CaptionTextStyle}"/>
                                                 </Grid>
                                             </DataTemplate>
                                         </ListBox.ItemTemplate>

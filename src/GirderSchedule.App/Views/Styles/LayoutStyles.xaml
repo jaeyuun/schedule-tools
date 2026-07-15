@@ -18,7 +18,7 @@
         <Setter Property="Background" Value="{StaticResource SurfaceBrush}"/>
         <Setter Property="BorderBrush" Value="{StaticResource LineBrush}"/>
         <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="CornerRadius" Value="{StaticResource DefaultCornerRadius}"/>
+        <Setter Property="CornerRadius" Value="{StaticResource MiniCornerRadius}"/>
     </Style>
 
     <Style x:Key="SectionBorderStyle" TargetType="Border">
@@ -48,7 +48,7 @@
         <Setter Property="Height" Value="42"/>
         <Setter Property="Padding" Value="18,0"/>
         <Setter Property="Foreground" Value="{StaticResource Ink500Brush}"/>
-        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="FontSize" Value="{DynamicResource DefaultFontSize}"/>
         <Setter Property="FontWeight" Value="SemiBold"/>
         <Setter Property="Template">
             <Setter.Value>

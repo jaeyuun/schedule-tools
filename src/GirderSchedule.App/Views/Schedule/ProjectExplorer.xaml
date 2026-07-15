@@ -45,7 +45,7 @@
                         <Style x:Key="FullRowTreeViewItemStyle" TargetType="{x:Type TreeViewItem}">
                             <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}"/>
                             <Setter Property="IsExpanded" Value="True"/>
-                            <Setter Property="FontSize" Value="{StaticResource DefaultFontSize}"/>
+                            <Setter Property="FontSize" Value="{DynamicResource DefaultFontSize}"/>
                             <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
                             <Setter Property="VerticalContentAlignment" Value="Center"/>
                             <Setter Property="MinHeight" Value="30"/>
@@ -142,9 +142,9 @@
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
 
-                                <CheckBox Grid.Column="0" IsChecked="{Binding IsChecked}" Style="{StaticResource ModernCheckBoxStyle}" Margin="0,0,6,0"/>
+                                <CheckBox Grid.Column="0" IsChecked="{Binding IsChecked}" Style="{StaticResource ModernCheckBoxStyle}"/>
                                 <TextBlock Grid.Column="1" Text="{Binding FloorName}" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="{StaticResource Ink900Brush}"/>
-                                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="8,0,0,0">
+                                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
                                     <TextBlock Text="[" Foreground="{StaticResource Ink500Brush}"/>
                                     <TextBlock Text="{Binding MainRebarText}" Foreground="{StaticResource Ink500Brush}"/>
                                     <TextBlock Text="/" Foreground="{StaticResource Ink500Brush}"/>
