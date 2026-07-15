@@ -71,11 +71,6 @@
                     <MenuItem Header="설정(_S)" Style="{StaticResource ModernTopMenuItemStyle}">
                         <MenuItem Header="환경 설정" Command="{Binding EditAppSettingCommand}" Style="{StaticResource ModernSubMenuItemStyle}"/>
                     </MenuItem>
-
-                    <MenuItem Header="도움말(_H)" Style="{StaticResource ModernTopMenuItemStyle}">
-                        <MenuItem Header="사용 방법" Command="{Binding HelpCommand}" Style="{StaticResource ModernSubMenuItemStyle}"/>
-                        <MenuItem Header="정보" Command="{Binding InfoCommand}" Style="{StaticResource ModernSubMenuItemStyle}"/>
-                    </MenuItem>
                 </Menu>
             </DockPanel>
         </Border>
