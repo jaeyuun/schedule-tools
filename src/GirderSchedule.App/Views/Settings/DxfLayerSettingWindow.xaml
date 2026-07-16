@@ -126,7 +126,7 @@
                                 </DataGridTemplateColumn.CellTemplate>
                                 <DataGridTemplateColumn.CellEditingTemplate>
                                     <DataTemplate>
-                                        <TextBox Style="{StaticResource LastGridCellTextBoxStyle}" Text="{Binding LayerName, UpdateSourceTrigger=LostFocus}"/>
+                                        <TextBox Style="{StaticResource GridCellTextBoxStyle}" Text="{Binding LayerName, UpdateSourceTrigger=LostFocus}"/>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellEditingTemplate>
                             </DataGridTemplateColumn>

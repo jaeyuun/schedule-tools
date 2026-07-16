@@ -139,7 +139,7 @@
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
                                     <TextBlock Text="HD" Margin="{StaticResource HorMarginSmall}" Style="{StaticResource DefaultTextStyle}"/>
-                                    <TextBox Grid.Column="1" Style="{StaticResource LastGridCellTextBoxStyle}" Text="{Binding SkinRebarDiameterText, UpdateSourceTrigger=LostFocus}"/>
+                                    <TextBox Grid.Column="1" Style="{StaticResource GridCellTextBoxStyle}" Text="{Binding SkinRebarDiameterText, UpdateSourceTrigger=LostFocus}"/>
                                 </Grid>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellEditingTemplate>

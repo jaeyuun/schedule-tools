@@ -24,6 +24,10 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="{StaticResource GridRowGapMedium}"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="{StaticResource GridRowGapXLarge}"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="{StaticResource GridRowGapMedium}"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
             <TextBlock Grid.Row="0" Text="환경 설정" Style="{StaticResource TitleTextStyle}"/>
@@ -46,24 +50,23 @@
             <Grid Grid.Row="8">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="{StaticResource GridRowGapMedium}"/>
+                    <ColumnDefinition Width="{StaticResource GridRowGapSmall}"/>
+                    <ColumnDefinition Width="36"/>
+                    <ColumnDefinition Width="{StaticResource GridRowGapSmall}"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="{StaticResource GridRowGapMedium}"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="{StaticResource GridRowGapLarge}"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <Button Grid.Column="0" Width="36" Content="−" Style="{StaticResource ModernOutlineMiniButtonStyle}" Command="{Binding DecreaseFontSizeCommand}" IsEnabled="{Binding CanDecreaseFontSize}"/>
-
-                <Border Grid.Column="2" Width="64" Height="32" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="{StaticResource MiniCornerRadius}">
-                    <TextBlock Text="{Binding DefaultFontSizeText}" FontSize="{DynamicResource DefaultFontSize}" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                </Border>
-
-                <Button Grid.Column="4" Width="36" Content="+" Style="{StaticResource ModernOutlineMiniButtonStyle}" Command="{Binding IncreaseFontSizeCommand}" IsEnabled="{Binding CanIncreaseFontSize}"/>
+                <Button Grid.Column="0" Padding="0" Content="➖" Style="{StaticResource ModernOutlineMiniButtonStyle}" Command="{Binding DecreaseFontSizeCommand}" IsEnabled="{Binding CanDecreaseFontSize}"/>
+                <TextBlock Grid.Column="2" TextAlignment="Center" Text="{Binding DefaultFontSizeText}" Style="{StaticResource SectionTitleTextStyle}"/>
+                <Button Grid.Column="4" Padding="0" Content="➕" Style="{StaticResource PrimaryMiniButtonStyle}" Command="{Binding IncreaseFontSizeCommand}" IsEnabled="{Binding CanIncreaseFontSize}"/>
                 <Button Grid.Column="6" Content="기본값" Style="{StaticResource ModernOutlineButtonStyle}" Command="{Binding ResetFontSizeCommand}"/>
             </Grid>
+
+            <TextBlock Grid.Row="10" Text="설치 버전" Style="{StaticResource SectionTitleTextStyle}"/>
+            <TextBlock Grid.Row="12" Text="{Binding VersionText}" Style="{StaticResource DefaultTextStyle}"/>
         </Grid>
 
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">

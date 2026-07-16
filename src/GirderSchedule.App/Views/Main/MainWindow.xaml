@@ -5,7 +5,7 @@
         Title="{Binding WindowTitle}"
         WindowStartupLocation="CenterScreen"
         Width="1400"
-        Height="900"
+        Height="920"
         Style="{StaticResource AppWindowStyle}"
         Closing="Window_Closing">
 
@@ -177,7 +177,7 @@
                                          Stretch="Uniform"
                                          StretchDirection="UpOnly"
                                          HorizontalAlignment="Center"
-                                         VerticalAlignment="Top">
+                                         VerticalAlignment="Center">
                                     <Grid Width="900" Height="720">
                                         <views:ScheduleSetEditor DataContext="{Binding Editor}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
                                     </Grid>

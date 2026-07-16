@@ -192,8 +192,6 @@ namespace GirderSchedule.App.ViewModels.Main
         public ICommand RemoveSetCommand { get; private set; }
         public ICommand ExportCurrentSetCommand { get; private set; }
         public ICommand ExportExcelCommand { get; private set; }
-        public ICommand HelpCommand { get; private set; }
-        public ICommand InfoCommand { get; private set; }
         public ICommand CopyScheduleSetCommand { get; private set; }
         public ICommand PasteScheduleSetCommand { get; private set; }
 

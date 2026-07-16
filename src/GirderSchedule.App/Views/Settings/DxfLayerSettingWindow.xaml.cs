@@ -26,7 +26,6 @@ namespace GirderSchedule.App.Views.Settings
             if (oldViewModel != null)
             {
                 oldViewModel.Accepted -= ViewModel_Accepted;
-                oldViewModel.Cancelled -= ViewModel_Cancelled;
             }
 
             var newViewModel = e.NewValue as DxfLayerSettingWindowViewModel;
@@ -34,19 +33,12 @@ namespace GirderSchedule.App.Views.Settings
             if (newViewModel != null)
             {
                 newViewModel.Accepted += ViewModel_Accepted;
-                newViewModel.Cancelled += ViewModel_Cancelled;
             }
         }
 
         private void ViewModel_Accepted(object sender, EventArgs e)
         {
             DialogResult = true;
-            Close();
-        }
-
-        private void ViewModel_Cancelled(object sender, EventArgs e)
-        {
-            DialogResult = false;
             Close();
         }
     }

@@ -2,6 +2,7 @@
 using GirderSchedule.App.Services.Settings;
 using System;
 using System.IO;
+using System.Reflection;
 using System.Windows.Input;
 using Forms = System.Windows.Forms;
 
@@ -54,6 +55,7 @@ namespace GirderSchedule.App.ViewModels.Settings
         }
 
         public string DefaultFontSizeText => DefaultFontSize.ToString("0");
+        public string VersionText { get; } = $"버전 {Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "정보 없음"}";
         public bool CanDecreaseFontSize => DefaultFontSize > AppSettingService.MinFontSize;
         public bool CanIncreaseFontSize => DefaultFontSize < AppSettingService.MaxFontSize;
 

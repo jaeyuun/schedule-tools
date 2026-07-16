@@ -23,7 +23,6 @@ namespace GirderSchedule.App.ViewModels.Settings
         private DxfSettingProfile _loadedProfile;
 
         public event EventHandler Accepted;
-        public event EventHandler Cancelled;
 
         public ObservableCollection<string> SettingNames { get; private set; }
         public ObservableCollection<string> TemplateNames { get; private set; }

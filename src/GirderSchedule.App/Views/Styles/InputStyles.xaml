@@ -37,10 +37,6 @@
         </Setter>
     </Style>
 
-    <Style x:Key="LastGridCellTextBoxStyle" TargetType="TextBox" BasedOn="{StaticResource GridCellTextBoxStyle}">
-        <Setter Property="Margin" Value="0,0,16,0"/>
-    </Style>
-
     <Style x:Key="ModernTextBoxStyle" TargetType="TextBox">
         <Setter Property="Height" Value="{StaticResource DefaultHeight}"/>
         <Setter Property="Padding" Value="{StaticResource DefaultInputPadding}"/>
