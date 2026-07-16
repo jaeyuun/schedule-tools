@@ -8,6 +8,7 @@
 		<UseWindowsForms>true</UseWindowsForms>
 		<RootNamespace>GirderSchedule.App</RootNamespace>
 		<AssemblyName>GirderSchedule.App</AssemblyName>
+		<ApplicationIcon>Resources\ganadi_icon_multi.ico</ApplicationIcon>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)' == 'Release'">
