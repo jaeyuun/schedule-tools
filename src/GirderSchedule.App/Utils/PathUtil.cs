@@ -1,27 +1,21 @@
-﻿using System;
+﻿using GirderSchedule.App.Constants;
+using System;
 using System.IO;
 
 namespace GirderSchedule.App.Utils
 {
     public static class PathUtil
     {
-        public static string GetDownloadsDirectory()
+        public static string GetDefaultProjectDirectory()
         {
-            var userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            var documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
 
-            if (string.IsNullOrWhiteSpace(userProfile))
+            if (string.IsNullOrWhiteSpace(documentsPath))
             {
-                return Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
             }
 
-            var downloads = Path.Combine(userProfile, "Downloads");
-
-            if (Directory.Exists(downloads))
-            {
-                return downloads;
-            }
-
-            return Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            return Path.Combine(documentsPath, FileConstants.ApplicationFolderName, FileConstants.ProjectFolderName);
         }
     }
 }

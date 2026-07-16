@@ -1,4 +1,6 @@
-﻿using GirderSchedule.App.Models;
+﻿using GirderSchedule.App.Constants;
+using GirderSchedule.App.Models;
+using GirderSchedule.App.Utils;
 using System;
 using System.IO;
 using System.Text.Json;
@@ -12,21 +14,16 @@ namespace GirderSchedule.App.Services.Settings
         public const double MinFontSize = 9;
         public const double MaxFontSize = 16;
 
-        private static readonly string SettingDirectoryPath = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "GirderSchedule");
-
-        private static readonly string SettingFilePath = Path.Combine(SettingDirectoryPath, "AppSetting.json");
-
         public AppSetting Load()
         {
             try
             {
-                if (!File.Exists(SettingFilePath))
+                if (!File.Exists(FileConstants.AppSettingFilePath))
                 {
                     return CreateDefaultSetting();
                 }
 
-                var json = File.ReadAllText(SettingFilePath);
+                var json = File.ReadAllText(FileConstants.AppSettingFilePath);
                 var setting = JsonSerializer.Deserialize<AppSetting>(json) ?? CreateDefaultSetting();
 
                 Normalize(setting);
@@ -47,7 +44,7 @@ namespace GirderSchedule.App.Services.Settings
             }
 
             Normalize(setting);
-            Directory.CreateDirectory(SettingDirectoryPath);
+            Directory.CreateDirectory(FileConstants.SettingPath);
 
             var options = new JsonSerializerOptions
             {
@@ -55,7 +52,7 @@ namespace GirderSchedule.App.Services.Settings
             };
 
             var json = JsonSerializer.Serialize(setting, options);
-            File.WriteAllText(SettingFilePath, json);
+            File.WriteAllText(FileConstants.AppSettingFilePath, json);
         }
 
         public static void ApplyFontSize(double fontSize)
@@ -82,6 +79,11 @@ namespace GirderSchedule.App.Services.Settings
             return Math.Clamp(fontSize, MinFontSize, MaxFontSize);
         }
 
+        public static string GetDefaultProjectFolder()
+        {
+            return PathUtil.GetDefaultProjectDirectory();
+        }
+
         private static AppSetting CreateDefaultSetting()
         {
             return new AppSetting
@@ -99,18 +101,6 @@ namespace GirderSchedule.App.Services.Settings
             }
 
             setting.DefaultFontSize = NormalizeFontSize(setting.DefaultFontSize);
-        }
-
-        public static string GetDefaultProjectFolder()
-        {
-            var downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
-
-            if (Directory.Exists(downloadsPath))
-            {
-                return downloadsPath;
-            }
-
-            return Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
         }
     }
 }

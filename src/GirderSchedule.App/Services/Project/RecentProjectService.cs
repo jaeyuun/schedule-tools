@@ -1,4 +1,5 @@
 ﻿using GirderSchedule.App.Common;
+using GirderSchedule.App.Constants;
 using GirderSchedule.App.Models;
 using System;
 using System.Collections.Generic;
@@ -9,25 +10,16 @@ namespace GirderSchedule.App.Services.Project
 {
     public sealed class RecentProjectService
     {
-        private readonly string _folderPath;
-        private readonly string _filePath;
-
-        public RecentProjectService()
-        {
-            _folderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "GirderSchedule");
-            _filePath = Path.Combine(_folderPath, "recent-projects.json");
-        }
-
         public List<RecentProjectInfo> Load()
         {
-            Directory.CreateDirectory(_folderPath);
+            Directory.CreateDirectory(FileConstants.RecentProjectPath);
 
-            if (!File.Exists(_filePath))
+            if (!File.Exists(FileConstants.RecentProjectFilePath))
             {
                 return new List<RecentProjectInfo>();
             }
 
-            var items = AppJsonSerializer.Read<List<RecentProjectInfo>>(_filePath);
+            var items = AppJsonSerializer.Read<List<RecentProjectInfo>>(FileConstants.RecentProjectFilePath);
 
             if (items == null)
             {
@@ -42,7 +34,7 @@ namespace GirderSchedule.App.Services.Project
 
         public void Save(List<RecentProjectInfo> items)
         {
-            Directory.CreateDirectory(_folderPath);
+            Directory.CreateDirectory(FileConstants.RecentProjectPath);
 
             if (items == null)
             {
@@ -57,7 +49,7 @@ namespace GirderSchedule.App.Services.Project
                 .Take(20)
                 .ToList();
 
-            AppJsonSerializer.Write(_filePath, ordered);
+            AppJsonSerializer.Write(FileConstants.RecentProjectFilePath, ordered);
         }
 
         public void AddOrUpdate(string filePath, string projectName)

@@ -236,7 +236,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:GirderSchedule"
         "ProductCode" = "8:{13ADCE51-9966-4E8F-AFEA-EA7BF9A90B17}"
-        "PackageCode" = "8:{4E42A662-7183-477B-867E-13B6E11D305B}"
+        "PackageCode" = "8:{48013240-0CB2-4732-AF7B-FE16F487F1A2}"
         "UpgradeCode" = "8:{16F828BB-E75E-4858-B909-EB64ED512B57}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -253,7 +253,7 @@
         "Keywords" = "8:"
         "ARPCOMMENTS" = "8:"
         "ARPURLINFOABOUT" = "8:"
-        "ARPPRODUCTICON" = "8:"
+        "ARPPRODUCTICON" = "8:_CFD22664CF544B309F959E4E32BE3834"
         "ARPIconIndex" = "3:0"
         "SearchPath" = "8:"
         "UseSystemSearchPath" = "11:TRUE"
@@ -367,7 +367,7 @@
             "Target" = "8:_60537FBFD6CC484DB52273D4E97C1225"
             "Folder" = "8:_D81A1B3F35954B47AA3BBBF51E6BC0B1"
             "WorkingFolder" = "8:_347A9A8BEC0B4B81BBD43867BD856F6C"
-            "Icon" = "8:"
+            "Icon" = "8:_CFD22664CF544B309F959E4E32BE3834"
             "Feature" = "8:"
             }
             "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_A09A5869764B429589FD5AABAA640BFE"
@@ -381,7 +381,7 @@
             "Target" = "8:_60537FBFD6CC484DB52273D4E97C1225"
             "Folder" = "8:_65B1591A1F1F4D4FB331D677731F3D1D"
             "WorkingFolder" = "8:_347A9A8BEC0B4B81BBD43867BD856F6C"
-            "Icon" = "8:"
+            "Icon" = "8:_CFD22664CF544B309F959E4E32BE3834"
             "Feature" = "8:"
             }
         }

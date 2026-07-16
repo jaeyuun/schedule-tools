@@ -87,7 +87,7 @@ namespace GirderSchedule.App.Services.Export
             var dialog = new SaveFileDialog();
             dialog.Title = FileConstants.ExcelSaveDialogTitle;
             dialog.Filter = FileConstants.ExcelFilter;
-            dialog.InitialDirectory = PathUtil.GetDownloadsDirectory();
+            dialog.InitialDirectory = PathUtil.GetDefaultProjectDirectory();
             dialog.FileName = BuildExcelFileName(exportProject.ProjectName, exportProject.ScheduleTitle);
             dialog.DefaultExt = FileConstants.ExcelExtension;
             dialog.AddExtension = true;

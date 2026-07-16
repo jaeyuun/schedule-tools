@@ -4,8 +4,8 @@
         xmlns:views="clr-namespace:GirderSchedule.App.Views.Schedule"
         Title="{Binding WindowTitle}"
         WindowStartupLocation="CenterScreen"
-        Width="1340"
-        Height="920"
+        Width="1400"
+        Height="900"
         Style="{StaticResource AppWindowStyle}"
         Closing="Window_Closing">
 
