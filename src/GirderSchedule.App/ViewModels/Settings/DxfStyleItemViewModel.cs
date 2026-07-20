@@ -21,6 +21,8 @@ namespace GirderSchedule.App.ViewModels.Settings
                 }
 
                 _styleName = value;
+                IsInvalid = false;
+
                 OnPropertyChanged(nameof(StyleName));
             }
         }

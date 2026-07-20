@@ -3,5 +3,6 @@
     public enum DxfOverrideRole
     {
         Dimension,
+        BlockInsert,
     }
 }

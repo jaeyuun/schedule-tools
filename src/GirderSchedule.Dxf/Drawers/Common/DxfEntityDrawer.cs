@@ -1,6 +1,8 @@
 using GirderSchedule.Domain.Models.Settings;
 using GirderSchedule.Dxf.Geometry;
+using GirderSchedule.Dxf.Layouts;
 using GirderSchedule.Dxf.Styles;
+using GirderSchedule.Dxf.Styles.Overrides;
 using netDxf;
 using netDxf.Blocks;
 using netDxf.Entities;
@@ -59,14 +61,17 @@ namespace GirderSchedule.Dxf.Drawers.Common
             return polyline;
         }
 
-        public Insert AddUnstyledInsert(Block block, double x, double y, double scale, double rotation)
+        public Insert AddOverriddenInsert(Block block, double x, double y, double defaultScale, double defaultRotation)
         {
-            var insert = CreateInsert(block, x, y, scale, rotation);
+            var insert = CreateInsert(block, x, y, defaultScale, defaultRotation);
 
-            if (insert != null)
+            if (insert == null)
             {
-                _document.Entities.Add(insert);
+                return null;
             }
+
+            _styler.ApplyOverride(insert, DxfOverrideRole.BlockInsert, defaultScale, defaultRotation);
+            _document.Entities.Add(insert);
 
             return insert;
         }

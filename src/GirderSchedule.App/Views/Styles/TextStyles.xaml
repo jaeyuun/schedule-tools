@@ -50,4 +50,13 @@
         <Setter Property="TextAlignment" Value="Center"/>
     </Style>
 
+    <Style x:Key="InvalidValueTextStyle" TargetType="TextBlock" BasedOn="{StaticResource DefaultTextStyle}">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding IsInvalid}" Value="True">
+                <Setter Property="Foreground" Value="{StaticResource DangerBrush}"/>
+                <Setter Property="FontWeight" Value="SemiBold"/>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
 </ResourceDictionary>

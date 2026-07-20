@@ -1,4 +1,5 @@
 ﻿using netDxf.Entities;
+using netDxf.Tables;
 
 namespace GirderSchedule.Dxf.Styles.Overrides
 {
@@ -34,6 +35,22 @@ namespace GirderSchedule.Dxf.Styles.Overrides
             }
 
             CopyDimensionStyleOverrides(target);
+        }
+
+        public static void ApplyDefault(Dimension dimension)
+        {
+            if (dimension == null)
+            {
+                return;
+            }
+
+            DxfOverridePropertyCopier.ClearCollection(dimension.StyleOverrides);
+
+            dimension.StyleOverrides.Add(new DimensionStyleOverride(DimensionStyleOverrideType.ArrowSize, 0.8));
+            dimension.StyleOverrides.Add(new DimensionStyleOverride(DimensionStyleOverrideType.TextHeight, 1.5));
+            dimension.StyleOverrides.Add(new DimensionStyleOverride(DimensionStyleOverrideType.TextOffset, 0.4));
+            dimension.StyleOverrides.Add(new DimensionStyleOverride(DimensionStyleOverrideType.DimScaleOverall, 50.0));
+            dimension.StyleOverrides.Add(new DimensionStyleOverride(DimensionStyleOverrideType.ExtLineOffset, 1.0));
         }
 
         private void CopyDimensionStyleOverrides(Dimension target)

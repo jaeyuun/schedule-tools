@@ -21,6 +21,8 @@ namespace GirderSchedule.App.ViewModels.Settings
                 }
 
                 _layerName = value;
+                IsInvalid = false;
+
                 OnPropertyChanged(nameof(LayerName));
             }
         }

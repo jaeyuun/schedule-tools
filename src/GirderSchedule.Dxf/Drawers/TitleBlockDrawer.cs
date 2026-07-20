@@ -39,7 +39,7 @@ namespace GirderSchedule.Dxf.Drawers
                 return;
             }
 
-            _entityDrawer.AddUnstyledInsert(_document.Blocks[blockName], x, y, TitleBlockLayout.BlockScale, 0.0);
+            _entityDrawer.AddOverriddenInsert(_document.Blocks[blockName], x, y, TitleBlockLayout.BlockScale, 0.0);
         }
 
         private void DrawTitle(ScheduleExportPage page, double pageBaseX, double pageBaseY)

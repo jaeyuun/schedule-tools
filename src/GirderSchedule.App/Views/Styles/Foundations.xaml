@@ -48,6 +48,9 @@
     <Color x:Key="Ink700Color">#334155</Color>
     <Color x:Key="Ink500Color">#64748B</Color>
     <Color x:Key="Ink300Color">#CBD5E1</Color>
+    <Color x:Key="DangerColor">#B45353</Color>
+
+    <SolidColorBrush x:Key="DangerBrush" Color="{StaticResource DangerColor}"/>
 
     <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource PrimaryColor}"/>
     <SolidColorBrush x:Key="PrimaryHoverBrush" Color="{StaticResource PrimaryHoverColor}"/>

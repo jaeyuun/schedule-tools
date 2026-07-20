@@ -245,5 +245,14 @@
             </Setter.Value>
         </Setter>
     </Style>
-    
+
+    <Style x:Key="InvalidGridCellTextBoxStyle" TargetType="TextBox" BasedOn="{StaticResource GridCellTextBoxStyle}">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding IsInvalid}" Value="True">
+                <Setter Property="Foreground" Value="{StaticResource DangerBrush}"/>
+                <Setter Property="FontWeight" Value="SemiBold"/>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
 </ResourceDictionary>

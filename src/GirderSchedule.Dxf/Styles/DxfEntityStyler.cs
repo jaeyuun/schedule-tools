@@ -59,6 +59,11 @@ namespace GirderSchedule.Dxf.Styles
 
         public void ApplyOverride(EntityObject entity, DxfOverrideRole role)
         {
+            ApplyOverride(entity, role, 1.0, 0.0);
+        }
+
+        public void ApplyOverride(EntityObject entity, DxfOverrideRole role, double defaultScale, double defaultRotation)
+        {
             if (entity == null)
             {
                 return;
@@ -67,7 +72,11 @@ namespace GirderSchedule.Dxf.Styles
             switch (role)
             {
                 case DxfOverrideRole.Dimension:
-                    _overrides.ApplyDimensionOverride(entity);
+                    _overrides?.ApplyDimensionOverride(entity);
+                    break;
+
+                case DxfOverrideRole.BlockInsert:
+                    _overrides?.ApplyBlockInsertOverride(entity, defaultScale, defaultRotation);
                     break;
             }
         }

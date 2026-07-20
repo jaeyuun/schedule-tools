@@ -4,10 +4,14 @@ using GirderSchedule.App.Services;
 using GirderSchedule.App.Services.Schedule;
 using GirderSchedule.Domain.Models;
 using GirderSchedule.Domain.Models.Settings;
+using GirderSchedule.Dxf.Constants;
 using Microsoft.Win32;
+using netDxf;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
+using System.Linq;
 using System.Windows.Input;
 
 namespace GirderSchedule.App.ViewModels.Settings
@@ -21,6 +25,7 @@ namespace GirderSchedule.App.ViewModels.Settings
         private string _selectedTemplateName = string.Empty;
         private bool _isTemplateInvalid;
         private DxfSettingProfile _loadedProfile;
+        private bool _isApplyingProfile;
 
         public event EventHandler Accepted;
 
@@ -81,6 +86,11 @@ namespace GirderSchedule.App.ViewModels.Settings
                 _selectedTemplateName = value;
                 IsTemplateInvalid = false;
                 OnPropertyChanged(nameof(SelectedTemplateName));
+
+                if (!_isApplyingProfile)
+                {
+                    ApplyBlockStyleFromSelectedTemplate();
+                }
             }
         }
 
@@ -218,29 +228,38 @@ namespace GirderSchedule.App.ViewModels.Settings
                 return;
             }
 
-            SelectedTemplateName = profile.TemplateName;
+            _isApplyingProfile = true;
 
-            Styles.Clear();
-
-            if (profile.StyleSettings != null)
+            try
             {
-                foreach (var style in profile.StyleSettings)
+                SelectedTemplateName = profile.TemplateName;
+
+                Styles.Clear();
+
+                if (profile.StyleSettings != null)
                 {
-                    Styles.Add(new DxfStyleItemViewModel(style.Role, style.RoleName, style.StyleName));
+                    foreach (var style in profile.StyleSettings)
+                    {
+                        Styles.Add(new DxfStyleItemViewModel(style.Role, style.RoleName, style.StyleName));
+                    }
                 }
+
+                Layers.Clear();
+
+                if (profile.LayerSettings != null)
+                {
+                    foreach (var layer in profile.LayerSettings)
+                    {
+                        Layers.Add(new DxfLayerItemViewModel(layer.Role, layer.RoleName, layer.LayerName));
+                    }
+                }
+
+                _loadedProfile = CreateProfileSnapshot(profile);
             }
-
-            Layers.Clear();
-
-            if (profile.LayerSettings != null)
+            finally
             {
-                foreach (var layer in profile.LayerSettings)
-                {
-                    Layers.Add(new DxfLayerItemViewModel(layer.Role, layer.RoleName, layer.LayerName));
-                }
+                _isApplyingProfile = false;
             }
-
-            _loadedProfile = CreateProfileSnapshot(profile);
         }
 
         private void AddTemplate()
@@ -268,6 +287,60 @@ namespace GirderSchedule.App.ViewModels.Settings
 
             RefreshTemplateNames();
             SelectedTemplateName = templateName;
+        }
+
+        private void ApplyBlockStyleFromSelectedTemplate()
+        {
+            if (string.IsNullOrWhiteSpace(SelectedTemplateName))
+            {
+                return;
+            }
+
+            var templatePath = _settingService.GetTemplatePath(SelectedTemplateName);
+            ApplyBlockStyleFromTemplate(templatePath);
+        }
+
+        private void ApplyBlockStyleFromTemplate(string templatePath)
+        {
+            if (string.IsNullOrWhiteSpace(templatePath) || !File.Exists(templatePath))
+            {
+                return;
+            }
+
+            try
+            {
+                var document = DxfDocument.Load(templatePath);
+
+                if (document == null)
+                {
+                    return;
+                }
+
+                var blockName = GetFirstInsertedBlockName(document);
+                var blockStyleItem = Styles.FirstOrDefault(x => x.Role == DxfStyleRole.Block);
+
+                if (blockStyleItem != null)
+                {
+                    blockStyleItem.StyleName = blockName;
+                }
+            }
+            catch
+            {
+                // 템플릿 선택은 유지하고 블록명 읽기 실패만 무시합니다.
+            }
+        }
+
+        private static string GetFirstInsertedBlockName(DxfDocument document)
+        {
+            if (document == null)
+            {
+                return DxfBlocks.TitleBlock;
+            }
+
+            return document.Entities.Inserts
+                .Where(x => x?.Block != null && !string.IsNullOrWhiteSpace(x.Block.Name))
+                .Select(x => x.Block.Name)
+                .FirstOrDefault() ?? DxfBlocks.TitleBlock;
         }
 
         private void DeleteTemplate()
