@@ -330,8 +330,8 @@ namespace GirderSchedule.Excel
         {
             DrawMainValue(sheet, row, startColumn, endColumn, _mapper.GetTopFirstCount(item));
             DrawMainValue(sheet, row + 1, startColumn, endColumn, _mapper.GetTopSecondCount(item));
-            DrawMainValue(sheet, row + 2, startColumn, endColumn, _mapper.GetBottomFirstCount(item));
-            DrawMainValue(sheet, row + 3, startColumn, endColumn, _mapper.GetBottomSecondCount(item));
+            DrawMainValue(sheet, row + 2, startColumn, endColumn, _mapper.GetBottomSecondCount(item));
+            DrawMainValue(sheet, row + 3, startColumn, endColumn, _mapper.GetBottomFirstCount(item));
             DrawStirrupValue(sheet, row + 4, startColumn, item);
         }
 

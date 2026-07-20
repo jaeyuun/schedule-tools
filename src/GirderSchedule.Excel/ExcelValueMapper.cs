@@ -140,7 +140,7 @@ namespace GirderSchedule.Excel
 
         public XLCellValue GetStirrupSpacing(ScheduleItem? item)
         {
-            return item == null || item.Stirrup == null || item.Stirrup.Spacing <= 0 ? EmptyCell() : item.Stirrup.Spacing;
+            return item == null || item.Stirrup == null || item.Stirrup.Spacing <= 0.0 ? EmptyCell() : item.Stirrup.Spacing;
         }
 
         private XLCellValue ToCellValue(int value)

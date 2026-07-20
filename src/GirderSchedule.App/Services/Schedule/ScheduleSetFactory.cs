@@ -48,10 +48,10 @@ namespace GirderSchedule.App.Services.Schedule
 
             item.Stirrup.Legs = 2;
             item.Stirrup.Diameter = 0.0;
-            item.Stirrup.Spacing = 0;
+            item.Stirrup.Spacing = 0.0;
 
             item.SkinRebar.Diameter = 0.0;
-            item.SkinRebar.Spacing = 0;
+            item.SkinRebar.Spacing = 0.0;
 
             return item;
         }

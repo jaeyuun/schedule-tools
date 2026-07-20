@@ -4,6 +4,6 @@
     {
         public int Legs { get; set; }
         public double Diameter { get; set; }
-        public int Spacing { get; set; }
+        public double Spacing { get; set; }
     }
 }

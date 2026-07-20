@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Globalization;
 using System.Reflection;
 using System.Windows;
@@ -11,15 +10,11 @@ namespace GirderSchedule.App.Behaviors
 {
     public static class NumericTextBoxBehavior
     {
-        public static readonly DependencyProperty PropertyNameProperty = DependencyProperty.RegisterAttached("PropertyName", typeof(string), typeof(NumericTextBoxBehavior), new PropertyMetadata(null, OnPropertyNameChanged));
+        private static readonly DependencyProperty IsInternalUpdateProperty = DependencyProperty.RegisterAttached("IsInternalUpdate", typeof(bool), typeof(NumericTextBoxBehavior), new PropertyMetadata(false));
+        private static readonly DependencyProperty OriginalValueProperty = DependencyProperty.RegisterAttached("OriginalValue", typeof(object), typeof(NumericTextBoxBehavior), new PropertyMetadata(null));
+        public static readonly DependencyProperty PropertyNameProperty = DependencyProperty.RegisterAttached("PropertyName", typeof(string), typeof(NumericTextBoxBehavior), new PropertyMetadata(string.Empty, OnPropertyNameChanged));
         public static readonly DependencyProperty AllowNegativeProperty = DependencyProperty.RegisterAttached("AllowNegative", typeof(bool), typeof(NumericTextBoxBehavior), new PropertyMetadata(false));
-        public static readonly DependencyProperty NormalizeOnLostFocusProperty = DependencyProperty.RegisterAttached("NormalizeOnLostFocus", typeof(bool), typeof(NumericTextBoxBehavior), new PropertyMetadata(true));
         public static readonly DependencyProperty UpdateSourceOnTextChangedProperty = DependencyProperty.RegisterAttached("UpdateSourceOnTextChanged", typeof(bool), typeof(NumericTextBoxBehavior), new PropertyMetadata(false));
-
-        private static readonly DependencyProperty SourceNotifierProperty = DependencyProperty.RegisterAttached("SourceNotifier", typeof(INotifyPropertyChanged), typeof(NumericTextBoxBehavior), new PropertyMetadata(null));
-        private static readonly DependencyProperty SourceHandlerProperty = DependencyProperty.RegisterAttached("SourceHandler", typeof(PropertyChangedEventHandler), typeof(NumericTextBoxBehavior), new PropertyMetadata(null));
-
-        private static bool _isUpdatingText;
 
         public static string GetPropertyName(DependencyObject obj)
         {
@@ -41,16 +36,6 @@ namespace GirderSchedule.App.Behaviors
             obj.SetValue(AllowNegativeProperty, value);
         }
 
-        public static bool GetNormalizeOnLostFocus(DependencyObject obj)
-        {
-            return (bool)obj.GetValue(NormalizeOnLostFocusProperty);
-        }
-
-        public static void SetNormalizeOnLostFocus(DependencyObject obj, bool value)
-        {
-            obj.SetValue(NormalizeOnLostFocusProperty, value);
-        }
-
         public static bool GetUpdateSourceOnTextChanged(DependencyObject obj)
         {
             return (bool)obj.GetValue(UpdateSourceOnTextChangedProperty);
@@ -61,26 +46,24 @@ namespace GirderSchedule.App.Behaviors
             obj.SetValue(UpdateSourceOnTextChangedProperty, value);
         }
 
-        public static void Refresh(DependencyObject root)
+        private static bool GetIsInternalUpdate(DependencyObject obj)
         {
-            if (root == null)
-            {
-                return;
-            }
+            return (bool)obj.GetValue(IsInternalUpdateProperty);
+        }
 
-            var textBox = root as TextBox;
+        private static void SetIsInternalUpdate(DependencyObject obj, bool value)
+        {
+            obj.SetValue(IsInternalUpdateProperty, value);
+        }
 
-            if (textBox != null && !string.IsNullOrWhiteSpace(GetPropertyName(textBox)))
-            {
-                RefreshText(textBox);
-            }
+        private static object GetOriginalValue(DependencyObject obj)
+        {
+            return obj.GetValue(OriginalValueProperty);
+        }
 
-            var childrenCount = VisualTreeHelper.GetChildrenCount(root);
-
-            for (var i = 0; i < childrenCount; i++)
-            {
-                Refresh(VisualTreeHelper.GetChild(root, i));
-            }
+        private static void SetOriginalValue(DependencyObject obj, object value)
+        {
+            obj.SetValue(OriginalValueProperty, value);
         }
 
         private static void OnPropertyNameChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -92,42 +75,38 @@ namespace GirderSchedule.App.Behaviors
                 return;
             }
 
-            Detach(textBox);
+            DetachEvents(textBox);
 
             if (string.IsNullOrWhiteSpace(e.NewValue as string))
             {
                 return;
             }
 
-            Attach(textBox);
-            SubscribeSource(textBox);
+            AttachEvents(textBox);
+            RefreshTextBox(textBox);
         }
 
-        private static void Attach(TextBox textBox)
+        private static void AttachEvents(TextBox textBox)
         {
             textBox.Loaded += TextBox_Loaded;
-            textBox.Unloaded += TextBox_Unloaded;
             textBox.DataContextChanged += TextBox_DataContextChanged;
+            textBox.GotKeyboardFocus += TextBox_GotKeyboardFocus;
+            textBox.LostKeyboardFocus += TextBox_LostKeyboardFocus;
             textBox.PreviewTextInput += TextBox_PreviewTextInput;
             textBox.PreviewKeyDown += TextBox_PreviewKeyDown;
             textBox.TextChanged += TextBox_TextChanged;
-            textBox.LostFocus += TextBox_LostFocus;
-
             DataObject.AddPastingHandler(textBox, TextBox_Pasting);
         }
 
-        private static void Detach(TextBox textBox)
+        private static void DetachEvents(TextBox textBox)
         {
-            UnsubscribeSource(textBox);
-
             textBox.Loaded -= TextBox_Loaded;
-            textBox.Unloaded -= TextBox_Unloaded;
             textBox.DataContextChanged -= TextBox_DataContextChanged;
+            textBox.GotKeyboardFocus -= TextBox_GotKeyboardFocus;
+            textBox.LostKeyboardFocus -= TextBox_LostKeyboardFocus;
             textBox.PreviewTextInput -= TextBox_PreviewTextInput;
             textBox.PreviewKeyDown -= TextBox_PreviewKeyDown;
             textBox.TextChanged -= TextBox_TextChanged;
-            textBox.LostFocus -= TextBox_LostFocus;
-
             DataObject.RemovePastingHandler(textBox, TextBox_Pasting);
         }
 
@@ -135,21 +114,48 @@ namespace GirderSchedule.App.Behaviors
         {
             var textBox = sender as TextBox;
 
-            SubscribeSource(textBox);
-            RefreshText(textBox);
-        }
+            if (textBox == null)
+            {
+                return;
+            }
 
-        private static void TextBox_Unloaded(object sender, RoutedEventArgs e)
-        {
-            UnsubscribeSource(sender as TextBox);
+            RefreshTextBox(textBox);
         }
 
         private static void TextBox_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             var textBox = sender as TextBox;
 
-            SubscribeSource(textBox);
-            RefreshText(textBox);
+            if (textBox == null)
+            {
+                return;
+            }
+
+            RefreshTextBox(textBox);
+        }
+
+        private static void TextBox_GotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+        {
+            var textBox = sender as TextBox;
+
+            if (textBox == null)
+            {
+                return;
+            }
+
+            SetOriginalValue(textBox, GetSourceValue(textBox));
+        }
+
+        private static void TextBox_LostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+        {
+            var textBox = sender as TextBox;
+
+            if (textBox == null)
+            {
+                return;
+            }
+
+            CommitValue(textBox);
         }
 
         private static void TextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
@@ -158,296 +164,311 @@ namespace GirderSchedule.App.Behaviors
 
             if (textBox == null)
             {
-                e.Handled = true;
                 return;
             }
 
-            var proposedText = GetProposedText(textBox, e.Text);
-            e.Handled = !IsAllowedText(proposedText, GetAllowNegative(textBox));
+            var candidateText = GetCandidateText(textBox, e.Text);
+
+            if (!IsAllowedIntermediateText(textBox, candidateText))
+            {
+                e.Handled = true;
+            }
         }
 
         private static void TextBox_PreviewKeyDown(object sender, KeyEventArgs e)
         {
+            var textBox = sender as TextBox;
+
+            if (textBox == null)
+            {
+                return;
+            }
+
+            if (e.Key == Key.Enter)
+            {
+                CommitValue(textBox);
+                MoveFocusNext(textBox);
+                e.Handled = true;
+                return;
+            }
+
+            if (e.Key == Key.Escape)
+            {
+                RestoreOriginalValue(textBox);
+                MoveFocusNext(textBox);
+                e.Handled = true;
+                return;
+            }
+
             if (e.Key == Key.Space)
             {
                 e.Handled = true;
             }
         }
 
+        private static void TextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            var textBox = sender as TextBox;
+
+            if (textBox == null || GetIsInternalUpdate(textBox))
+            {
+                return;
+            }
+
+            if (!GetUpdateSourceOnTextChanged(textBox))
+            {
+                return;
+            }
+
+            TryUpdateSourceWhileTyping(textBox);
+        }
+
         private static void TextBox_Pasting(object sender, DataObjectPastingEventArgs e)
         {
             var textBox = sender as TextBox;
 
-            if (textBox == null || !e.DataObject.GetDataPresent(typeof(string)))
+            if (textBox == null)
+            {
+                return;
+            }
+
+            if (!e.DataObject.GetDataPresent(DataFormats.Text))
             {
                 e.CancelCommand();
                 return;
             }
 
-            var pasteText = e.DataObject.GetData(typeof(string)) as string;
-            var proposedText = GetProposedText(textBox, pasteText);
+            var pastedText = e.DataObject.GetData(DataFormats.Text) as string ?? string.Empty;
+            var candidateText = GetCandidateText(textBox, pastedText);
 
-            if (!IsAllowedText(proposedText, GetAllowNegative(textBox)))
+            if (!IsAllowedIntermediateText(textBox, candidateText))
             {
                 e.CancelCommand();
             }
         }
 
-        private static void TextBox_TextChanged(object sender, TextChangedEventArgs e)
+        private static void TryUpdateSourceWhileTyping(TextBox textBox)
         {
-            if (_isUpdatingText)
+            var text = NormalizeInputText(textBox.Text);
+
+            if (IsIntermediateText(text))
             {
                 return;
             }
 
-            var textBox = sender as TextBox;
+            var property = GetTargetProperty(textBox);
 
-            if (textBox == null || !GetUpdateSourceOnTextChanged(textBox))
+            if (property == null)
             {
                 return;
             }
 
-            ApplyTextToSource(textBox, false);
+            object convertedValue;
+
+            if (!TryConvertValue(property.PropertyType, text, out convertedValue))
+            {
+                return;
+            }
+
+            SetSourceValue(textBox, property, convertedValue);
         }
 
-        private static void TextBox_LostFocus(object sender, RoutedEventArgs e)
+        private static void CommitValue(TextBox textBox)
         {
-            var textBox = sender as TextBox;
+            var property = GetTargetProperty(textBox);
 
-            if (textBox == null)
+            if (property == null)
             {
                 return;
             }
 
-            ApplyTextToSource(textBox, true);
+            var text = NormalizeCommitText(textBox.Text, property.PropertyType);
 
-            if (GetNormalizeOnLostFocus(textBox))
-            {
-                NormalizeText(textBox);
-            }
-        }
+            object convertedValue;
 
-        private static void SubscribeSource(TextBox textBox)
-        {
-            if (textBox == null)
+            if (!TryConvertValue(property.PropertyType, text, out convertedValue))
             {
+                RestoreOriginalValue(textBox);
                 return;
             }
 
-            UnsubscribeSource(textBox);
-
-            var notifier = textBox.DataContext as INotifyPropertyChanged;
-
-            if (notifier == null)
-            {
-                ClearSourceSubscription(textBox);
-                return;
-            }
-
-            PropertyChangedEventHandler handler = delegate (object sender, PropertyChangedEventArgs e)
-            {
-                Source_PropertyChanged(textBox, e);
-            };
-
-            notifier.PropertyChanged += handler;
-
-            textBox.SetValue(SourceNotifierProperty, notifier);
-            textBox.SetValue(SourceHandlerProperty, handler);
+            SetSourceValue(textBox, property, convertedValue);
+            SetOriginalValue(textBox, convertedValue);
+            SetTextWithoutNotification(textBox, FormatValue(convertedValue));
         }
 
-        private static void UnsubscribeSource(TextBox textBox)
+        private static string NormalizeCommitText(string text, Type propertyType)
         {
-            if (textBox == null)
+            text = NormalizeInputText(text);
+
+            if (string.IsNullOrWhiteSpace(text) || text == "-" || text == "." || text == "-.")
             {
-                return;
+                return "0";
             }
 
-            var notifier = textBox.GetValue(SourceNotifierProperty) as INotifyPropertyChanged;
-            var handler = textBox.GetValue(SourceHandlerProperty) as PropertyChangedEventHandler;
-
-            if (notifier != null && handler != null)
+            if (IsIntegerType(propertyType))
             {
-                notifier.PropertyChanged -= handler;
+                return text;
             }
 
-            ClearSourceSubscription(textBox);
+            if (text.StartsWith(".", StringComparison.Ordinal))
+            {
+                text = "0" + text;
+            }
+            else if (text.StartsWith("-.", StringComparison.Ordinal))
+            {
+                text = "-0" + text.Substring(1);
+            }
+
+            if (text.EndsWith(".", StringComparison.Ordinal))
+            {
+                text = text.TrimEnd('.');
+            }
+
+            if (string.IsNullOrWhiteSpace(text) || text == "-")
+            {
+                return "0";
+            }
+
+            return text;
         }
 
-        private static void ClearSourceSubscription(TextBox textBox)
+        private static string NormalizeInputText(string text)
         {
-            textBox.SetValue(SourceNotifierProperty, null);
-            textBox.SetValue(SourceHandlerProperty, null);
+            return (text ?? string.Empty)
+                .Trim()
+                .Replace(',', '.');
         }
 
-        private static void Source_PropertyChanged(TextBox textBox, PropertyChangedEventArgs e)
+        private static bool IsAllowedIntermediateText(TextBox textBox, string text)
         {
-            if (textBox == null || textBox.IsKeyboardFocusWithin)
-            {
-                return;
-            }
+            text = NormalizeInputText(text);
 
-            var propertyName = GetPropertyName(textBox);
-
-            if (!string.IsNullOrWhiteSpace(e.PropertyName) && e.PropertyName != propertyName)
-            {
-                return;
-            }
-
-            textBox.Dispatcher.BeginInvoke(new Action(() =>
-            {
-                if (!textBox.IsKeyboardFocusWithin)
-                {
-                    RefreshText(textBox);
-                }
-            }));
-        }
-
-        private static string GetProposedText(TextBox textBox, string input)
-        {
-            var text = textBox.Text ?? string.Empty;
-            var selectionStart = textBox.SelectionStart;
-            var selectionLength = textBox.SelectionLength;
-
-            if (selectionLength > 0)
-            {
-                text = text.Remove(selectionStart, selectionLength);
-            }
-
-            return text.Insert(selectionStart, input ?? string.Empty);
-        }
-
-        private static bool IsAllowedText(string text, bool allowNegative)
-        {
             if (string.IsNullOrEmpty(text))
             {
                 return true;
             }
 
-            var dotCount = 0;
-            var minusCount = 0;
-
-            for (var i = 0; i < text.Length; i++)
-            {
-                var c = text[i];
-
-                if (char.IsDigit(c))
-                {
-                    continue;
-                }
-
-                if (c == '.')
-                {
-                    dotCount++;
-
-                    if (dotCount > 1)
-                    {
-                        return false;
-                    }
-
-                    continue;
-                }
-
-                if (c == '-' && allowNegative && i == 0)
-                {
-                    minusCount++;
-
-                    if (minusCount > 1)
-                    {
-                        return false;
-                    }
-
-                    continue;
-                }
-
-                return false;
-            }
-
-            return true;
-        }
-
-        private static void ApplyTextToSource(TextBox textBox, bool force)
-        {
-            if (textBox == null)
-            {
-                return;
-            }
-
-            var source = textBox.DataContext;
-            var property = GetSourceProperty(textBox, source, true);
-
-            if (source == null || property == null)
-            {
-                return;
-            }
-
-            var text = textBox.Text ?? string.Empty;
-
-            if (string.IsNullOrWhiteSpace(text))
-            {
-                if (force)
-                {
-                    SetEmptyValue(source, property);
-                }
-
-                return;
-            }
-
-            double number;
-
-            if (!TryGetNumber(text, out number))
-            {
-                return;
-            }
-
-            SetValue(source, property, number);
-        }
-
-        private static void RefreshText(TextBox textBox)
-        {
-            if (textBox == null)
-            {
-                return;
-            }
-
-            var source = textBox.DataContext;
-            var property = GetSourceProperty(textBox, source, false);
-
-            if (source == null || property == null)
-            {
-                return;
-            }
-
-            var value = property.GetValue(source, null);
-            SetText(textBox, FormatValue(value));
-        }
-
-        private static PropertyInfo GetSourceProperty(TextBox textBox, object source, bool requireWrite)
-        {
-            if (source == null)
-            {
-                return null;
-            }
-
-            var propertyName = GetPropertyName(textBox);
-
-            if (string.IsNullOrWhiteSpace(propertyName))
-            {
-                return null;
-            }
-
-            var property = source.GetType().GetProperty(propertyName, BindingFlags.Instance | BindingFlags.Public);
+            var property = GetTargetProperty(textBox);
 
             if (property == null)
             {
-                return null;
+                return false;
             }
 
-            if (requireWrite && !property.CanWrite)
+            var isInteger = IsIntegerType(property.PropertyType);
+            var allowNegative = GetAllowNegative(textBox);
+
+            if (text == "-")
+            {
+                return allowNegative;
+            }
+
+            if (!isInteger && text == ".")
+            {
+                return true;
+            }
+
+            if (!isInteger && text == "-.")
+            {
+                return allowNegative;
+            }
+
+            if (!allowNegative && text.Contains("-"))
+            {
+                return false;
+            }
+
+            if (text.IndexOf('-', 1) >= 0)
+            {
+                return false;
+            }
+
+            if (isInteger && text.Contains("."))
+            {
+                return false;
+            }
+
+            if (!isInteger && CountCharacter(text, '.') > 1)
+            {
+                return false;
+            }
+
+            if (isInteger)
+            {
+                int intValue;
+                return int.TryParse(text, NumberStyles.Integer, CultureInfo.InvariantCulture, out intValue);
+            }
+
+            double doubleValue;
+            return double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out doubleValue);
+        }
+
+        private static bool IsIntermediateText(string text)
+        {
+            return string.IsNullOrWhiteSpace(text) ||
+                   text == "-" ||
+                   text == "." ||
+                   text == "-." ||
+                   text.EndsWith(".", StringComparison.Ordinal);
+        }
+
+        private static int CountCharacter(string text, char value)
+        {
+            var count = 0;
+
+            for (var i = 0; i < text.Length; i++)
+            {
+                if (text[i] == value)
+                {
+                    count++;
+                }
+            }
+
+            return count;
+        }
+
+        private static string GetCandidateText(TextBox textBox, string inputText)
+        {
+            var currentText = textBox.Text ?? string.Empty;
+            var selectionStart = textBox.SelectionStart;
+            var selectionLength = textBox.SelectionLength;
+
+            if (selectionStart < 0)
+            {
+                selectionStart = 0;
+            }
+
+            if (selectionStart > currentText.Length)
+            {
+                selectionStart = currentText.Length;
+            }
+
+            if (selectionLength < 0)
+            {
+                selectionLength = 0;
+            }
+
+            if (selectionStart + selectionLength > currentText.Length)
+            {
+                selectionLength = currentText.Length - selectionStart;
+            }
+
+            return currentText.Remove(selectionStart, selectionLength).Insert(selectionStart, inputText ?? string.Empty);
+        }
+
+        private static PropertyInfo GetTargetProperty(TextBox textBox)
+        {
+            var propertyName = GetPropertyName(textBox);
+
+            if (string.IsNullOrWhiteSpace(propertyName) || textBox.DataContext == null)
             {
                 return null;
             }
 
-            if (!requireWrite && !property.CanRead)
+            var property = textBox.DataContext.GetType().GetProperty(propertyName, BindingFlags.Instance | BindingFlags.Public);
+
+            if (property == null || !property.CanRead || !property.CanWrite)
             {
                 return null;
             }
@@ -455,133 +476,106 @@ namespace GirderSchedule.App.Behaviors
             return property;
         }
 
-        private static bool TryGetNumber(string text, out double number)
+        private static object GetSourceValue(TextBox textBox)
         {
-            number = 0.0;
+            var property = GetTargetProperty(textBox);
 
-            if (string.IsNullOrWhiteSpace(text))
+            if (property == null || textBox.DataContext == null)
             {
-                return false;
+                return null;
             }
 
-            text = NormalizeNumberText(text.Trim());
-
-            if (string.IsNullOrWhiteSpace(text))
-            {
-                number = 0.0;
-                return true;
-            }
-
-            if (double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out number))
-            {
-                return true;
-            }
-
-            return double.TryParse(text, NumberStyles.Float, CultureInfo.CurrentCulture, out number);
+            return property.GetValue(textBox.DataContext);
         }
 
-        private static string NormalizeNumberText(string text)
+        private static void SetSourceValue(TextBox textBox, PropertyInfo property, object value)
         {
-            if (text == "-" || text == "." || text == "-.")
+            if (textBox.DataContext == null || property == null)
             {
-                return string.Empty;
+                return;
             }
 
-            if (text.StartsWith("."))
+            var currentValue = property.GetValue(textBox.DataContext);
+
+            if (Equals(currentValue, value))
             {
-                text = "0" + text;
-            }
-            else if (text.StartsWith("-."))
-            {
-                text = "-0" + text.Substring(1);
+                return;
             }
 
-            if (text.EndsWith("."))
-            {
-                text = text.Substring(0, text.Length - 1);
-            }
-
-            if (text == "-")
-            {
-                return string.Empty;
-            }
-
-            return text;
+            property.SetValue(textBox.DataContext, value);
         }
 
-        private static void SetValue(object source, PropertyInfo property, double number)
+        private static bool TryConvertValue(Type propertyType, string text, out object convertedValue)
         {
-            var nullableType = Nullable.GetUnderlyingType(property.PropertyType);
-            var type = nullableType ?? property.PropertyType;
+            var underlyingType = Nullable.GetUnderlyingType(propertyType) ?? propertyType;
 
-            if (type == typeof(string))
+            if (underlyingType == typeof(int))
             {
-                property.SetValue(source, FormatNumber(number), null);
-                return;
+                int value;
+
+                if (int.TryParse(text, NumberStyles.Integer, CultureInfo.InvariantCulture, out value))
+                {
+                    convertedValue = value;
+                    return true;
+                }
+            }
+            else if (underlyingType == typeof(double))
+            {
+                double value;
+
+                if (double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out value))
+                {
+                    convertedValue = value;
+                    return true;
+                }
+            }
+            else if (underlyingType == typeof(float))
+            {
+                float value;
+
+                if (float.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out value))
+                {
+                    convertedValue = value;
+                    return true;
+                }
+            }
+            else if (underlyingType == typeof(decimal))
+            {
+                decimal value;
+
+                if (decimal.TryParse(text, NumberStyles.Number, CultureInfo.InvariantCulture, out value))
+                {
+                    convertedValue = value;
+                    return true;
+                }
+            }
+            else if (underlyingType == typeof(long))
+            {
+                long value;
+
+                if (long.TryParse(text, NumberStyles.Integer, CultureInfo.InvariantCulture, out value))
+                {
+                    convertedValue = value;
+                    return true;
+                }
             }
 
-            if (type == typeof(double))
-            {
-                property.SetValue(source, number, null);
-                return;
-            }
-
-            if (type == typeof(int))
-            {
-                property.SetValue(source, (int)number, null);
-            }
+            convertedValue = null;
+            return false;
         }
 
-        private static void SetEmptyValue(object source, PropertyInfo property)
+        private static bool IsIntegerType(Type propertyType)
         {
-            var nullableType = Nullable.GetUnderlyingType(property.PropertyType);
-            var type = nullableType ?? property.PropertyType;
+            var underlyingType = Nullable.GetUnderlyingType(propertyType) ?? propertyType;
 
-            if (property.PropertyType == typeof(string))
-            {
-                property.SetValue(source, string.Empty, null);
-                return;
-            }
-
-            if (nullableType != null)
-            {
-                property.SetValue(source, null, null);
-                return;
-            }
-
-            if (type == typeof(double))
-            {
-                property.SetValue(source, 0.0, null);
-                return;
-            }
-
-            if (type == typeof(int))
-            {
-                property.SetValue(source, 0, null);
-            }
-        }
-
-        private static void NormalizeText(TextBox textBox)
-        {
-            double number;
-
-            if (!TryGetNumber(textBox.Text, out number))
-            {
-                RefreshText(textBox);
-                return;
-            }
-
-            SetText(textBox, FormatNumber(number));
-        }
-
-        private static void SetText(TextBox textBox, string text)
-        {
-            _isUpdatingText = true;
-
-            textBox.Text = text ?? string.Empty;
-            textBox.CaretIndex = textBox.Text.Length;
-
-            _isUpdatingText = false;
+            return underlyingType == typeof(byte) ||
+                   underlyingType == typeof(short) ||
+                   underlyingType == typeof(int) ||
+                   underlyingType == typeof(long) ||
+                   underlyingType == typeof(sbyte) ||
+                   underlyingType == typeof(ushort) ||
+                   underlyingType == typeof(uint) ||
+                   underlyingType == typeof(ulong);
         }
 
         private static string FormatValue(object value)
@@ -591,17 +585,87 @@ namespace GirderSchedule.App.Behaviors
                 return string.Empty;
             }
 
-            if (value is double)
+            if (value is double doubleValue)
             {
-                return FormatNumber((double)value);
+                return doubleValue.ToString("0.################", CultureInfo.InvariantCulture);
             }
 
-            return value.ToString();
+            if (value is float floatValue)
+            {
+                return floatValue.ToString("0.################", CultureInfo.InvariantCulture);
+            }
+
+            if (value is decimal decimalValue)
+            {
+                return decimalValue.ToString("0.################", CultureInfo.InvariantCulture);
+            }
+
+            return Convert.ToString(value, CultureInfo.InvariantCulture) ?? string.Empty;
         }
 
-        private static string FormatNumber(double value)
+        private static void RestoreOriginalValue(TextBox textBox)
         {
-            return value.ToString("0.#", CultureInfo.InvariantCulture);
+            var originalValue = GetOriginalValue(textBox);
+
+            if (originalValue == null)
+            {
+                originalValue = GetSourceValue(textBox);
+            }
+
+            SetTextWithoutNotification(textBox, FormatValue(originalValue));
+        }
+
+        private static void RefreshTextBox(TextBox textBox)
+        {
+            if (textBox == null || textBox.IsKeyboardFocusWithin)
+            {
+                return;
+            }
+
+            var value = GetSourceValue(textBox);
+
+            SetOriginalValue(textBox, value);
+            SetTextWithoutNotification(textBox, FormatValue(value));
+        }
+
+        private static void SetTextWithoutNotification(TextBox textBox, string text)
+        {
+            SetIsInternalUpdate(textBox, true);
+
+            try
+            {
+                textBox.Text = text ?? string.Empty;
+            }
+            finally
+            {
+                SetIsInternalUpdate(textBox, false);
+            }
+        }
+
+        private static void MoveFocusNext(TextBox textBox)
+        {
+            var request = new TraversalRequest(FocusNavigationDirection.Next);
+            textBox.MoveFocus(request);
+        }
+
+        public static void Refresh(DependencyObject root)
+        {
+            if (root == null)
+            {
+                return;
+            }
+
+            if (root is TextBox textBox && !string.IsNullOrWhiteSpace(GetPropertyName(textBox)))
+            {
+                RefreshTextBox(textBox);
+            }
+
+            var childCount = VisualTreeHelper.GetChildrenCount(root);
+
+            for (var i = 0; i < childCount; i++)
+            {
+                Refresh(VisualTreeHelper.GetChild(root, i));
+            }
         }
     }
 }

@@ -89,7 +89,7 @@ namespace GirderSchedule.App.Services.Schedule
 
         public string FormatStirrupText(StirrupData stirrup)
         {
-            if (stirrup == null || stirrup.Legs <= 0 || stirrup.Diameter <= 0.0 || stirrup.Spacing <= 0)
+            if (stirrup == null || stirrup.Legs <= 0 || stirrup.Diameter <= 0.0 || stirrup.Spacing <= 0.0)
             {
                 return "-";
             }

@@ -54,7 +54,7 @@
 
         <Border Grid.Row="0" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="0,0,0,1">
             <DockPanel LastChildFill="True">
-                <Menu DockPanel.Dock="Left" Style="{StaticResource ModernMenuBarStyle}">
+                <Menu x:Name="MainMenu" DockPanel.Dock="Left" Focusable="True" Style="{StaticResource ModernMenuBarStyle}" PreviewMouseDown="MainMenu_PreviewMouseDown">
                     <MenuItem Header="파일(_F)" Style="{StaticResource ModernTopMenuItemStyle}">
                         <MenuItem Header="새 일람표" Command="{Binding NewProjectCommand}" Style="{StaticResource ModernSubMenuItemStyle}"/>
                         <MenuItem Header="열기" Command="{Binding OpenProjectCommand}" Style="{StaticResource ModernSubMenuItemStyle}"/>

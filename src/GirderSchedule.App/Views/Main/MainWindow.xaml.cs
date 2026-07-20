@@ -4,6 +4,7 @@ using GirderSchedule.Domain.Models;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace GirderSchedule.App.Views.Main
 {
@@ -28,6 +29,11 @@ namespace GirderSchedule.App.Views.Main
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             WindowSizeHelper.FitToWorkArea(this);
+        }
+
+        private void MainMenu_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            Keyboard.Focus(MainMenu);
         }
 
         private void Window_Closing(object sender, CancelEventArgs e)
@@ -78,38 +84,24 @@ namespace GirderSchedule.App.Views.Main
             UpdatePreviewToolbar();
         }
 
-		private void UpdatePreviewToolbar()
-		{
-			if (EditorToolbar == null ||
-				PreviewToolbar == null ||
-				PreviewControl == null ||
-				MainTabControl == null)
-			{
-				return;
-			}
+        private void UpdatePreviewToolbar()
+        {
+            if (EditorToolbar == null || PreviewToolbar == null || PreviewControl == null || MainTabControl == null)
+            {
+                return;
+            }
 
-			var isPreviewSelected = ReferenceEquals(MainTabControl.SelectedItem, PreviewTabItem);
+            var isPreviewSelected = ReferenceEquals(MainTabControl.SelectedItem, PreviewTabItem);
 
-			EditorToolbar.Visibility = isPreviewSelected
-				? Visibility.Collapsed
-				: Visibility.Visible;
+            EditorToolbar.Visibility = isPreviewSelected ? Visibility.Collapsed : Visibility.Visible;
+            PreviewToolbar.Visibility = isPreviewSelected ? Visibility.Visible : Visibility.Collapsed;
+            EditorTabContent.Visibility = isPreviewSelected ? Visibility.Collapsed : Visibility.Visible;
+            PreviewTabContent.Visibility = isPreviewSelected ? Visibility.Visible : Visibility.Collapsed;
 
-			PreviewToolbar.Visibility = isPreviewSelected
-				? Visibility.Visible
-				: Visibility.Collapsed;
-
-			EditorTabContent.Visibility = isPreviewSelected
-				? Visibility.Collapsed
-				: Visibility.Visible;
-
-			PreviewTabContent.Visibility = isPreviewSelected
-				? Visibility.Visible
-				: Visibility.Collapsed;
-
-			PreviewPrevPageButton.IsEnabled = PreviewControl.CanGoPreviousPage;
-			PreviewNextPageButton.IsEnabled = PreviewControl.CanGoNextPage;
-			PreviewZoomTextBlock.Text = PreviewControl.ZoomText;
-			PreviewPageTextBlock.Text = PreviewControl.PageText;
-		}
-	}
+            PreviewPrevPageButton.IsEnabled = PreviewControl.CanGoPreviousPage;
+            PreviewNextPageButton.IsEnabled = PreviewControl.CanGoNextPage;
+            PreviewZoomTextBlock.Text = PreviewControl.ZoomText;
+            PreviewPageTextBlock.Text = PreviewControl.PageText;
+        }
+    }
 }

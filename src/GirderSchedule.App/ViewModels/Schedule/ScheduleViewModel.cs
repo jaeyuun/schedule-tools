@@ -185,6 +185,7 @@ namespace GirderSchedule.App.ViewModels.Schedule
 
             OnPropertyChanged(nameof(CurrentSet));
             OnPropertyChanged(nameof(FloorPrefix));
+            OnPropertyChanged(nameof(DisplayFloorPrefix));
             OnPropertyChanged(nameof(FloorName));
             OnPropertyChanged(nameof(MemberName));
             OnPropertyChanged(nameof(WidthValue));

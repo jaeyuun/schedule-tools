@@ -102,7 +102,7 @@ namespace GirderSchedule.Domain.Formatting
                 return "- HD   @";
             }
 
-            if (item.Stirrup.Legs <= 0 || item.Stirrup.Diameter <= 0 || item.Stirrup.Spacing <= 0)
+            if (item.Stirrup.Legs <= 0 || item.Stirrup.Diameter <= 0 || item.Stirrup.Spacing <= 0.0)
             {
                 return "- HD   @";
             }

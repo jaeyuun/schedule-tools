@@ -210,7 +210,7 @@ namespace GirderSchedule.App.ViewModels.Schedule
             }
         }
 
-        public int StirrupSpacing
+        public double StirrupSpacing
         {
             get { return _model.Stirrup.Spacing; }
             set
@@ -242,7 +242,7 @@ namespace GirderSchedule.App.ViewModels.Schedule
             }
         }
 
-        public int SkinRebarSpacing
+        public double SkinRebarSpacing
         {
             get { return _model.SkinRebar.Spacing; }
             set
