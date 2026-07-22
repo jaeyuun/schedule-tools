@@ -161,7 +161,7 @@
                     <TextBox x:Name="SearchTextBox" Style="{StaticResource ModernTextBoxStyle}" Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
                     <Button HorizontalAlignment="Right" VerticalAlignment="Center" Command="{Binding ClearSearchCommand}" Style="{StaticResource HomeSearchClearButtonStyle}">
-                        <TextBlock Margin="8,0" Text="{Binding Text, ElementName=SearchTextBox, Converter={StaticResource SearchIconTextConverter}}" Style="{StaticResource CaptionTextStyle}"/>
+                        <TextBlock Margin="{StaticResource HorMarginMedium}" Text="{Binding Text, ElementName=SearchTextBox, Converter={StaticResource SearchIconTextConverter}}" Style="{StaticResource CaptionTextStyle}"/>
                     </Button>
                 </Grid>
 

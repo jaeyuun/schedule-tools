@@ -1,6 +1,4 @@
-﻿using ScheduleTools.Core.IO;
-using ScheduleTools.Core.Serialization;
-using System;
+﻿using ScheduleTools.Core.Serialization;
 
 namespace ScheduleTools.Core.Settings
 {
@@ -8,6 +6,7 @@ namespace ScheduleTools.Core.Settings
     {
         private readonly AppSettingOptions _options;
 
+        public string ProjectPath => _options.ProjectPath;
         public double DefaultFontSize => _options.DefaultFontSize;
         public double MinFontSize => _options.MinFontSize;
         public double MaxFontSize => _options.MaxFontSize;
@@ -41,15 +40,8 @@ namespace ScheduleTools.Core.Settings
         public AppSetting CreateDefault()
         {
             return new AppSetting(
-                GetDefaultProjectFolder(),
+                _options.ProjectPath,
                 _options.DefaultFontSize);
-        }
-
-        public string GetDefaultProjectFolder()
-        {
-            return PathHelper.GetDefaultProjectDirectory(
-                _options.ApplicationFolderName,
-                _options.ProjectFolderName);
         }
 
         public double NormalizeFontSize(double fontSize)
@@ -69,7 +61,7 @@ namespace ScheduleTools.Core.Settings
         {
             if (string.IsNullOrWhiteSpace(setting.DefaultProjectFolder))
             {
-                setting.DefaultProjectFolder = GetDefaultProjectFolder();
+                setting.DefaultProjectFolder = _options.ProjectPath;
             }
 
             setting.DefaultFontSize = NormalizeFontSize(setting.DefaultFontSize);

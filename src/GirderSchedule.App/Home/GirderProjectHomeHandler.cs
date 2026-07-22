@@ -7,9 +7,9 @@ using Microsoft.Win32;
 using ScheduleTools.Wpf.Home.Contracts;
 using ScheduleTools.Wpf.Home.Models;
 using ScheduleTools.Wpf.ProjectCreate.Views;
+using ScheduleTools.Wpf.Windows.Contracts;
 using System;
 using System.IO;
-using System.Windows;
 
 namespace GirderSchedule.App.Home
 {
@@ -17,13 +17,16 @@ namespace GirderSchedule.App.Home
     {
         private readonly ProjectFileService _projectFileService;
         private readonly ScheduleProjectFactory _projectFactory;
+        private readonly IWindowService _windowService;
 
         public GirderProjectHomeHandler(
             ProjectFileService projectFileService,
-            ScheduleProjectFactory projectFactory)
+            ScheduleProjectFactory projectFactory,
+            IWindowService windowService)
         {
             _projectFileService = projectFileService ?? throw new ArgumentNullException(nameof(projectFileService));
             _projectFactory = projectFactory ?? throw new ArgumentNullException(nameof(projectFactory));
+            _windowService = windowService ?? throw new ArgumentNullException(nameof(windowService));
         }
 
         public string ProjectDialogTitle => FileConstants.ProjectDialogTitle;
@@ -34,15 +37,12 @@ namespace GirderSchedule.App.Home
 
         public HomeProjectLaunchResult CreateProject()
         {
-            var owner = Application.Current.MainWindow;
-
             var window = new ProjectCreateWindow
             {
-                Owner = owner,
                 DataContext = AppServices.CreateProjectCreateWindowViewModel()
             };
 
-            if (window.ShowDialog() != true || window.Result == null)
+            if (_windowService.ShowDialog(window) != true || window.Result == null)
                 return HomeProjectLaunchResult.Cancel();
 
             try
@@ -90,7 +90,7 @@ namespace GirderSchedule.App.Home
                 Multiselect = false
             };
 
-            var owner = Application.Current.MainWindow;
+            var owner = _windowService.GetMainWindow();
 
             if (dialog.ShowDialog(owner) != true)
                 return HomeProjectLaunchResult.Cancel();
@@ -130,15 +130,7 @@ namespace GirderSchedule.App.Home
             if (!result.IsSuccess || result.MainWindow == null)
                 return;
 
-            var currentWindow = Application.Current.MainWindow;
-            var mainWindow = result.MainWindow;
-
-            Application.Current.MainWindow = mainWindow;
-
-            mainWindow.Show();
-
-            if (currentWindow != null && !ReferenceEquals(currentWindow, mainWindow))
-                currentWindow.Close();
+            _windowService.SwitchMainWindow(result.MainWindow);
         }
     }
 }

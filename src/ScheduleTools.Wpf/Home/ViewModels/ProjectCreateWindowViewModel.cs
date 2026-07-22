@@ -55,7 +55,7 @@ namespace ScheduleTools.Wpf.ProjectCreate.ViewModels
         {
             _appSettingService = appSettingService ?? throw new ArgumentNullException(nameof(appSettingService));
 
-            ProjectFolder = _appSettingService.GetDefaultProjectFolder();
+            ProjectFolder = _appSettingService.ProjectPath;
 
             BrowseFolderCommand = new RelayCommand(_ => BrowseFolderRequested?.Invoke(this, EventArgs.Empty));
             CancelCommand = new RelayCommand(_ => CloseRequested?.Invoke(this, false));

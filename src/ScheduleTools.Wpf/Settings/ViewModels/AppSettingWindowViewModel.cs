@@ -134,7 +134,7 @@ namespace ScheduleTools.Wpf.Settings.ViewModels
 
             if (string.IsNullOrWhiteSpace(folderPath))
             {
-                folderPath = _settingService.GetDefaultProjectFolder();
+                folderPath = _settingService.ProjectPath;
             }
 
             var setting = _settingService.Load();

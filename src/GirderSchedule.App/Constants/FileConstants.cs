@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ScheduleTools.Core.IO;
+using System;
 using System.IO;
 
 namespace GirderSchedule.App.Constants
@@ -29,31 +30,26 @@ namespace GirderSchedule.App.Constants
 
         public const string CompanyFolderName = "ScheduleTools";
         public const string ApplicationFolderName = "GirderSchedule";
-        public const string ProjectFolderName = "Projects";
 
         public const string ResourcesFolderName = "Resources";
         public const string SettingFolderName = "Settings";
         public const string TemplateFolderName = "Templates";
-        public const string RecentProjectFolderName = "RecentProjects";
 
         public const string AppSettingFileName = "AppSetting.json";
-        public const string RecentProjectFileName = "recent-projects.json";
+        public const string RecentProjectFileName = "RecentProjects.json";
         public const string TemplateFileName = "GirderTemplate.dxf";
 
-        public static string AppDataPath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), CompanyFolderName, ApplicationFolderName);
-
+        public static string AppDataPath => PathHelper.GetApplicationDataDirectory(CompanyFolderName, ApplicationFolderName);
+        public static string ProjectPath => PathHelper.GetDocumentsDirectory(ApplicationFolderName);
         public static string SettingPath => Path.Combine(AppDataPath, SettingFolderName);
         public static string TemplatePath => Path.Combine(AppDataPath, TemplateFolderName);
-        public static string RecentProjectPath => Path.Combine(AppDataPath, RecentProjectFolderName);
-
         public static string AppSettingFilePath => Path.Combine(SettingPath, AppSettingFileName);
-
         public static string DefaultTemplateFilePath
         {
             get
             {
 #if DEBUG
-                return Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", ResourcesFolderName, TemplateFileName));
+                return Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", ResourcesFolderName, TemplateFileName);
 #else
                 return Path.Combine(InstalledResourcePath, TemplateFileName);
 #endif

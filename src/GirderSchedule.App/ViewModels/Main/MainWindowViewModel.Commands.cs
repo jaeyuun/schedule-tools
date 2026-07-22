@@ -15,28 +15,27 @@ namespace GirderSchedule.App.ViewModels.Main
     {
         private void InitializeCommands()
         {
-            NewProjectCommand = new RelayCommand(p => NewProject());
-            OpenProjectCommand = new RelayCommand(p => OpenProject());
-            SaveProjectCommand = new RelayCommand(p => SaveProject());
-            SaveAsProjectCommand = new RelayCommand(p => SaveAsProject());
-            EditFloorSettingCommand = new RelayCommand(p => EditFloorSetting());
-            EditDxfLayerSettingCommand = new RelayCommand(p => EditDxfLayerSetting());
-            EditAppSettingCommand = new RelayCommand(p => EditAppSetting());
-            AddSetCommand = new RelayCommand(p => AddSet(), p => SelectedFloor != null);
-            RemoveSetCommand = new RelayCommand(p => RemoveSet(), p => SelectedFloor != null && SelectedSet != null);
-            ExportCurrentSetCommand = new RelayCommand(p => ExportProjectDxf());
-            ExportExcelCommand = new RelayCommand(p => ExportProjectExcel());
-            CopyScheduleSetCommand = new RelayCommand(p => CopyScheduleSet(), p => CanCopyScheduleSet());
-            PasteScheduleSetCommand = new RelayCommand(p => PasteScheduleSet(), p => CanPasteScheduleSet());
+            NewProjectCommand = new RelayCommand(_ => NewProject());
+            OpenProjectCommand = new RelayCommand(_ => OpenProject());
+            SaveProjectCommand = new RelayCommand(_ => SaveProject());
+            SaveAsProjectCommand = new RelayCommand(_ => SaveAsProject());
+            EditFloorSettingCommand = new RelayCommand(_ => EditFloorSetting());
+            EditDxfLayerSettingCommand = new RelayCommand(_ => EditDxfLayerSetting());
+            EditAppSettingCommand = new RelayCommand(_ => EditAppSetting());
+            AddSetCommand = new RelayCommand(_ => AddSet(), _ => SelectedFloor != null);
+            RemoveSetCommand = new RelayCommand(_ => RemoveSet(), _ => SelectedFloor != null && SelectedSet != null);
+            ExportCurrentSetCommand = new RelayCommand(_ => ExportProjectDxf());
+            ExportExcelCommand = new RelayCommand(_ => ExportProjectExcel());
+            CopyScheduleSetCommand = new RelayCommand(_ => CopyScheduleSet(), _ => CanCopyScheduleSet());
+            PasteScheduleSetCommand = new RelayCommand(_ => PasteScheduleSet(), _ => CanPasteScheduleSet());
         }
 
         private void AddSet()
         {
             var node = _scheduleSetEditService.AddSet(_selectedFloor);
+
             if (node == null)
-            {
                 return;
-            }
 
             SelectedSet = node;
             IsDirty = true;
@@ -45,116 +44,117 @@ namespace GirderSchedule.App.ViewModels.Main
         private void RemoveSet()
         {
             if (SelectedFloor == null || SelectedSet == null)
-            {
                 return;
-            }
 
             var result = DialogService.ShowConfirm(
                 Properties.Resources.Title_DeleteMember,
                 Properties.Resources.Content_DeleteSelectedMemberConfirm);
 
             if (result != MessageBoxResult.Yes)
-            {
                 return;
-            }
 
-            SelectedSet = _scheduleSetEditService.RemoveSet(SelectedFloor, SelectedSet);
+            SelectedSet = _scheduleSetEditService.RemoveSet(
+                SelectedFloor,
+                SelectedSet);
+
             IsDirty = true;
         }
 
         private void EditFloorSetting()
         {
-            var viewModel = new FloorSettingWindowViewModel(Floors);
-            viewModel.SelectedFloor = SelectedFloor;
+            var viewModel = new FloorSettingWindowViewModel(Floors)
+            {
+                SelectedFloor = SelectedFloor
+            };
+
             viewModel.FloorSettingChanged += FloorSettingWindow_FloorSettingChanged;
 
-            var window = new FloorSettingWindow();
-            window.Owner = Application.Current.MainWindow;
-            window.DataContext = viewModel;
-            window.ShowDialog();
+            try
+            {
+                var window = new FloorSettingWindow
+                {
+                    DataContext = viewModel
+                };
 
-            viewModel.FloorSettingChanged -= FloorSettingWindow_FloorSettingChanged;
+                AppServices.WindowService.ShowDialog(window);
+            }
+            finally
+            {
+                viewModel.FloorSettingChanged -= FloorSettingWindow_FloorSettingChanged;
+            }
 
             _floorSettingEditService.SyncProjectFloors(Project, Floors);
             _floorSettingEditService.EnsureEachFloorHasSet(Floors);
 
             if (Floors.Count > 0 && SelectedFloor == null)
-            {
                 SelectedFloor = Floors[0];
-            }
         }
 
         private void EditDxfLayerSetting()
         {
             var originalSettingName = Project.DxfSettingName;
+
             var viewModel = new DxfLayerSettingWindowViewModel(Project);
-            var window = new DxfLayerSettingWindow();
-            window.Owner = Application.Current.MainWindow;
-            window.DataContext = viewModel;
-            if (window.ShowDialog() == true && Project.DxfSettingName != originalSettingName)
+
+            var window = new DxfLayerSettingWindow
             {
+                DataContext = viewModel
+            };
+
+            if (AppServices.WindowService.ShowDialog(window) == true && Project.DxfSettingName != originalSettingName)
                 IsDirty = true;
-            }
         }
 
         private void EditAppSetting()
         {
             var window = new AppSettingWindow
             {
-                Owner = Application.Current.MainWindow,
                 DataContext = AppServices.CreateAppSettingWindowViewModel()
             };
 
-            window.ShowDialog();
+            AppServices.WindowService.ShowDialog(window);
         }
 
-        private void FloorSettingWindow_FloorSettingChanged(object sender, EventArgs e)
+        private void FloorSettingWindow_FloorSettingChanged(object? sender, EventArgs e)
         {
-            var viewModel = sender as FloorSettingWindowViewModel;
-
-            if (viewModel == null || viewModel.SelectedFloor == null)
-            {
+            if (sender is not FloorSettingWindowViewModel viewModel || viewModel.SelectedFloor == null)
                 return;
-            }
 
             _floorSettingEditService.SyncProjectFloors(Project, Floors);
             _floorSettingEditService.EnsureEachFloorHasSet(Floors);
             ApplyFloorSettingToSets(viewModel.SelectedFloor);
 
             if (Floors.Count > 0 && SelectedFloor == null)
-            {
                 SelectedFloor = Floors[0];
-            }
 
             IsDirty = true;
         }
 
         private void ApplyFloorSettingToSets(FloorNodeViewModel floor)
         {
-            if (floor == null)
-            {
-                return;
-            }
+            ArgumentNullException.ThrowIfNull(floor);
 
             _floorSettingEditService.ApplyFloorSettingToSets(floor);
 
-            if (SelectedSet != null && floor.Sets.Contains(SelectedSet))
-            {
-                SelectedSet.RefreshAll();
-                Editor.LoadSet(floor.Model, SelectedSet.Model);
-            }
+            if (SelectedSet == null || !floor.Sets.Contains(SelectedSet))
+                return;
+
+            SelectedSet.RefreshAll();
+            Editor.LoadSet(floor.Model, SelectedSet.Model);
         }
 
         public void MoveFloor(FloorNodeViewModel source, FloorNodeViewModel target, bool isAfter)
         {
-            var isMoved = _scheduleTreeMoveService.MoveFloor(Floors, source, target, isAfter);
+            var isMoved = _scheduleTreeMoveService.MoveFloor(
+                Floors,
+                source,
+                target,
+                isAfter);
 
             SelectedFloor = source;
 
             if (!isMoved)
-            {
                 return;
-            }
 
             _floorSettingEditService.SyncProjectFloors(Project, Floors);
             IsDirty = true;
@@ -162,44 +162,52 @@ namespace GirderSchedule.App.ViewModels.Main
 
         public void MoveSet(ScheduleSetNodeViewModel source, ScheduleSetNodeViewModel target, bool isAfter)
         {
-            var result = _scheduleTreeMoveService.MoveSet(Floors, source, target, isAfter);
+            var result = _scheduleTreeMoveService.MoveSet(
+                Floors,
+                source,
+                target,
+                isAfter);
+
             ApplyMoveSetResult(result);
         }
 
         public void MoveSetToFloorAroundFloor(ScheduleSetNodeViewModel source, FloorNodeViewModel targetFloor, bool isAfter)
         {
-            var result = _scheduleTreeMoveService.MoveSetToFloorAroundFloor(Floors, source, targetFloor, isAfter);
+            var result = _scheduleTreeMoveService.MoveSetToFloorAroundFloor(
+                Floors,
+                source,
+                targetFloor,
+                isAfter);
+
             ApplyMoveSetResult(result);
         }
 
         public void MoveSetToFloor(ScheduleSetNodeViewModel source, FloorNodeViewModel targetFloor)
         {
-            var result = _scheduleTreeMoveService.MoveSetToFloor(Floors, source, targetFloor);
+            var result = _scheduleTreeMoveService.MoveSetToFloor(
+                Floors,
+                source,
+                targetFloor);
+
             ApplyMoveSetResult(result);
         }
 
         private void ApplyMoveSetResult(MoveSetResult result)
         {
             if (result == null || !result.IsSuccess)
-            {
                 return;
-            }
 
             SelectedFloor = result.SelectedFloor;
             SelectedSet = result.SelectedSet;
 
             if (result.IsChanged)
-            {
                 IsDirty = true;
-            }
         }
 
         private void ExportProjectDxf()
         {
             if (!SaveProjectBeforeExport())
-            {
                 return;
-            }
 
             _exportService.ExportDxf(Project, Floors);
         }
@@ -207,9 +215,7 @@ namespace GirderSchedule.App.ViewModels.Main
         private void ExportProjectExcel()
         {
             if (!SaveProjectBeforeExport())
-            {
                 return;
-            }
 
             _exportService.ExportExcel(Project, Floors);
         }
@@ -232,27 +238,19 @@ namespace GirderSchedule.App.ViewModels.Main
         private void PasteScheduleSet()
         {
             if (!_scheduleSetEditService.Paste(SelectedSet))
-            {
                 return;
-            }
 
             var parentFloor = FindFloorBySet(SelectedSet);
 
             if (parentFloor != null)
-            {
                 Editor.LoadSet(parentFloor.Model, SelectedSet.Model);
-            }
 
             IsDirty = true;
         }
 
-        private void Editor_CurrentSetChanged(object sender, EventArgs e)
+        private void Editor_CurrentSetChanged(object? sender, EventArgs e)
         {
-            if (SelectedSet != null)
-            {
-                SelectedSet.RefreshAll();
-            }
-
+            SelectedSet?.RefreshAll();
             IsDirty = true;
         }
     }

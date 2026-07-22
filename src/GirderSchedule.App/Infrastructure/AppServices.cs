@@ -10,6 +10,8 @@ using ScheduleTools.Wpf.Home.ViewModels;
 using ScheduleTools.Wpf.ProjectCreate.ViewModels;
 using ScheduleTools.Wpf.Services;
 using ScheduleTools.Wpf.Settings.ViewModels;
+using ScheduleTools.Wpf.Windows.Contracts;
+using ScheduleTools.Wpf.Windows.Services;
 using System.Reflection;
 
 namespace GirderSchedule.App.Infrastructure
@@ -17,16 +19,11 @@ namespace GirderSchedule.App.Infrastructure
     public static class AppServices
     {
         public static AppSettingService AppSetting { get; } = CreateAppSettingService();
-
         public static ProjectFileService ProjectFile { get; } = new ProjectFileService();
-
         public static ScheduleProjectFactory ProjectFactory { get; } = new ScheduleProjectFactory();
-
-        public static RecentProjectService RecentProject { get; } =
-            new RecentProjectService(FileConstants.RecentProjectPath);
-
-        public static IProjectHomeHandler ProjectHomeHandler { get; } =
-            new GirderProjectHomeHandler(ProjectFile, ProjectFactory);
+        public static RecentProjectService RecentProject { get; } = new RecentProjectService(FileConstants.SettingPath);
+        public static IWindowService WindowService { get; } = new WindowService();
+        public static IProjectHomeHandler ProjectHomeHandler { get; } = new GirderProjectHomeHandler(ProjectFile, ProjectFactory, WindowService);
 
         public static HomeStartViewModel CreateHomeStartViewModel()
         {
@@ -46,15 +43,26 @@ namespace GirderSchedule.App.Infrastructure
         {
             var version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "정보 없음";
 
-            return new AppSettingWindowViewModel(AppSetting, version);
+            return new AppSettingWindowViewModel(
+                AppSetting,
+                version);
+        }
+
+        public static ProjectService CreateProjectService()
+        {
+            return new ProjectService(
+                ProjectFile,
+                RecentProject,
+                AppSetting,
+                ProjectFactory,
+                WindowService);
         }
 
         private static AppSettingService CreateAppSettingService()
         {
             var options = new AppSettingOptions(
                 FileConstants.AppSettingFilePath,
-                FileConstants.ApplicationFolderName,
-                FileConstants.ProjectFolderName);
+                FileConstants.ProjectPath);
 
             return new AppSettingService(options);
         }

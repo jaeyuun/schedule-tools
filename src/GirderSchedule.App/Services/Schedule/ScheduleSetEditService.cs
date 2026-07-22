@@ -16,7 +16,7 @@ namespace GirderSchedule.App.Services.Schedule
             _copyService = copyService;
         }
 
-        public ScheduleSetNodeViewModel AddSet(FloorNodeViewModel selectedFloor)
+        public ScheduleSetNodeViewModel? AddSet(FloorNodeViewModel selectedFloor)
         {
             if (selectedFloor == null)
             {
@@ -29,7 +29,7 @@ namespace GirderSchedule.App.Services.Schedule
             return selectedFloor.AddSet(set);
         }
 
-        public ScheduleSetNodeViewModel RemoveSet(FloorNodeViewModel selectedFloor, ScheduleSetNodeViewModel selectedSet)
+        public ScheduleSetNodeViewModel? RemoveSet(FloorNodeViewModel selectedFloor, ScheduleSetNodeViewModel selectedSet)
         {
             if (selectedFloor == null || selectedSet == null)
             {
@@ -52,7 +52,7 @@ namespace GirderSchedule.App.Services.Schedule
             return selectedFloor.Sets[index];
         }
 
-        public bool CanCopy(ScheduleSetNodeViewModel selectedSet)
+        public bool CanCopy(ScheduleSetNodeViewModel? selectedSet)
         {
             return selectedSet != null && selectedSet.Model != null;
         }

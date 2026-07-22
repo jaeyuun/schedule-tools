@@ -7,9 +7,9 @@ using ScheduleTools.Core.Settings;
 using ScheduleTools.Wpf.ProjectCreate.ViewModels;
 using ScheduleTools.Wpf.ProjectCreate.Views;
 using ScheduleTools.Wpf.Services;
+using ScheduleTools.Wpf.Windows.Contracts;
 using System;
 using System.IO;
-using System.Windows;
 
 namespace GirderSchedule.App.Services.Project
 {
@@ -18,15 +18,16 @@ namespace GirderSchedule.App.Services.Project
         private readonly ProjectFileService _fileService;
         private readonly RecentProjectService _recentProjectService;
         private readonly AppSettingService _appSettingService;
+        private readonly ScheduleProjectFactory _projectFactory;
+        private readonly IWindowService _windowService;
 
-        public ProjectService(
-            ProjectFileService fileService,
-            RecentProjectService recentProjectService,
-            AppSettingService appSettingService)
+        public ProjectService(ProjectFileService fileService, RecentProjectService recentProjectService, AppSettingService appSettingService, ScheduleProjectFactory projectFactory, IWindowService windowService)
         {
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
             _recentProjectService = recentProjectService ?? throw new ArgumentNullException(nameof(recentProjectService));
             _appSettingService = appSettingService ?? throw new ArgumentNullException(nameof(appSettingService));
+            _projectFactory = projectFactory ?? throw new ArgumentNullException(nameof(projectFactory));
+            _windowService = windowService ?? throw new ArgumentNullException(nameof(windowService));
         }
 
         public ProjectOpenResult CreateNewProject()
@@ -35,43 +36,44 @@ namespace GirderSchedule.App.Services.Project
 
             var window = new ProjectCreateWindow
             {
-                Owner = Application.Current.MainWindow,
                 DataContext = viewModel
             };
 
-            if (window.ShowDialog() != true || window.Result == null)
+            if (_windowService.ShowDialog(window) != true || window.Result == null)
                 return ProjectOpenResult.Cancel();
 
             try
             {
                 var result = window.Result;
+                var projectName = result.ProjectName.Trim();
+                var projectFolder = result.ProjectFolder.Trim();
 
-                Directory.CreateDirectory(result.ProjectFolder);
+                Directory.CreateDirectory(projectFolder);
 
-                var project = new ScheduleProjectFactory().Create(result.ProjectName);
-
-                var fileName = result.ProjectName + FileConstants.ProjectExtension;
-                var filePath = Path.Combine(result.ProjectFolder, fileName);
+                var fileName = projectName + FileConstants.ProjectExtension;
+                var filePath = Path.Combine(projectFolder, fileName);
 
                 if (File.Exists(filePath))
                 {
                     DialogService.ShowNotice(
                         Properties.Resources.Title_ProjectSaveFailed,
-                        Properties.Resources.Content_FileSaveFailedWithError);
+                        "같은 이름의 프로젝트 파일이 이미 존재합니다.");
 
                     return ProjectOpenResult.Fail();
                 }
+
+                var project = _projectFactory.Create(projectName);
 
                 _fileService.Save(filePath, project);
                 _recentProjectService.AddOrUpdate(filePath, project.ProjectName);
 
                 return ProjectOpenResult.Success(project, filePath);
             }
-            catch
+            catch (Exception ex)
             {
                 DialogService.ShowNotice(
                     Properties.Resources.Title_ProjectSaveFailed,
-                    Properties.Resources.Content_FileSaveFailedWithError);
+                    $"{Properties.Resources.Content_FileSaveFailedWithError}\n\n{ex.Message}");
 
                 return ProjectOpenResult.Fail();
             }
@@ -83,25 +85,33 @@ namespace GirderSchedule.App.Services.Project
             {
                 Title = FileConstants.ProjectDialogTitle,
                 Filter = FileConstants.ProjectFilter,
-                DefaultExt = FileConstants.ProjectExtension
+                DefaultExt = FileConstants.ProjectExtension,
+                CheckFileExists = true,
+                Multiselect = false
             };
 
-            if (dialog.ShowDialog() != true)
+            var owner = _windowService.GetMainWindow();
+
+            if (dialog.ShowDialog(owner) != true)
                 return ProjectOpenResult.Cancel();
 
             try
             {
                 var project = _fileService.Load(dialog.FileName);
 
-                _recentProjectService.AddOrUpdate(dialog.FileName, project.ProjectName);
+                _recentProjectService.AddOrUpdate(
+                    dialog.FileName,
+                    project.ProjectName);
 
-                return ProjectOpenResult.Success(project, dialog.FileName);
+                return ProjectOpenResult.Success(
+                    project,
+                    dialog.FileName);
             }
-            catch
+            catch (Exception ex)
             {
                 DialogService.ShowNotice(
                     Properties.Resources.Title_OpenProjectFailed,
-                    Properties.Resources.Content_FileOpenFailedWithError);
+                    $"{Properties.Resources.Content_FileOpenFailedWithError}\n\n{ex.Message}");
 
                 return ProjectOpenResult.Fail();
             }
@@ -121,11 +131,11 @@ namespace GirderSchedule.App.Services.Project
 
                 return ProjectSaveResult.Success(filePath);
             }
-            catch
+            catch (Exception ex)
             {
                 DialogService.ShowNotice(
                     Properties.Resources.Title_ProjectSaveFailed,
-                    Properties.Resources.Content_FileSaveFailedWithError);
+                    $"{Properties.Resources.Content_FileSaveFailedWithError}\n\n{ex.Message}");
 
                 return ProjectSaveResult.Fail();
             }
@@ -146,7 +156,9 @@ namespace GirderSchedule.App.Services.Project
                     : project.ProjectName + FileConstants.ProjectExtension
             };
 
-            if (dialog.ShowDialog() != true)
+            var owner = _windowService.GetMainWindow();
+
+            if (dialog.ShowDialog(owner) != true)
                 return ProjectSaveResult.Cancel();
 
             try
@@ -156,11 +168,11 @@ namespace GirderSchedule.App.Services.Project
 
                 return ProjectSaveResult.Success(dialog.FileName);
             }
-            catch
+            catch (Exception ex)
             {
                 DialogService.ShowNotice(
                     Properties.Resources.Title_ProjectSaveFailed,
-                    Properties.Resources.Content_FileSaveFailedWithError);
+                    $"{Properties.Resources.Content_FileSaveFailedWithError}\n\n{ex.Message}");
 
                 return ProjectSaveResult.Fail();
             }

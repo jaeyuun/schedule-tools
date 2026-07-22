@@ -141,7 +141,7 @@ namespace GirderSchedule.App.ViewModels.Main
             }
         }
 
-        public ScheduleSetNodeViewModel SelectedSet
+        public ScheduleSetNodeViewModel? SelectedSet
         {
             get { return _selectedSet; }
             set
@@ -195,10 +195,7 @@ namespace GirderSchedule.App.ViewModels.Main
 
         private MainWindowViewModel(bool _)
         {
-            _projectService = new ProjectService(
-                AppServices.ProjectFile,
-                AppServices.RecentProject,
-                AppServices.AppSetting);
+            _projectService = AppServices.CreateProjectService();
 
             _floorSettingEditService = new FloorSettingEditService(
                 _setFactory,

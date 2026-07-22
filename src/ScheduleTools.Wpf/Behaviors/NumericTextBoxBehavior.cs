@@ -60,7 +60,7 @@ namespace ScheduleTools.Wpf.Behaviors
             return obj.GetValue(OriginalValueProperty);
         }
 
-        private static void SetOriginalValue(DependencyObject obj, object value)
+        private static void SetOriginalValue(DependencyObject obj, object? value)
         {
             obj.SetValue(OriginalValueProperty, value);
         }
@@ -262,9 +262,8 @@ namespace ScheduleTools.Wpf.Behaviors
                 return;
             }
 
-            object convertedValue;
 
-            if (!TryConvertValue(property.PropertyType, text, out convertedValue))
+            if (!TryConvertValue(property.PropertyType, text, out object? convertedValue))
             {
                 return;
             }
@@ -283,9 +282,8 @@ namespace ScheduleTools.Wpf.Behaviors
 
             var text = NormalizeCommitText(textBox.Text, property.PropertyType);
 
-            object convertedValue;
 
-            if (!TryConvertValue(property.PropertyType, text, out convertedValue))
+            if (!TryConvertValue(property.PropertyType, text, out object? convertedValue))
             {
                 RestoreOriginalValue(textBox);
                 return;
@@ -456,7 +454,7 @@ namespace ScheduleTools.Wpf.Behaviors
             return currentText.Remove(selectionStart, selectionLength).Insert(selectionStart, inputText ?? string.Empty);
         }
 
-        private static PropertyInfo GetTargetProperty(TextBox textBox)
+        private static PropertyInfo? GetTargetProperty(TextBox textBox)
         {
             var propertyName = GetPropertyName(textBox);
 
@@ -475,7 +473,7 @@ namespace ScheduleTools.Wpf.Behaviors
             return property;
         }
 
-        private static object GetSourceValue(TextBox textBox)
+        private static object? GetSourceValue(TextBox textBox)
         {
             var property = GetTargetProperty(textBox);
 
@@ -487,7 +485,7 @@ namespace ScheduleTools.Wpf.Behaviors
             return property.GetValue(textBox.DataContext);
         }
 
-        private static void SetSourceValue(TextBox textBox, PropertyInfo property, object value)
+        private static void SetSourceValue(TextBox textBox, PropertyInfo property, object? value)
         {
             if (textBox.DataContext == null || property == null)
             {
@@ -504,7 +502,7 @@ namespace ScheduleTools.Wpf.Behaviors
             property.SetValue(textBox.DataContext, value);
         }
 
-        private static bool TryConvertValue(Type propertyType, string text, out object convertedValue)
+        private static bool TryConvertValue(Type propertyType, string text, out object? convertedValue)
         {
             var underlyingType = Nullable.GetUnderlyingType(propertyType) ?? propertyType;
 
@@ -577,7 +575,7 @@ namespace ScheduleTools.Wpf.Behaviors
                    underlyingType == typeof(ulong);
         }
 
-        private static string FormatValue(object value)
+        private static string FormatValue(object? value)
         {
             if (value == null)
             {
