@@ -2,9 +2,9 @@
 
 	<PropertyGroup>
 		<TargetFramework>net8.0-windows</TargetFramework>
-		<Nullable>disable</Nullable>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
 		<UseWPF>true</UseWPF>
-		<ImplicitUsings>disable</ImplicitUsings>
 		<RootNamespace>GirderSchedule.Domain</RootNamespace>
 		<AssemblyName>GirderSchedule.Domain</AssemblyName>
 	</PropertyGroup>

@@ -1,8 +1,12 @@
-﻿using GirderSchedule.App.Services.Export;
+﻿using GirderSchedule.App.Constants;
+using GirderSchedule.App.Infrastructure;
+using GirderSchedule.App.Services.Export;
 using GirderSchedule.App.Services.Project;
 using GirderSchedule.App.Services.Schedule;
 using GirderSchedule.App.ViewModels.Schedule;
 using GirderSchedule.Domain.Models;
+using ScheduleTools.Core.RecentProjects;
+using ScheduleTools.Wpf.Mvvm;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 
@@ -10,14 +14,14 @@ namespace GirderSchedule.App.ViewModels.Main
 {
     public sealed partial class MainWindowViewModel : ViewModelBase
     {
-        private readonly ScheduleSetFactory _setFactory = new ScheduleSetFactory();
-        private readonly ScheduleExportService _exportService = new ScheduleExportService();
-        private readonly ScheduleTreeMoveService _scheduleTreeMoveService = new ScheduleTreeMoveService();
-        private readonly ProjectDisplayService _projectDisplayNameService = new ProjectDisplayService();
+        private readonly ScheduleSetFactory _setFactory = new();
+        private readonly ScheduleExportService _exportService = new();
+        private readonly ScheduleTreeMoveService _scheduleTreeMoveService = new();
+        private readonly ProjectDisplayService _projectDisplayService = new();
 
-        private ProjectService _projectService;
-        private FloorSettingEditService _floorSettingEditService;
-        private ScheduleSetEditService _scheduleSetEditService;
+        private readonly ProjectService _projectService;
+        private readonly FloorSettingEditService _floorSettingEditService;
+        private readonly ScheduleSetEditService _scheduleSetEditService;
 
         private ScheduleProject _project;
         private FloorNodeViewModel _selectedFloor;
@@ -102,15 +106,9 @@ namespace GirderSchedule.App.ViewModels.Main
             }
         }
 
-        public string WindowTitle
-        {
-            get { return _projectDisplayNameService.GetWindowTitle(Project, IsDirty, CurrentFilePath); }
-        }
+        public string WindowTitle => _projectDisplayService.GetWindowTitle(Project, IsDirty, CurrentFilePath);
 
-        public string ProjectDisplayName
-        {
-            get { return _projectDisplayNameService.GetProjectDisplayName(Project, IsDirty); }
-        }
+        public string ProjectDisplayName => _projectDisplayService.GetProjectDisplayName(Project, IsDirty);
 
         public FloorNodeViewModel SelectedFloor
         {
@@ -195,17 +193,33 @@ namespace GirderSchedule.App.ViewModels.Main
         public ICommand CopyScheduleSetCommand { get; private set; }
         public ICommand PasteScheduleSetCommand { get; private set; }
 
-        public MainWindowViewModel()
+        private MainWindowViewModel(bool _)
         {
+            _projectService = new ProjectService(
+                AppServices.ProjectFile,
+                AppServices.RecentProject,
+                AppServices.AppSetting);
+
+            _floorSettingEditService = new FloorSettingEditService(
+                _setFactory,
+                new FloorSettingApplyService());
+
+            _scheduleSetEditService = new ScheduleSetEditService(
+                _setFactory,
+                new ScheduleSetCopyService());
+
             Initialize();
+        }
+
+        public MainWindowViewModel() : this(true)
+        {
             CurrentFilePath = string.Empty;
             LoadProject(CreateNewProject("새 프로젝트"));
             IsDirty = false;
         }
 
-        public MainWindowViewModel(ScheduleProject project, string filePath)
+        public MainWindowViewModel(ScheduleProject project, string filePath) : this(true)
         {
-            Initialize();
             CurrentFilePath = filePath;
             LoadProject(project);
             IsDirty = false;
@@ -218,12 +232,9 @@ namespace GirderSchedule.App.ViewModels.Main
 
         private void Initialize()
         {
-            _projectService = new ProjectService(new ProjectFileService(), new RecentProjectService());
-            _floorSettingEditService = new FloorSettingEditService(_setFactory, new FloorSettingApplyService());
-            _scheduleSetEditService = new ScheduleSetEditService(_setFactory, new ScheduleSetCopyService());
-
             Editor = new ScheduleViewModel();
             Editor.CurrentSetChanged += Editor_CurrentSetChanged;
+
             Floors = new ObservableCollection<FloorNodeViewModel>();
 
             InitializeCommands();

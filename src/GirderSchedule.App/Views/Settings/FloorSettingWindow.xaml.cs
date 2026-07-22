@@ -1,6 +1,6 @@
-﻿using GirderSchedule.App.Utils;
-using GirderSchedule.App.ViewModels.Schedule;
+﻿using GirderSchedule.App.ViewModels.Schedule;
 using GirderSchedule.App.ViewModels.Settings;
+using ScheduleTools.Wpf.Utilities;
 using System;
 using System.Windows;
 using System.Windows.Controls;

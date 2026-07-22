@@ -1,21 +1,19 @@
 ﻿using GirderSchedule.App.Constants;
 using GirderSchedule.App.Services.Schedule;
-using GirderSchedule.App.Utils;
-using GirderSchedule.App.ViewModels.Settings;
 using GirderSchedule.App.ViewModels.Schedule;
+using GirderSchedule.App.ViewModels.Settings;
 using GirderSchedule.App.Views.Settings;
 using GirderSchedule.Domain.Models;
 using GirderSchedule.Domain.Models.Export;
-using GirderSchedule.Domain.Models.Settings;
 using GirderSchedule.Dxf.Export;
-using GirderSchedule.Dxf.Styles;
 using GirderSchedule.Excel;
 using Microsoft.Win32;
+using ScheduleTools.Core.IO;
+using ScheduleTools.Wpf.Services;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
-using System.Linq;
 using System.Windows;
 
 namespace GirderSchedule.App.Services.Export
@@ -51,7 +49,7 @@ namespace GirderSchedule.App.Services.Export
 
             if (pages.Count == 0)
             {
-                AppDialogService.ShowNotice(
+                DialogService.ShowNotice(
                     Properties.Resources.Title_ExportFailed,
                     Properties.Resources.Content_NoExportTargetSelected);
                 return;
@@ -78,7 +76,7 @@ namespace GirderSchedule.App.Services.Export
 
             if (exportProject == null || exportProject.Floors.Count == 0)
             {
-                AppDialogService.ShowNotice(
+                DialogService.ShowNotice(
                     Properties.Resources.Title_ExportFailed,
                     Properties.Resources.Content_NoExportTargetSelected);
                 return;
@@ -87,7 +85,7 @@ namespace GirderSchedule.App.Services.Export
             var dialog = new SaveFileDialog();
             dialog.Title = FileConstants.ExcelSaveDialogTitle;
             dialog.Filter = FileConstants.ExcelFilter;
-            dialog.InitialDirectory = PathUtil.GetDefaultProjectDirectory();
+            dialog.InitialDirectory = PathHelper.GetDefaultProjectDirectory(FileConstants.ApplicationFolderName, FileConstants.ProjectFolderName);
             dialog.FileName = BuildExcelFileName(exportProject.ProjectName, exportProject.ScheduleTitle);
             dialog.DefaultExt = FileConstants.ExcelExtension;
             dialog.AddExtension = true;
@@ -126,7 +124,7 @@ namespace GirderSchedule.App.Services.Export
 
                 if (!File.Exists(templatePath))
                 {
-                    AppDialogService.ShowNotice(
+                    DialogService.ShowNotice(
                         Properties.Resources.Title_ExportFailed,
                         Properties.Resources.Content_DxfTemplateFileNotFound);
                     return;
@@ -137,37 +135,37 @@ namespace GirderSchedule.App.Services.Export
 
                 exporter.Export(pages, filePath, options);
 
-                AppDialogService.ShowNotice(
+                DialogService.ShowNotice(
                     Properties.Resources.Title_ExportCompleted,
                     Properties.Resources.Content_ExportCompleted);
             }
             catch (UnauthorizedAccessException)
             {
-                AppDialogService.ShowNotice(
+                DialogService.ShowNotice(
                     Properties.Resources.Title_ExportFailed,
                     string.Format(Properties.Resources.Content_FileSaveFailedNoPermission, filePath));
             }
             catch (IOException)
             {
-                AppDialogService.ShowNotice(
+                DialogService.ShowNotice(
                     Properties.Resources.Title_ExportFailed,
                     string.Format(Properties.Resources.Content_FileSaveFailedFileOpened, filePath));
             }
             catch (Exception ex) when (ex.InnerException is IOException)
             {
-                AppDialogService.ShowNotice(
+                DialogService.ShowNotice(
                     Properties.Resources.Title_ExportFailed,
                     string.Format(Properties.Resources.Content_FileSaveFailedFileOpened, filePath));
             }
             catch (Exception ex) when (ex.InnerException is UnauthorizedAccessException)
             {
-                AppDialogService.ShowNotice(
+                DialogService.ShowNotice(
                     Properties.Resources.Title_ExportFailed,
                     string.Format(Properties.Resources.Content_FileSaveFailedNoPermission, filePath));
             }
             catch
             {
-                AppDialogService.ShowNotice(
+                DialogService.ShowNotice(
                     Properties.Resources.Title_ExportFailed,
                     Properties.Resources.Content_FileSaveFailedWithError);
             }
@@ -184,25 +182,25 @@ namespace GirderSchedule.App.Services.Export
 
                 exporter.Export(exportProject, filePath, options);
 
-                AppDialogService.ShowNotice(
+                DialogService.ShowNotice(
                     Properties.Resources.Title_ExportCompleted,
                     Properties.Resources.Content_ExportCompleted);
             }
             catch (IOException)
             {
-                AppDialogService.ShowNotice(
+                DialogService.ShowNotice(
                     Properties.Resources.Title_ExportFailed,
                     string.Format(Properties.Resources.Content_FileSaveFailedFileOpened, filePath));
             }
             catch (UnauthorizedAccessException)
             {
-                AppDialogService.ShowNotice(
+                DialogService.ShowNotice(
                     Properties.Resources.Title_ExportFailed,
                     string.Format(Properties.Resources.Content_FileSaveFailedNoPermission, filePath));
             }
             catch
             {
-                AppDialogService.ShowNotice(
+                DialogService.ShowNotice(
                     Properties.Resources.Title_ExportFailed,
                     Properties.Resources.Content_FileSaveFailedWithError);
             }
@@ -210,8 +208,8 @@ namespace GirderSchedule.App.Services.Export
 
         private string BuildDxfFileName(string projectName, string scheduleTitle)
         {
-            projectName = FileNameUtil.Sanitize(projectName);
-            scheduleTitle = FileNameUtil.Sanitize(scheduleTitle);
+            projectName = FileNameHelper.Sanitize(projectName);
+            scheduleTitle = FileNameHelper.Sanitize(scheduleTitle);
 
             if (string.IsNullOrWhiteSpace(projectName))
             {
@@ -228,8 +226,8 @@ namespace GirderSchedule.App.Services.Export
 
         private string BuildExcelFileName(string projectName, string scheduleTitle)
         {
-            projectName = FileNameUtil.Sanitize(projectName);
-            scheduleTitle = FileNameUtil.Sanitize(scheduleTitle);
+            projectName = FileNameHelper.Sanitize(projectName);
+            scheduleTitle = FileNameHelper.Sanitize(scheduleTitle);
 
             if (string.IsNullOrWhiteSpace(projectName))
             {

@@ -1,9 +1,9 @@
-using GirderSchedule.App.Common;
 using GirderSchedule.App.Constants;
 using GirderSchedule.Domain.Models.Settings;
 using GirderSchedule.Dxf.Constants;
 using GirderSchedule.Dxf.Documents;
 using netDxf;
+using ScheduleTools.Core.Serialization;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -231,7 +231,7 @@ namespace GirderSchedule.App.Services.Schedule
                 }
 
                 var json = ReadCompressedJson(fileStream);
-                var profile = AppJsonSerializer.Deserialize<DxfSettingProfile>(json);
+                var profile = JsonFileSerializer.Deserialize<DxfSettingProfile>(json);
 
                 if (profile == null)
                 {
@@ -264,7 +264,7 @@ namespace GirderSchedule.App.Services.Schedule
             EnsureProfile(profile, profile.SettingName);
 
             var path = GetSettingPath(profile.SettingName);
-            var json = AppJsonSerializer.Serialize(profile);
+            var json = JsonFileSerializer.Serialize(profile);
 
             WriteSettingFile(path, json);
         }

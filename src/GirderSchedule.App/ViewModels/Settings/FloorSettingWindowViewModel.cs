@@ -1,8 +1,9 @@
-﻿using GirderSchedule.App.Commands;
-using GirderSchedule.App.Services;
-using GirderSchedule.App.Services.Schedule;
+﻿using GirderSchedule.App.Services.Schedule;
 using GirderSchedule.App.ViewModels.Schedule;
 using GirderSchedule.Domain.Models;
+using ScheduleTools.Wpf.Commands;
+using ScheduleTools.Wpf.Mvvm;
+using ScheduleTools.Wpf.Services;
 using System;
 using System.Collections.ObjectModel;
 using System.Windows;
@@ -135,7 +136,7 @@ namespace GirderSchedule.App.ViewModels.Settings
         {
             if (string.IsNullOrWhiteSpace(InputFloorName))
             {
-                AppDialogService.ShowNotice(
+                DialogService.ShowNotice(
                     Properties.Resources.Title_FloorSetting,
                     Properties.Resources.Content_InputFloorName);
                 return;
@@ -169,7 +170,7 @@ namespace GirderSchedule.App.ViewModels.Settings
 
             if (string.IsNullOrWhiteSpace(InputFloorName))
             {
-                AppDialogService.ShowNotice(
+                DialogService.ShowNotice(
                     Properties.Resources.Title_FloorSetting,
                     Properties.Resources.Content_InputFloorName);
                 return;
@@ -201,7 +202,7 @@ namespace GirderSchedule.App.ViewModels.Settings
                 return;
             }
 
-            var result = AppDialogService.ShowConfirm(
+            var result = DialogService.ShowConfirm(
                 Properties.Resources.Title_DeleteFloor,
                 Properties.Resources.Content_DeleteSelectedFloorWithMembersConfirm);
 

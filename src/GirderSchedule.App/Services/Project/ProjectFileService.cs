@@ -1,7 +1,7 @@
-﻿using GirderSchedule.App.Common;
-using GirderSchedule.App.Services.Schedule;
+﻿using GirderSchedule.App.Services.Schedule;
 using GirderSchedule.Domain.Models;
 using GirderSchedule.Domain.Models.Settings;
+using ScheduleTools.Core.Serialization;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -17,7 +17,7 @@ namespace GirderSchedule.App.Services.Project
 
         public void Save(string filePath, ScheduleProject project)
         {
-            var json = AppJsonSerializer.Serialize(project);
+            var json = JsonFileSerializer.Serialize(project);
             var jsonBytes = Encoding.UTF8.GetBytes(json);
 
             using (var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write))
@@ -50,7 +50,7 @@ namespace GirderSchedule.App.Services.Project
                     gzipStream.CopyTo(memoryStream);
 
                     var json = Encoding.UTF8.GetString(memoryStream.ToArray());
-                    var project = AppJsonSerializer.Deserialize<ScheduleProject>(json);
+                    var project = JsonFileSerializer.Deserialize<ScheduleProject>(json);
 
                     if (project == null)
                     {

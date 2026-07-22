@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<OutputType>WinExe</OutputType>
 		<TargetFramework>net8.0-windows</TargetFramework>
-		<Nullable>disable</Nullable>
+		<Nullable>enable</Nullable>
 		<UseWPF>true</UseWPF>
 		<UseWindowsForms>true</UseWindowsForms>
 		<RootNamespace>GirderSchedule.App</RootNamespace>
@@ -37,9 +37,12 @@
 		<ProjectReference Include="..\GirderSchedule.Domain\GirderSchedule.Domain.csproj" />
 		<ProjectReference Include="..\GirderSchedule.Dxf\GirderSchedule.Dxf.csproj" />
 		<ProjectReference Include="..\GirderSchedule.Excel\GirderSchedule.Excel.csproj" />
+		<ProjectReference Include="..\ScheduleTools.Core\ScheduleTools.Core.csproj" />
+		<ProjectReference Include="..\ScheduleTools.Wpf\ScheduleTools.Wpf.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
+		<Folder Include="Settings\" />
 		<Folder Include="Resources\" />
 	</ItemGroup>
 

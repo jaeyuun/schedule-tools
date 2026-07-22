@@ -1,10 +1,10 @@
 ﻿using GirderSchedule.App.Rendering.Previews;
 using GirderSchedule.App.Services.Previews;
 using GirderSchedule.App.Services.Schedule;
-using GirderSchedule.App.ViewModels.Settings;
 using GirderSchedule.App.ViewModels.Schedule;
-using GirderSchedule.App.Views.Schedule.Behaviors;
+using GirderSchedule.App.ViewModels.Settings;
 using GirderSchedule.Domain.Models.Export;
+using ScheduleTools.Wpf.Behaviors;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

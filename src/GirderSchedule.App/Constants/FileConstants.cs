@@ -29,7 +29,7 @@ namespace GirderSchedule.App.Constants
 
         public const string CompanyFolderName = "ScheduleTools";
         public const string ApplicationFolderName = "GirderSchedule";
-        public const string ProjectFolderName = "GirderSchedule";
+        public const string ProjectFolderName = "Projects";
 
         public const string ResourcesFolderName = "Resources";
         public const string SettingFolderName = "Settings";
@@ -47,9 +47,6 @@ namespace GirderSchedule.App.Constants
         public static string RecentProjectPath => Path.Combine(AppDataPath, RecentProjectFolderName);
 
         public static string AppSettingFilePath => Path.Combine(SettingPath, AppSettingFileName);
-        public static string RecentProjectFilePath => Path.Combine(RecentProjectPath, RecentProjectFileName);
-
-        public static string InstalledResourcePath => Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ResourcesFolderName);
 
         public static string DefaultTemplateFilePath
         {

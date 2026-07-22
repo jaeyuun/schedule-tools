@@ -1,4 +1,5 @@
 using GirderSchedule.Domain.Models.Settings;
+using ScheduleTools.Wpf.Mvvm;
 
 namespace GirderSchedule.App.ViewModels.Settings
 {

@@ -1,5 +1,5 @@
 ﻿using GirderSchedule.App.Services;
-using GirderSchedule.App.Services.Ui;
+using ScheduleTools.Wpf.Services;
 using GirderSchedule.App.ViewModels.Schedule;
 using GirderSchedule.Domain.Models;
 using System.Windows;
@@ -117,7 +117,7 @@ namespace GirderSchedule.App.ViewModels.Main
                 return true;
             }
 
-            var result = AppDialogService.ShowSaveConfirm(
+            var result = DialogService.ShowSaveConfirm(
                 Properties.Resources.Title_ProjectSave, 
                 Properties.Resources.Content_UnsavedChangesSaveConfirm);
 
@@ -138,7 +138,7 @@ namespace GirderSchedule.App.ViewModels.Main
         {
             if (string.IsNullOrWhiteSpace(CurrentFilePath))
             {
-                var result = AppDialogService.ShowConfirm(
+                var result = DialogService.ShowConfirm(
                     Properties.Resources.Title_ProjectSave, 
                     Properties.Resources.Content_ProjectSaveRequiredBeforeExportConfirm);
 

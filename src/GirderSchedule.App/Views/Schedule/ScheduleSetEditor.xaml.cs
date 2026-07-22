@@ -1,11 +1,11 @@
+using GirderSchedule.App.Rendering.Models;
+using GirderSchedule.App.Rendering.Section;
+using GirderSchedule.App.ViewModels.Schedule;
+using ScheduleTools.Wpf.Behaviors;
 using System;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
-using GirderSchedule.App.Behaviors;
-using GirderSchedule.App.Rendering.Models;
-using GirderSchedule.App.Rendering.Section;
-using GirderSchedule.App.ViewModels.Schedule;
 
 namespace GirderSchedule.App.Views.Schedule
 {

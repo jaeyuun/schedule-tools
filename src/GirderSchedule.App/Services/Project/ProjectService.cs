@@ -1,11 +1,14 @@
 ﻿using GirderSchedule.App.Constants;
-using GirderSchedule.App.Services.Ui;
-using GirderSchedule.App.ViewModels.Home;
-using GirderSchedule.App.ViewModels.Settings;
-using GirderSchedule.App.Views.Home;
-using GirderSchedule.App.Views.Settings;
+using GirderSchedule.App.Services.Schedule;
 using GirderSchedule.Domain.Models;
 using Microsoft.Win32;
+using ScheduleTools.Core.RecentProjects;
+using ScheduleTools.Core.Settings;
+using ScheduleTools.Wpf.ProjectCreate.ViewModels;
+using ScheduleTools.Wpf.ProjectCreate.Views;
+using ScheduleTools.Wpf.Services;
+using System;
+using System.IO;
 using System.Windows;
 
 namespace GirderSchedule.App.Services.Project
@@ -14,152 +17,171 @@ namespace GirderSchedule.App.Services.Project
     {
         private readonly ProjectFileService _fileService;
         private readonly RecentProjectService _recentProjectService;
+        private readonly AppSettingService _appSettingService;
 
-        public ProjectService(ProjectFileService fileService, RecentProjectService recentProjectService)
+        public ProjectService(
+            ProjectFileService fileService,
+            RecentProjectService recentProjectService,
+            AppSettingService appSettingService)
         {
-            _fileService = fileService;
-            _recentProjectService = recentProjectService;
+            _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
+            _recentProjectService = recentProjectService ?? throw new ArgumentNullException(nameof(recentProjectService));
+            _appSettingService = appSettingService ?? throw new ArgumentNullException(nameof(appSettingService));
         }
 
-        public ProjectCreateResult CreateNewProject()
+        public ProjectOpenResult CreateNewProject()
         {
-            var window = new ProjectCreateWindow();
-            window.Owner = Application.Current.MainWindow;
+            var viewModel = new ProjectCreateWindowViewModel(_appSettingService);
 
-            if (window.ShowDialog() != true)
+            var window = new ProjectCreateWindow
             {
-                return ProjectCreateResult.Cancel();
-            }
+                Owner = Application.Current.MainWindow,
+                DataContext = viewModel
+            };
 
-            var viewModel = window.DataContext as ProjectCreateWindowViewModel;
+            if (window.ShowDialog() != true || window.Result == null)
+                return ProjectOpenResult.Cancel();
 
-            if (viewModel == null || viewModel.CreatedProject == null)
+            try
             {
-                return ProjectCreateResult.Cancel();
-            }
+                var result = window.Result;
 
-            return ProjectCreateResult.Success(viewModel.CreatedProject, viewModel.CreatedFilePath);
+                Directory.CreateDirectory(result.ProjectFolder);
+
+                var project = new ScheduleProjectFactory().Create(result.ProjectName);
+
+                var fileName = result.ProjectName + FileConstants.ProjectExtension;
+                var filePath = Path.Combine(result.ProjectFolder, fileName);
+
+                if (File.Exists(filePath))
+                {
+                    DialogService.ShowNotice(
+                        Properties.Resources.Title_ProjectSaveFailed,
+                        Properties.Resources.Content_FileSaveFailedWithError);
+
+                    return ProjectOpenResult.Fail();
+                }
+
+                _fileService.Save(filePath, project);
+                _recentProjectService.AddOrUpdate(filePath, project.ProjectName);
+
+                return ProjectOpenResult.Success(project, filePath);
+            }
+            catch
+            {
+                DialogService.ShowNotice(
+                    Properties.Resources.Title_ProjectSaveFailed,
+                    Properties.Resources.Content_FileSaveFailedWithError);
+
+                return ProjectOpenResult.Fail();
+            }
         }
 
         public ProjectOpenResult OpenProject()
         {
-            var dialog = new OpenFileDialog();
-            dialog.Title = FileConstants.ProjectDialogTitle;
-            dialog.Filter = FileConstants.ProjectFilter;
-            dialog.DefaultExt = FileConstants.ProjectExtension;
+            var dialog = new OpenFileDialog
+            {
+                Title = FileConstants.ProjectDialogTitle,
+                Filter = FileConstants.ProjectFilter,
+                DefaultExt = FileConstants.ProjectExtension
+            };
 
             if (dialog.ShowDialog() != true)
-            {
                 return ProjectOpenResult.Cancel();
-            }
 
             try
             {
                 var project = _fileService.Load(dialog.FileName);
+
                 _recentProjectService.AddOrUpdate(dialog.FileName, project.ProjectName);
+
                 return ProjectOpenResult.Success(project, dialog.FileName);
             }
             catch
             {
-                AppDialogService.ShowNotice(
-                    Properties.Resources.Title_OpenProjectFailed
-                    , Properties.Resources.Content_FileOpenFailedWithError);
+                DialogService.ShowNotice(
+                    Properties.Resources.Title_OpenProjectFailed,
+                    Properties.Resources.Content_FileOpenFailedWithError);
+
                 return ProjectOpenResult.Fail();
             }
         }
 
         public ProjectSaveResult SaveProject(ScheduleProject project, string filePath)
         {
+            ArgumentNullException.ThrowIfNull(project);
+
             if (string.IsNullOrWhiteSpace(filePath))
-            {
                 return SaveProjectAs(project);
-            }
 
             try
             {
                 _fileService.Save(filePath, project);
                 _recentProjectService.AddOrUpdate(filePath, project.ProjectName);
+
                 return ProjectSaveResult.Success(filePath);
             }
             catch
             {
-                AppDialogService.ShowNotice(
+                DialogService.ShowNotice(
                     Properties.Resources.Title_ProjectSaveFailed,
                     Properties.Resources.Content_FileSaveFailedWithError);
+
                 return ProjectSaveResult.Fail();
             }
         }
 
         public ProjectSaveResult SaveProjectAs(ScheduleProject project)
         {
-            var dialog = new SaveFileDialog();
-            dialog.Title = FileConstants.ProjectDialogTitle;
-            dialog.Filter = FileConstants.ProjectFilter;
-            dialog.DefaultExt = FileConstants.ProjectExtension;
-            dialog.AddExtension = true;
-            dialog.FileName = string.IsNullOrWhiteSpace(project.ProjectName) ? FileConstants.DefaultProjectFileName : project.ProjectName + FileConstants.ProjectExtension;
+            ArgumentNullException.ThrowIfNull(project);
+
+            var dialog = new SaveFileDialog
+            {
+                Title = FileConstants.ProjectDialogTitle,
+                Filter = FileConstants.ProjectFilter,
+                DefaultExt = FileConstants.ProjectExtension,
+                AddExtension = true,
+                FileName = string.IsNullOrWhiteSpace(project.ProjectName)
+                    ? FileConstants.DefaultProjectFileName
+                    : project.ProjectName + FileConstants.ProjectExtension
+            };
 
             if (dialog.ShowDialog() != true)
-            {
                 return ProjectSaveResult.Cancel();
-            }
 
             try
             {
                 _fileService.Save(dialog.FileName, project);
                 _recentProjectService.AddOrUpdate(dialog.FileName, project.ProjectName);
+
                 return ProjectSaveResult.Success(dialog.FileName);
             }
             catch
             {
-                AppDialogService.ShowNotice(
-                    Properties.Resources.Title_ProjectSaveFailed, 
+                DialogService.ShowNotice(
+                    Properties.Resources.Title_ProjectSaveFailed,
                     Properties.Resources.Content_FileSaveFailedWithError);
+
                 return ProjectSaveResult.Fail();
             }
         }
     }
 
-    public sealed class ProjectCreateResult
-    {
-        public bool IsSuccess { get; private set; }
-        public ScheduleProject Project { get; private set; }
-        public string FilePath { get; private set; }
-
-        private ProjectCreateResult()
-        {
-            FilePath = string.Empty;
-        }
-
-        public static ProjectCreateResult Success(ScheduleProject project, string filePath)
-        {
-            return new ProjectCreateResult
-            {
-                IsSuccess = true,
-                Project = project,
-                FilePath = filePath ?? string.Empty
-            };
-        }
-
-        public static ProjectCreateResult Cancel()
-        {
-            return new ProjectCreateResult();
-        }
-    }
-
     public sealed class ProjectOpenResult
     {
-        public bool IsSuccess { get; private set; }
-        public ScheduleProject Project { get; private set; }
-        public string FilePath { get; private set; }
+        public bool IsSuccess { get; private init; }
+        public bool IsCanceled { get; private init; }
+        public ScheduleProject? Project { get; private init; }
+        public string FilePath { get; private init; } = string.Empty;
 
         private ProjectOpenResult()
         {
-            FilePath = string.Empty;
         }
 
         public static ProjectOpenResult Success(ScheduleProject project, string filePath)
         {
+            ArgumentNullException.ThrowIfNull(project);
+
             return new ProjectOpenResult
             {
                 IsSuccess = true,
@@ -170,7 +192,10 @@ namespace GirderSchedule.App.Services.Project
 
         public static ProjectOpenResult Cancel()
         {
-            return new ProjectOpenResult();
+            return new ProjectOpenResult
+            {
+                IsCanceled = true
+            };
         }
 
         public static ProjectOpenResult Fail()
@@ -181,12 +206,12 @@ namespace GirderSchedule.App.Services.Project
 
     public sealed class ProjectSaveResult
     {
-        public bool IsSuccess { get; private set; }
-        public string FilePath { get; private set; }
+        public bool IsSuccess { get; private init; }
+        public bool IsCanceled { get; private init; }
+        public string FilePath { get; private init; } = string.Empty;
 
         private ProjectSaveResult()
         {
-            FilePath = string.Empty;
         }
 
         public static ProjectSaveResult Success(string filePath)
@@ -200,7 +225,10 @@ namespace GirderSchedule.App.Services.Project
 
         public static ProjectSaveResult Cancel()
         {
-            return new ProjectSaveResult();
+            return new ProjectSaveResult
+            {
+                IsCanceled = true
+            };
         }
 
         public static ProjectSaveResult Fail()

@@ -1,7 +1,9 @@
-﻿using GirderSchedule.App.Commands;
+﻿using ScheduleTools.Wpf.Commands;
 using GirderSchedule.App.Services;
 using System;
 using System.Windows.Input;
+using ScheduleTools.Wpf.Mvvm;
+using ScheduleTools.Wpf.Services;
 
 namespace GirderSchedule.App.ViewModels.Settings
 {
@@ -66,7 +68,7 @@ namespace GirderSchedule.App.ViewModels.Settings
 
             if (count <= 0)
             {
-                AppDialogService.ShowNotice(
+                DialogService.ShowNotice(
                     Properties.Resources.Title_ExportFailed,
                     Properties.Resources.Content_TotalColumnCountMustBeAtLeastOne);
                 return;

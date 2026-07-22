@@ -1,11 +1,12 @@
-﻿using GirderSchedule.App.Commands;
-using GirderSchedule.App.Services;
+﻿using GirderSchedule.App.Infrastructure;
 using GirderSchedule.App.Services.Schedule;
 using GirderSchedule.App.ViewModels.Schedule;
 using GirderSchedule.App.ViewModels.Settings;
 using GirderSchedule.App.Views.Settings;
+using ScheduleTools.Wpf.Commands;
+using ScheduleTools.Wpf.Services;
+using ScheduleTools.Wpf.Settings.Views;
 using System;
-using System.Reflection;
 using System.Windows;
 
 namespace GirderSchedule.App.ViewModels.Main
@@ -48,7 +49,7 @@ namespace GirderSchedule.App.ViewModels.Main
                 return;
             }
 
-            var result = AppDialogService.ShowConfirm(
+            var result = DialogService.ShowConfirm(
                 Properties.Resources.Title_DeleteMember,
                 Properties.Resources.Content_DeleteSelectedMemberConfirm);
 
@@ -98,10 +99,12 @@ namespace GirderSchedule.App.ViewModels.Main
 
         private void EditAppSetting()
         {
-            var viewModel = new AppSettingWindowViewModel();
-            var window = new AppSettingWindow();
-            window.Owner = Application.Current.MainWindow;
-            window.DataContext = viewModel;
+            var window = new AppSettingWindow
+            {
+                Owner = Application.Current.MainWindow,
+                DataContext = AppServices.CreateAppSettingWindowViewModel()
+            };
+
             window.ShowDialog();
         }
 

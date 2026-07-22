@@ -1,46 +1,23 @@
 ﻿<Application x:Class="GirderSchedule.App.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             StartupUri="Views/Home/HomeWindow.xaml">
+             ShutdownMode="OnMainWindowClose">
+
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="Views/Styles/Foundations.xaml"/>
-                <ResourceDictionary Source="Views/Styles/IconStyles.xaml"/>
-                <ResourceDictionary Source="Views/Styles/TextStyles.xaml"/>
-                <ResourceDictionary Source="Views/Styles/ButtonStyles.xaml"/>
-                <ResourceDictionary Source="Views/Styles/InputStyles.xaml"/>
-                <ResourceDictionary Source="Views/Styles/DataGridStyles.xaml"/>
-                <ResourceDictionary Source="Views/Styles/ScrollBarStyles.xaml"/>
-                <ResourceDictionary Source="Views/Styles/WindowStyles.xaml"/>
-                <ResourceDictionary Source="Views/Styles/DialogStyles.xaml"/>
-                <ResourceDictionary Source="Views/Styles/MenuStyles.xaml"/>
-                <ResourceDictionary Source="Views/Styles/LayoutStyles.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/ScheduleTools.Wpf;component/Themes/Foundations.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/ScheduleTools.Wpf;component/Themes/TextStyles.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/ScheduleTools.Wpf;component/Themes/ButtonStyles.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/ScheduleTools.Wpf;component/Themes/InputStyles.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/ScheduleTools.Wpf;component/Themes/DataGridStyles.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/ScheduleTools.Wpf;component/Themes/ScrollBarStyles.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/ScheduleTools.Wpf;component/Themes/WindowStyles.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/ScheduleTools.Wpf;component/Themes/DialogStyles.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/ScheduleTools.Wpf;component/Themes/MenuStyles.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/ScheduleTools.Wpf;component/Themes/LayoutStyles.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/ScheduleTools.Wpf;component/Themes/IconStyles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
-
-            <Style TargetType="{x:Type TextBlock}">
-                <Setter Property="FontSize" Value="{DynamicResource DefaultFontSize}"/>
-            </Style>
-
-            <Style TargetType="{x:Type TextBox}">
-                <Setter Property="FontSize" Value="{DynamicResource DefaultFontSize}"/>
-            </Style>
-
-            <Style TargetType="{x:Type ComboBox}">
-                <Setter Property="FontSize" Value="{DynamicResource DefaultFontSize}"/>
-            </Style>
-
-            <Style TargetType="{x:Type Button}">
-                <Setter Property="FontSize" Value="{DynamicResource DefaultFontSize}"/>
-            </Style>
-
-            <Style TargetType="{x:Type CheckBox}">
-                <Setter Property="FontSize" Value="{DynamicResource DefaultFontSize}"/>
-            </Style>
-
-            <Style TargetType="{x:Type Label}">
-                <Setter Property="FontSize" Value="{DynamicResource DefaultFontSize}"/>
-            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

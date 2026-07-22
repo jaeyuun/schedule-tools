@@ -1,12 +1,13 @@
-using GirderSchedule.App.Commands;
 using GirderSchedule.App.Constants;
-using GirderSchedule.App.Services;
 using GirderSchedule.App.Services.Schedule;
 using GirderSchedule.Domain.Models;
 using GirderSchedule.Domain.Models.Settings;
 using GirderSchedule.Dxf.Constants;
 using Microsoft.Win32;
 using netDxf;
+using ScheduleTools.Wpf.Commands;
+using ScheduleTools.Wpf.Mvvm;
+using ScheduleTools.Wpf.Services;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -279,7 +280,7 @@ namespace GirderSchedule.App.ViewModels.Settings
 
             if (string.IsNullOrWhiteSpace(templateName))
             {
-                AppDialogService.ShowNotice(
+                DialogService.ShowNotice(
                     Properties.Resources.Title_DxfSetting,
                     Properties.Resources.Content_DxfTemplateAddFailed);
                 return;
@@ -347,7 +348,7 @@ namespace GirderSchedule.App.ViewModels.Settings
         {
             if (!_settingService.DeleteTemplate(SelectedTemplateName))
             {
-                AppDialogService.ShowNotice(
+                DialogService.ShowNotice(
                     Properties.Resources.Title_DxfSetting,
                     Properties.Resources.Content_DxfTemplateDeleteFailed);
                 return;
@@ -363,7 +364,7 @@ namespace GirderSchedule.App.ViewModels.Settings
 
             if (string.IsNullOrWhiteSpace(settingName))
             {
-                AppDialogService.ShowNotice(
+                DialogService.ShowNotice(
                     Properties.Resources.Title_DxfSetting,
                     Properties.Resources.Content_DxfSettingNameSet);
                 return;
@@ -374,7 +375,7 @@ namespace GirderSchedule.App.ViewModels.Settings
 
             if (!_settingService.Validate(profile).IsValid)
             {
-                AppDialogService.ShowNotice(
+                DialogService.ShowNotice(
                     Properties.Resources.Title_DxfSetting,
                     Properties.Resources.Content_DxfSettingNameError);
                 return;
@@ -402,7 +403,7 @@ namespace GirderSchedule.App.ViewModels.Settings
         {
             if (!_settingService.DeleteSetting(SelectedSettingName))
             {
-                AppDialogService.ShowNotice(
+                DialogService.ShowNotice(
                     Properties.Resources.Title_DxfSetting,
                     Properties.Resources.Content_DxfSettingDeleteFailed);
                 return;
@@ -422,7 +423,7 @@ namespace GirderSchedule.App.ViewModels.Settings
         {
             if (!ValidateCurrentSetting())
             {
-                AppDialogService.ShowNotice(
+                DialogService.ShowNotice(
                     Properties.Resources.Title_DxfSetting,
                     Properties.Resources.Content_DxfSettingNameError);
                 return;

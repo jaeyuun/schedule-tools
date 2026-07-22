@@ -1,8 +1,9 @@
-﻿using GirderSchedule.App.Commands;
+﻿using ScheduleTools.Wpf.Commands;
 using GirderSchedule.App.Services.Schedule;
 using GirderSchedule.Domain.Models;
 using System;
 using System.Windows.Input;
+using ScheduleTools.Wpf.Mvvm;
 
 namespace GirderSchedule.App.ViewModels.Schedule
 {
