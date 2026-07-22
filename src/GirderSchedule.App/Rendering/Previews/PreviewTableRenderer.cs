@@ -2,6 +2,7 @@ using GirderSchedule.App.Rendering.Formatting;
 using GirderSchedule.App.Rendering.Models;
 using GirderSchedule.App.Rendering.Section;
 using GirderSchedule.Domain.Models;
+using ScheduleTools.Wpf.Rendering;
 using System.Windows.Controls;
 
 namespace GirderSchedule.App.Rendering.Previews
@@ -26,7 +27,7 @@ namespace GirderSchedule.App.Rendering.Previews
             _formatter = new PreviewTextFormatter();
         }
 
-        public void DrawSetCell(Canvas canvas, ScheduleSet set, double x, double y, double width, double height, int row, int column, bool showLabels)
+        public void DrawSetCell(Canvas canvas, ScheduleSet? set, double x, double y, double width, double height, int row, int column, bool showLabels)
         {
             var layout = new SchedulePreviewCellLayout(x, y, width, height, showLabels);
 
@@ -125,7 +126,7 @@ namespace GirderSchedule.App.Rendering.Previews
             return item.Position;
         }
 
-        private void DrawPartColumn(Canvas canvas, string title, ScheduleItem item, double x, SchedulePreviewCellLayout layout)
+        private void DrawPartColumn(Canvas canvas, string title, ScheduleItem? item, double x, SchedulePreviewCellLayout layout)
         {
             _drawer.DrawTextBox(canvas, title, x, layout.SectionAreaY, layout.PartWidth, layout.PartHeaderHeight, 8.0, _brushes.Thin);
 
@@ -133,7 +134,7 @@ namespace GirderSchedule.App.Rendering.Previews
 
             DrawMemberForce(canvas, item, x, layout.ForceY, layout.PartWidth, layout.ForceHeight, isDisabled);
 
-            if (isDisabled)
+            if (item == null || isDisabled)
             {
                 DrawDisabledSection(canvas, x, layout);
                 return;
@@ -143,7 +144,7 @@ namespace GirderSchedule.App.Rendering.Previews
             DrawRebarTexts(canvas, item, x, layout);
         }
 
-        private void DrawMemberForce(Canvas canvas, ScheduleItem item, double x, double y, double width, double height, bool isDisabled)
+        private void DrawMemberForce(Canvas canvas, ScheduleItem? item, double x, double y, double width, double height, bool isDisabled)
         {
             var middleX = x + width / 2.0;
             var halfWidth = width / 2.0;

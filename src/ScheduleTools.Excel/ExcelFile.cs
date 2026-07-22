@@ -1,14 +1,12 @@
-﻿using System.IO;
-
-namespace GirderSchedule.Excel.Utils
+namespace ScheduleTools.Excel
 {
-    public static class ExcelFileUtil
+    public static class ExcelFile
     {
         public static void EnsureDirectory(string filePath)
         {
             var directory = Path.GetDirectoryName(filePath);
 
-            if (!string.IsNullOrWhiteSpace(directory) && !Directory.Exists(directory))
+            if (!string.IsNullOrWhiteSpace(directory))
             {
                 Directory.CreateDirectory(directory);
             }

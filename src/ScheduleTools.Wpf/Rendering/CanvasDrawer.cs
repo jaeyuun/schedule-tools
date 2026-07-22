@@ -1,29 +1,19 @@
-using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
-namespace GirderSchedule.App.Rendering
+namespace ScheduleTools.Wpf.Rendering
 {
-    public sealed class CanvasDrawer
+    public class CanvasDrawer
     {
         public void DrawLine(Canvas canvas, double x1, double y1, double x2, double y2, Brush stroke, double thickness)
         {
-            var line = new Line
-            {
-                X1 = x1,
-                Y1 = y1,
-                X2 = x2,
-                Y2 = y2,
-                Stroke = stroke,
-                StrokeThickness = thickness
-            };
-
+            var line = new Line { X1 = x1, Y1 = y1, X2 = x2, Y2 = y2, Stroke = stroke, StrokeThickness = thickness };
             canvas.Children.Add(line);
         }
 
-        public void DrawCircle(Canvas canvas, double centerX, double centerY, double radius, Brush stroke, double strokeThickness, Brush fill)
+        public void DrawCircle(Canvas canvas, double centerX, double centerY, double radius, Brush? stroke, double strokeThickness, Brush? fill)
         {
             var circle = new Ellipse
             {
@@ -57,13 +47,7 @@ namespace GirderSchedule.App.Rendering
 
         public void DrawText(Canvas canvas, string text, double x, double y, double fontSize, Brush foreground)
         {
-            var block = new TextBlock
-            {
-                Text = text ?? string.Empty,
-                FontSize = fontSize,
-                Foreground = foreground
-            };
-
+            var block = new TextBlock { Text = text ?? string.Empty, FontSize = fontSize, Foreground = foreground };
             Canvas.SetLeft(block, x);
             Canvas.SetTop(block, y);
             canvas.Children.Add(block);
@@ -85,11 +69,8 @@ namespace GirderSchedule.App.Rendering
             };
 
             block.Measure(new Size(width, double.PositiveInfinity));
-
-            var top = y + (height - block.DesiredSize.Height) / 2.0;
-
             Canvas.SetLeft(block, x);
-            Canvas.SetTop(block, top);
+            Canvas.SetTop(block, y + (height - block.DesiredSize.Height) / 2.0);
             canvas.Children.Add(block);
         }
 
@@ -105,7 +86,6 @@ namespace GirderSchedule.App.Rendering
             };
 
             textBlock.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
-
             Canvas.SetLeft(textBlock, centerX - textBlock.DesiredSize.Width / 2.0);
             Canvas.SetTop(textBlock, centerY - textBlock.DesiredSize.Height / 2.0);
 

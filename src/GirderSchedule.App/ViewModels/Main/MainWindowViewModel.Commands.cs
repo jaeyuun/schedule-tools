@@ -32,7 +32,10 @@ namespace GirderSchedule.App.ViewModels.Main
 
         private void AddSet()
         {
-            var node = _scheduleSetEditService.AddSet(_selectedFloor);
+            var selectedFloor = _selectedFloor;
+            if (selectedFloor == null) return;
+
+            var node = _scheduleSetEditService.AddSet(selectedFloor);
 
             if (node == null)
                 return;
@@ -237,13 +240,13 @@ namespace GirderSchedule.App.ViewModels.Main
 
         private void PasteScheduleSet()
         {
-            if (!_scheduleSetEditService.Paste(SelectedSet))
-                return;
+            var selectedSet = SelectedSet;
+            if (selectedSet == null || !_scheduleSetEditService.Paste(selectedSet)) return;
 
-            var parentFloor = FindFloorBySet(SelectedSet);
+            var parentFloor = FindFloorBySet(selectedSet);
 
             if (parentFloor != null)
-                Editor.LoadSet(parentFloor.Model, SelectedSet.Model);
+                Editor.LoadSet(parentFloor.Model, selectedSet.Model);
 
             IsDirty = true;
         }

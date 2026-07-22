@@ -1,73 +1,53 @@
-using GirderSchedule.App.Constants;
 using GirderSchedule.Domain.Models.Settings;
 using GirderSchedule.Dxf.Constants;
 using GirderSchedule.Dxf.Documents;
 using netDxf;
-using ScheduleTools.Core.Serialization;
+using ScheduleTools.Dxf.Settings;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
-using System.Text;
 
 namespace GirderSchedule.App.Services.Schedule
 {
     public sealed class DxfSettingService
     {
-        private const string Header = "GIRDER_SCHEDULE_DXF_SETTING_V1";
+        private readonly DxfSettingFileStore<DxfSettingProfile> _settingStore;
+        private readonly DxfTemplateStore _templateStore;
+
+        public DxfSettingService(DxfStorageOptions options)
+        {
+            _templateStore = new DxfTemplateStore(options);
+            _settingStore = new DxfSettingFileStore<DxfSettingProfile>(options, CreateDefaultSettingProfile);
+        }
 
         public void EnsureDefaultStorage()
         {
-            Directory.CreateDirectory(FileConstants.SettingPath);
-            Directory.CreateDirectory(FileConstants.TemplatePath);
+            _settingStore.EnsureDirectory();
+            _templateStore.EnsureDirectory();
             EnsureDefaultSetting();
         }
 
         public List<string> GetSettingNames()
         {
             EnsureDefaultStorage();
-
-            return Directory.GetFiles(FileConstants.SettingPath, $"*{FileConstants.DxfSettingExtension}")
-                .Select(Path.GetFileNameWithoutExtension)
-                .Where(name => !string.IsNullOrWhiteSpace(name))
-                .OrderBy(name => IsDefaultSettingName(name) ? 0 : 1)
-                .ThenBy(name => name)
-                .ToList();
+            return _settingStore.GetNames();
         }
 
         public List<string> GetTemplateNames()
         {
             EnsureDefaultStorage();
-
-            var names = Directory.GetFiles(FileConstants.TemplatePath, $"*{FileConstants.DxfExtension}")
-                .Select(Path.GetFileName)
-                .Where(name => !string.IsNullOrWhiteSpace(name))
-                .Where(name => !IsDefaultTemplateName(name))
-                .OrderBy(name => name)
-                .ToList();
-
-            if (File.Exists(FileConstants.DefaultTemplateFilePath))
-            {
-                names.Insert(0, FileConstants.TemplateFileName);
-            }
-
-            return names;
+            return _templateStore.GetNames();
         }
 
         public bool SettingExists(string settingName)
         {
-            return File.Exists(GetSettingPath(settingName));
+            return _settingStore.Exists(settingName);
         }
 
         public string NormalizeSettingName(string settingName)
         {
-            if (string.IsNullOrWhiteSpace(settingName) || !SettingExists(settingName))
-            {
-                return FileConstants.DxfSettingName;
-            }
-
-            return settingName;
+            return _settingStore.NormalizeName(settingName);
         }
 
         public DxfSettingProfile LoadSetting(string settingName)
@@ -75,95 +55,47 @@ namespace GirderSchedule.App.Services.Schedule
             EnsureDefaultStorage();
 
             settingName = NormalizeSettingName(settingName);
-            var path = GetSettingPath(settingName);
-
-            if (!File.Exists(path))
-            {
-                return CreateDefaultSettingProfile();
-            }
-
-            return ReadSettingFile(path, settingName);
+            var profile = _settingStore.Load(settingName);
+            EnsureProfile(profile, settingName);
+            return profile;
         }
 
         public void SaveSetting(DxfSettingProfile profile)
         {
-            Directory.CreateDirectory(FileConstants.SettingPath);
-            Directory.CreateDirectory(FileConstants.TemplatePath);
+            EnsureDefaultStorage();
             SaveSettingCore(profile);
         }
 
         public string AddTemplate(string sourceTemplatePath)
         {
             EnsureDefaultStorage();
-
-            if (string.IsNullOrWhiteSpace(sourceTemplatePath) || !File.Exists(sourceTemplatePath))
-            {
-                return string.Empty;
-            }
-
-            var fileName = Path.GetFileName(sourceTemplatePath);
-            var destinationPath = Path.Combine(FileConstants.TemplatePath, fileName);
-
-            File.Copy(sourceTemplatePath, destinationPath, true);
-
-            return fileName;
+            return _templateStore.Add(sourceTemplatePath);
         }
 
         public bool DeleteTemplate(string templateName)
         {
-            if (IsDefaultTemplateName(templateName))
-            {
-                return false;
-            }
+            if (!_templateStore.Delete(templateName)) return false;
 
-            var path = Path.Combine(FileConstants.TemplatePath, templateName);
-
-            if (!File.Exists(path))
-            {
-                return false;
-            }
-
-            File.Delete(path);
             ReassignDeletedTemplate(templateName);
-
             return true;
         }
 
         public bool DeleteSetting(string settingName)
         {
-            if (IsDefaultSettingName(settingName))
-            {
-                return false;
-            }
-
-            var path = GetSettingPath(settingName);
-
-            if (!File.Exists(path))
-            {
-                return false;
-            }
-
-            File.Delete(path);
-
-            return true;
+            return _settingStore.Delete(settingName);
         }
 
         public string GetTemplatePath(string templateName)
         {
-            if (IsDefaultTemplateName(templateName))
-            {
-                return FileConstants.DefaultTemplateFilePath;
-            }
-
-            return Path.Combine(FileConstants.TemplatePath, templateName);
+            return _templateStore.GetPath(templateName);
         }
 
         public DxfSettingProfile CreateDefaultSettingProfile()
         {
             return new DxfSettingProfile
             {
-                SettingName = FileConstants.DxfSettingName,
-                TemplateName = FileConstants.TemplateFileName,
+                SettingName = _settingStore.DefaultSettingName,
+                TemplateName = _templateStore.DefaultTemplateName,
                 StyleSettings = CreateDefaultStyleSettings(),
                 LayerSettings = CreateDefaultLayerSettings()
             };
@@ -218,71 +150,12 @@ namespace GirderSchedule.App.Services.Schedule
             return result;
         }
 
-        private DxfSettingProfile ReadSettingFile(string path, string fallbackSettingName)
-        {
-            using (var fileStream = new FileStream(path, FileMode.Open, FileAccess.Read))
-            using (var reader = new BinaryReader(fileStream, Encoding.UTF8, true))
-            {
-                var header = reader.ReadString();
-
-                if (header != Header)
-                {
-                    return CreateDefaultSettingProfile();
-                }
-
-                var json = ReadCompressedJson(fileStream);
-                var profile = JsonFileSerializer.Deserialize<DxfSettingProfile>(json);
-
-                if (profile == null)
-                {
-                    return CreateDefaultSettingProfile();
-                }
-
-                EnsureProfile(profile, fallbackSettingName);
-
-                return profile;
-            }
-        }
-
-        private static string ReadCompressedJson(Stream stream)
-        {
-            using (var gzipStream = new GZipStream(stream, CompressionMode.Decompress))
-            using (var memoryStream = new MemoryStream())
-            {
-                gzipStream.CopyTo(memoryStream);
-                return Encoding.UTF8.GetString(memoryStream.ToArray());
-            }
-        }
-
         private void SaveSettingCore(DxfSettingProfile profile)
         {
-            if (profile == null)
-            {
-                profile = CreateDefaultSettingProfile();
-            }
+            profile ??= CreateDefaultSettingProfile();
 
             EnsureProfile(profile, profile.SettingName);
-
-            var path = GetSettingPath(profile.SettingName);
-            var json = JsonFileSerializer.Serialize(profile);
-
-            WriteSettingFile(path, json);
-        }
-
-        private static void WriteSettingFile(string path, string json)
-        {
-            var jsonBytes = Encoding.UTF8.GetBytes(json);
-
-            using (var fileStream = new FileStream(path, FileMode.Create, FileAccess.Write))
-            using (var writer = new BinaryWriter(fileStream, Encoding.UTF8))
-            {
-                writer.Write(Header);
-
-                using (var gzipStream = new GZipStream(fileStream, CompressionLevel.Optimal, true))
-                {
-                    gzipStream.Write(jsonBytes, 0, jsonBytes.Length);
-                }
-            }
+            _settingStore.Save(profile.SettingName, profile);
         }
 
         private bool ValidateProfileBase(DxfSettingProfile profile, DxfSettingValidationResult result)
@@ -372,10 +245,7 @@ namespace GirderSchedule.App.Services.Schedule
 
         private void EnsureDefaultSetting()
         {
-            if (SettingExists(FileConstants.DxfSettingName))
-            {
-                return;
-            }
+            if (SettingExists(_settingStore.DefaultSettingName)) return;
 
             SaveSettingCore(CreateDefaultSettingProfile());
         }
@@ -392,16 +262,16 @@ namespace GirderSchedule.App.Services.Schedule
             EnsureLayerSettings(profile);
         }
 
-        private static void EnsureProfileNames(DxfSettingProfile profile, string fallbackSettingName)
+        private void EnsureProfileNames(DxfSettingProfile profile, string fallbackSettingName)
         {
             if (string.IsNullOrWhiteSpace(profile.SettingName))
             {
-                profile.SettingName = string.IsNullOrWhiteSpace(fallbackSettingName) ? FileConstants.DxfSettingName : fallbackSettingName;
+                profile.SettingName = string.IsNullOrWhiteSpace(fallbackSettingName) ? _settingStore.DefaultSettingName : fallbackSettingName;
             }
 
             if (string.IsNullOrWhiteSpace(profile.TemplateName))
             {
-                profile.TemplateName = FileConstants.TemplateFileName;
+                profile.TemplateName = _templateStore.DefaultTemplateName;
             }
         }
 
@@ -497,60 +367,11 @@ namespace GirderSchedule.App.Services.Schedule
 
                 if (string.Equals(profile.TemplateName, deletedTemplateName, StringComparison.OrdinalIgnoreCase))
                 {
-                    profile.TemplateName = FileConstants.TemplateFileName;
+                    profile.TemplateName = _templateStore.DefaultTemplateName;
                     SaveSetting(profile);
                 }
             }
         }
 
-        private void RenameSettingProfile(string newName)
-        {
-            var profile = LoadSetting(newName);
-            profile.SettingName = newName;
-            SaveSetting(profile);
-        }
-
-        private string GetSettingPath(string settingName)
-        {
-            if (string.IsNullOrWhiteSpace(settingName))
-            {
-                settingName = FileConstants.DxfSettingName;
-            }
-
-            return Path.Combine(FileConstants.SettingPath, settingName + FileConstants.DxfSettingExtension);
-        }
-
-        private static bool IsDefaultSettingName(string settingName)
-        {
-            return string.Equals(settingName, FileConstants.DxfSettingName, StringComparison.OrdinalIgnoreCase);
-        }
-
-        private static bool IsDefaultTemplateName(string templateName)
-        {
-            if (string.IsNullOrWhiteSpace(templateName))
-            {
-                return true;
-            }
-
-            return string.Equals(templateName, FileConstants.TemplateFileName, StringComparison.OrdinalIgnoreCase);
-        }
-    }
-
-    public sealed class DxfSettingValidationResult
-    {
-        public string TemplateError { get; set; } = string.Empty;
-        public List<string> InvalidStyles { get; private set; }
-        public List<string> InvalidLayers { get; private set; }
-
-        public bool IsValid
-        {
-            get { return string.IsNullOrWhiteSpace(TemplateError) && InvalidStyles.Count == 0 && InvalidLayers.Count == 0; }
-        }
-
-        public DxfSettingValidationResult()
-        {
-            InvalidStyles = new List<string>();
-            InvalidLayers = new List<string>();
-        }
     }
 }

@@ -1,4 +1,4 @@
-﻿<Window x:Class="ScheduleTools.Wpf.ProjectCreate.Views.ProjectCreateWindow"
+﻿<Window x:Class="ScheduleTools.Wpf.Home.Views.ProjectCreateWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="새 프로젝트"

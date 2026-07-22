@@ -45,7 +45,7 @@ namespace GirderSchedule.App.ViewModels.Main
 
             var result = _projectService.CreateNewProject();
 
-            if (!result.IsSuccess)
+            if (!result.IsSuccess || result.Project == null)
             {
                 return;
             }
@@ -66,7 +66,7 @@ namespace GirderSchedule.App.ViewModels.Main
 
             var result = _projectService.OpenProject();
 
-            if (!result.IsSuccess)
+            if (!result.IsSuccess || result.Project == null)
             {
                 return;
             }

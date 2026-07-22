@@ -1,5 +1,5 @@
 using GirderSchedule.Domain.Models;
-using GirderSchedule.Dxf.Geometry;
+using ScheduleTools.Dxf.Geometry;
 
 namespace GirderSchedule.Dxf.Layouts
 {
@@ -13,7 +13,7 @@ namespace GirderSchedule.Dxf.Layouts
         private const double SlabUp = 150.0;
         private const double MaximumSlabUpRatio = 0.4;
 
-        public SectionLayout Create(DxfBox box, ScheduleItem item)
+        public SectionLayout? Create(DxfBox? box, ScheduleItem? item)
         {
             if (box == null)
             {
@@ -67,7 +67,7 @@ namespace GirderSchedule.Dxf.Layouts
             };
         }
 
-        private double GetSectionWidth(ScheduleItem item)
+        private double GetSectionWidth(ScheduleItem? item)
         {
             if (item == null || item.Section == null || item.Section.Width <= 0.0)
             {
@@ -77,7 +77,7 @@ namespace GirderSchedule.Dxf.Layouts
             return item.Section.Width;
         }
 
-        private double GetSectionHeight(ScheduleItem item)
+        private double GetSectionHeight(ScheduleItem? item)
         {
             if (item == null || item.Section == null || item.Section.Height <= 0.0)
             {

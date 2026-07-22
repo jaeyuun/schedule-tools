@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net8.0-windows</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <RootNamespace>GirderSchedule.Dxf</RootNamespace>
@@ -14,11 +14,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="netDxf" Version="2023.11.10" />
-    </ItemGroup>
-
-    <ItemGroup>
         <ProjectReference Include="..\GirderSchedule.Domain\GirderSchedule.Domain.csproj" />
+        <ProjectReference Include="..\ScheduleTools.Dxf\ScheduleTools.Dxf.csproj" />
     </ItemGroup>
 
 </Project>

@@ -10,7 +10,7 @@ namespace GirderSchedule.App.Services.Schedule
         private readonly ScheduleDisplayService _displayService = new ScheduleDisplayService();
         private readonly ScheduleSetCopyService _copyService = new ScheduleSetCopyService();
 
-        public ScheduleProject Build(ScheduleProject sourceProject, ObservableCollection<FloorNodeViewModel> floors)
+        public ScheduleProject? Build(ScheduleProject? sourceProject, ObservableCollection<FloorNodeViewModel> floors)
         {
             if (sourceProject == null)
             {

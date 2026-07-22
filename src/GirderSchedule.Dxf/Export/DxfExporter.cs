@@ -7,20 +7,21 @@ using GirderSchedule.Dxf.Styles;
 using GirderSchedule.Dxf.Styles.Overrides;
 using GirderSchedule.Dxf.Validation;
 using netDxf;
+using ScheduleTools.Dxf.Documents;
 
 namespace GirderSchedule.Dxf.Export
 {
     public sealed class DxfExporter
     {
         private readonly DxfDocumentLoader _loader;
-        private readonly DxfDocumentSaver _saver;
+        private readonly DxfDocumentFile _documentFile;
         private readonly DxfResourceValidator _validator;
         private readonly SectionLayoutFactory _layoutFactory;
 
         public DxfExporter()
         {
             _loader = new DxfDocumentLoader();
-            _saver = new DxfDocumentSaver();
+            _documentFile = new DxfDocumentFile();
             _validator = new DxfResourceValidator();
             _layoutFactory = new SectionLayoutFactory();
         }
@@ -61,7 +62,7 @@ namespace GirderSchedule.Dxf.Export
                 scheduleDrawer.Draw(pages[pageIndex], pageBaseX, pageBaseY, options);
             }
 
-            _saver.Save(document, filePath);
+            _documentFile.Save(document, filePath);
         }
 
         private ScheduleDrawer CreateScheduleDrawer(DxfDocument document, DxfExportOptions options, DxfOverrideSet overrides)

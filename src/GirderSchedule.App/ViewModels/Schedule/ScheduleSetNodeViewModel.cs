@@ -8,7 +8,7 @@ namespace GirderSchedule.App.ViewModels.Schedule
     {
         private readonly ScheduleDisplayService _displayService = new ScheduleDisplayService();
         private readonly ScheduleSet _model;
-        private FloorNodeViewModel _parent;
+        private FloorNodeViewModel? _parent;
         private bool _isChecked = true;
         private bool _isSelected;
         private bool _isInternalChanging;
@@ -18,7 +18,7 @@ namespace GirderSchedule.App.ViewModels.Schedule
             get { return _model; }
         }
 
-        public FloorNodeViewModel Parent
+        public FloorNodeViewModel? Parent
         {
             get { return _parent; }
             set

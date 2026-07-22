@@ -1,6 +1,4 @@
 ﻿using ScheduleTools.Wpf.Settings.ViewModels;
-using ScheduleTools.Wpf.Utilities;
-using System;
 using System.ComponentModel;
 using System.Windows;
 
@@ -16,14 +14,8 @@ namespace ScheduleTools.Wpf.Settings.Views
             InitializeComponent();
 
             DataContextChanged += AppSettingWindow_DataContextChanged;
-            Loaded += Window_Loaded;
             Closing += AppSettingWindow_Closing;
             Closed += AppSettingWindow_Closed;
-        }
-
-        private void Window_Loaded(object sender, RoutedEventArgs e)
-        {
-            WindowSizeHelper.FitToWorkArea(this);
         }
 
         private void AppSettingWindow_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)

@@ -11,21 +11,21 @@ namespace GirderSchedule.App.ViewModels.Schedule
     {
         private readonly ScheduleDisplayService _displayService = new ScheduleDisplayService();
 
-        private ScheduleFloor _floor;
-        private ScheduleSet _set;
+        private ScheduleFloor? _floor;
+        private ScheduleSet? _set;
         private bool _isApplyingSectionPositions;
         private bool _isWidthOver;
         private bool _isHeightOver;
 
-        public SectionItemViewModel Left { get; private set; }
-        public SectionItemViewModel Center { get; private set; }
-        public SectionItemViewModel Right { get; private set; }
+        public SectionItemViewModel? Left { get; private set; }
+        public SectionItemViewModel? Center { get; private set; }
+        public SectionItemViewModel? Right { get; private set; }
 
         public ICommand RedrawCommand { get; private set; }
 
-        public event EventHandler CurrentSetChanged;
+        public event EventHandler? CurrentSetChanged;
 
-        public ScheduleSet CurrentSet
+        public ScheduleSet? CurrentSet
         {
             get { return _set; }
         }
@@ -268,7 +268,7 @@ namespace GirderSchedule.App.ViewModels.Schedule
             }
         }
 
-        private void SectionItem_Changed(object sender, EventArgs e)
+        private void SectionItem_Changed(object? sender, EventArgs e)
         {
             if (_isApplyingSectionPositions)
             {
@@ -279,7 +279,7 @@ namespace GirderSchedule.App.ViewModels.Schedule
             RaiseCurrentSetChanged();
         }
 
-        private void SectionItem_SectionEnabledChanged(object sender, EventArgs e)
+        private void SectionItem_SectionEnabledChanged(object? sender, EventArgs e)
         {
             if (_isApplyingSectionPositions)
             {

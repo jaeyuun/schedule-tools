@@ -12,7 +12,7 @@ namespace GirderSchedule.App.Views.Schedule
     public partial class ScheduleSetEditor : UserControl
     {
         private readonly SectionRenderer _sectionRenderer = new SectionRenderer();
-        private ScheduleViewModel _viewModel;
+        private ScheduleViewModel? _viewModel;
         private bool _isRedrawQueued;
 
         public ScheduleSetEditor()
@@ -60,7 +60,7 @@ namespace GirderSchedule.App.Views.Schedule
             QueueRedraw();
         }
 
-        private void ViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void ViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             if (!IsEditorRefreshProperty(e.PropertyName))
             {
@@ -74,7 +74,7 @@ namespace GirderSchedule.App.Views.Schedule
             }));
         }
 
-        private bool IsEditorRefreshProperty(string propertyName)
+        private bool IsEditorRefreshProperty(string? propertyName)
         {
             if (string.IsNullOrWhiteSpace(propertyName))
             {
@@ -161,7 +161,7 @@ namespace GirderSchedule.App.Views.Schedule
             canvas.Children.Clear();
         }
 
-        private void DrawSection(Canvas canvas, SectionItemViewModel section, bool isWidthOver, bool isHeightOver)
+        private void DrawSection(Canvas canvas, SectionItemViewModel? section, bool isWidthOver, bool isHeightOver)
         {
             if (canvas == null)
             {

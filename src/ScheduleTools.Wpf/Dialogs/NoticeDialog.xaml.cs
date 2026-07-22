@@ -1,5 +1,4 @@
-﻿using ScheduleTools.Wpf.Utilities;
-using System.Windows;
+﻿using System.Windows;
 
 namespace ScheduleTools.Wpf.Dialogs
 {
@@ -24,19 +23,12 @@ namespace ScheduleTools.Wpf.Dialogs
         {
             InitializeComponent();
             DataContext = this;
-            Loaded += Window_Loaded;
         }
 
         public NoticeDialog(string title, string content) : this()
         {
             DialogTitle = title;
             DialogContent = content;
-            Loaded += Window_Loaded;
-        }
-
-        private void Window_Loaded(object sender, RoutedEventArgs e)
-        {
-            WindowSizeHelper.FitToWorkArea(this);
         }
 
         private void OkButton_Click(object sender, RoutedEventArgs e)

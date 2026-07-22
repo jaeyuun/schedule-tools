@@ -8,7 +8,7 @@ namespace GirderSchedule.App.Services.Schedule
         private readonly ScheduleSetFactory _setFactory;
         private readonly ScheduleSetCopyService _copyService;
 
-        private ScheduleSet _copiedScheduleSet;
+        private ScheduleSet? _copiedScheduleSet;
 
         public ScheduleSetEditService(ScheduleSetFactory setFactory, ScheduleSetCopyService copyService)
         {
@@ -57,29 +57,24 @@ namespace GirderSchedule.App.Services.Schedule
             return selectedSet != null && selectedSet.Model != null;
         }
 
-        public bool CanPaste(ScheduleSetNodeViewModel selectedSet)
+        public bool CanPaste(ScheduleSetNodeViewModel? selectedSet)
         {
             return _copiedScheduleSet != null && selectedSet != null && selectedSet.Model != null;
         }
 
-        public void Copy(ScheduleSetNodeViewModel selectedSet)
+        public void Copy(ScheduleSetNodeViewModel? selectedSet)
         {
-            if (!CanCopy(selectedSet))
-            {
-                return;
-            }
+            if (selectedSet == null || !CanCopy(selectedSet)) return;
 
             _copiedScheduleSet = _copyService.Clone(selectedSet.Model);
         }
 
-        public bool Paste(ScheduleSetNodeViewModel selectedSet)
+        public bool Paste(ScheduleSetNodeViewModel? selectedSet)
         {
-            if (!CanPaste(selectedSet))
-            {
-                return false;
-            }
+            var copiedScheduleSet = _copiedScheduleSet;
+            if (selectedSet == null || copiedScheduleSet == null || !CanPaste(selectedSet)) return false;
 
-            _copyService.CopyTo(_copiedScheduleSet, selectedSet.Model);
+            _copyService.CopyTo(copiedScheduleSet, selectedSet.Model);
             selectedSet.RefreshAll();
 
             return true;

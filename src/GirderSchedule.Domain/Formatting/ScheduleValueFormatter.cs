@@ -13,7 +13,7 @@ namespace GirderSchedule.Domain.Formatting
             return value.ToString("0", CultureInfo.InvariantCulture);
         }
 
-        public string FormatMemberName(ScheduleSet set)
+        public string FormatMemberName(ScheduleSet? set)
         {
             if (set == null || string.IsNullOrWhiteSpace(set.MemberName))
             {
@@ -23,7 +23,7 @@ namespace GirderSchedule.Domain.Formatting
             return set.MemberName;
         }
 
-        public string FormatSetSectionSize(ScheduleSet set)
+        public string FormatSetSectionSize(ScheduleSet? set)
         {
             var item = _query.GetFirstEnabledItem(set);
 
@@ -35,7 +35,7 @@ namespace GirderSchedule.Domain.Formatting
             return "(" + FormatNumber(item.Section.Width) + " x " + FormatNumber(item.Section.Height) + ")";
         }
 
-        public string FormatSectionNote(ScheduleItem item)
+        public string FormatSectionNote(ScheduleItem? item)
         {
             if (item == null || item.Section == null)
             {
@@ -45,7 +45,7 @@ namespace GirderSchedule.Domain.Formatting
             return string.IsNullOrWhiteSpace(item.Section.Note) ? string.Empty : item.Section.Note;
         }
 
-        public string FormatMomentForce(ScheduleItem item)
+        public string FormatMomentForce(ScheduleItem? item)
         {
             if (item == null || item.MemberForce == null || !item.MemberForce.Moment.HasValue)
             {
@@ -55,7 +55,7 @@ namespace GirderSchedule.Domain.Formatting
             return "M = " + FormatNumber(item.MemberForce.Moment.Value);
         }
 
-        public string FormatShearForce(ScheduleItem item)
+        public string FormatShearForce(ScheduleItem? item)
         {
             if (item == null || item.MemberForce == null || !item.MemberForce.Shear.HasValue)
             {
@@ -65,7 +65,7 @@ namespace GirderSchedule.Domain.Formatting
             return "V = " + FormatNumber(item.MemberForce.Shear.Value);
         }
 
-        public string FormatTopRebar(ScheduleItem item)
+        public string FormatTopRebar(ScheduleItem? item)
         {
             if (item == null || item.MainRebar == null)
             {
@@ -75,7 +75,7 @@ namespace GirderSchedule.Domain.Formatting
             return FormatMainRebar(_query.GetTopTotalCount(item), item.MainRebar.Diameter);
         }
 
-        public string FormatBottomRebar(ScheduleItem item)
+        public string FormatBottomRebar(ScheduleItem? item)
         {
             if (item == null || item.MainRebar == null)
             {
@@ -95,7 +95,7 @@ namespace GirderSchedule.Domain.Formatting
             return count + " - HD " + FormatNumber(diameter);
         }
 
-        public string FormatStirrup(ScheduleItem item)
+        public string FormatStirrup(ScheduleItem? item)
         {
             if (item == null || item.Stirrup == null)
             {
@@ -110,7 +110,7 @@ namespace GirderSchedule.Domain.Formatting
             return item.Stirrup.Legs + " - HD " + FormatNumber(item.Stirrup.Diameter) + " @ " + FormatNumber(item.Stirrup.Spacing);
         }
 
-        public string FormatSkinRebar(ScheduleItem item)
+        public string FormatSkinRebar(ScheduleItem? item)
         {
             if (item == null || item.Section == null || item.SkinRebar == null)
             {

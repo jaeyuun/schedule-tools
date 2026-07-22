@@ -8,10 +8,10 @@ namespace GirderSchedule.App.Services.Previews
 {
     public sealed class SchedulePreviewChangeWatcher
     {
-        private ObservableCollection<FloorNodeViewModel> _floors;
-        private Action _changed;
+        private ObservableCollection<FloorNodeViewModel>? _floors;
+        private Action? _changed;
 
-        public void Attach(ObservableCollection<FloorNodeViewModel> floors, Action changed)
+        public void Attach(ObservableCollection<FloorNodeViewModel>? floors, Action changed)
         {
             Detach();
 
@@ -50,7 +50,7 @@ namespace GirderSchedule.App.Services.Previews
             _changed = null;
         }
 
-        private void AttachFloor(FloorNodeViewModel floor)
+        private void AttachFloor(FloorNodeViewModel? floor)
         {
             if (floor == null)
             {
@@ -72,7 +72,7 @@ namespace GirderSchedule.App.Services.Previews
             }
         }
 
-        private void DetachFloor(FloorNodeViewModel floor)
+        private void DetachFloor(FloorNodeViewModel? floor)
         {
             if (floor == null)
             {
@@ -94,7 +94,7 @@ namespace GirderSchedule.App.Services.Previews
             }
         }
 
-        private void AttachSet(ScheduleSetNodeViewModel set)
+        private void AttachSet(ScheduleSetNodeViewModel? set)
         {
             if (set == null)
             {
@@ -104,7 +104,7 @@ namespace GirderSchedule.App.Services.Previews
             set.PropertyChanged += Set_PropertyChanged;
         }
 
-        private void DetachSet(ScheduleSetNodeViewModel set)
+        private void DetachSet(ScheduleSetNodeViewModel? set)
         {
             if (set == null)
             {
@@ -114,7 +114,7 @@ namespace GirderSchedule.App.Services.Previews
             set.PropertyChanged -= Set_PropertyChanged;
         }
 
-        private void Floors_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void Floors_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.OldItems != null)
             {
@@ -135,7 +135,7 @@ namespace GirderSchedule.App.Services.Previews
             RaiseChanged();
         }
 
-        private void Sets_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void Sets_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.OldItems != null)
             {
@@ -156,7 +156,7 @@ namespace GirderSchedule.App.Services.Previews
             RaiseChanged();
         }
 
-        private void Floor_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void Floor_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(FloorNodeViewModel.IsChecked) || e.PropertyName == nameof(FloorNodeViewModel.FloorPrefix) || e.PropertyName == nameof(FloorNodeViewModel.FloorName))
             {
@@ -164,7 +164,7 @@ namespace GirderSchedule.App.Services.Previews
             }
         }
 
-        private void Set_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void Set_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(ScheduleSetNodeViewModel.IsChecked) || e.PropertyName == nameof(ScheduleSetNodeViewModel.MemberName))
             {

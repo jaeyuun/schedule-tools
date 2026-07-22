@@ -1,6 +1,5 @@
 ﻿using GirderSchedule.App.ViewModels.Schedule;
 using GirderSchedule.App.ViewModels.Settings;
-using ScheduleTools.Wpf.Utilities;
 using System;
 using System.Windows;
 using System.Windows.Controls;
@@ -12,18 +11,12 @@ namespace GirderSchedule.App.Views.Settings
     public partial class FloorSettingWindow : Window
     {
         private Point _dragStartPoint;
-        private FloorNodeViewModel _draggedFloor;
-        private DataGridRow _insertLineRow;
+        private FloorNodeViewModel? _draggedFloor;
+        private DataGridRow? _insertLineRow;
 
         public FloorSettingWindow()
         {
             InitializeComponent();
-            Loaded += Window_Loaded;
-        }
-
-        private void Window_Loaded(object sender, RoutedEventArgs e)
-        {
-            WindowSizeHelper.FitToWorkArea(this);
         }
 
         private void FloorGrid_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -156,7 +149,7 @@ namespace GirderSchedule.App.Views.Settings
             viewModel.SelectedFloor = source;
         }
 
-        private int GetInsertIndex(DependencyObject source, FloorSettingWindowViewModel viewModel)
+        private int GetInsertIndex(DependencyObject? source, FloorSettingWindowViewModel viewModel)
         {
             var row = FindParent<DataGridRow>(source);
 
@@ -190,7 +183,7 @@ namespace GirderSchedule.App.Views.Settings
             return targetIndex + 1;
         }
 
-        private void ShowInsertLine(DataGridRow row, bool isAfter)
+        private void ShowInsertLine(DataGridRow? row, bool isAfter)
         {
             if (_insertLineRow != null && _insertLineRow != row)
             {
@@ -236,7 +229,7 @@ namespace GirderSchedule.App.Views.Settings
             row.ClearValue(BorderThicknessProperty);
         }
 
-        private DataGridRow GetLastRow()
+        private DataGridRow? GetLastRow()
         {
             if (FloorGrid.Items.Count == 0)
             {
@@ -247,7 +240,7 @@ namespace GirderSchedule.App.Views.Settings
             return FloorGrid.ItemContainerGenerator.ContainerFromIndex(index) as DataGridRow;
         }
 
-        private FloorNodeViewModel GetRowViewModel(DependencyObject source)
+        private FloorNodeViewModel? GetRowViewModel(DependencyObject? source)
         {
             var row = FindParent<DataGridRow>(source);
 
@@ -259,7 +252,7 @@ namespace GirderSchedule.App.Views.Settings
             return row.Item as FloorNodeViewModel;
         }
 
-        private T FindParent<T>(DependencyObject source) where T : DependencyObject
+        private T? FindParent<T>(DependencyObject? source) where T : DependencyObject
         {
             while (source != null)
             {

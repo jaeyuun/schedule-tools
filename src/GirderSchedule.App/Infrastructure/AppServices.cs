@@ -1,13 +1,17 @@
 ﻿using GirderSchedule.App.Constants;
 using GirderSchedule.App.Home;
+using GirderSchedule.App.Services.Export;
 using GirderSchedule.App.Services.Project;
 using GirderSchedule.App.Services.Schedule;
+using ScheduleTools.Core.Application.Contracts;
+using ScheduleTools.Core.Application.Services;
 using ScheduleTools.Core.RecentProjects;
 using ScheduleTools.Core.Settings;
+using ScheduleTools.Wpf.FileDialogs.Contracts;
+using ScheduleTools.Wpf.FileDialogs.Services;
 using ScheduleTools.Wpf.Home.Contracts;
 using ScheduleTools.Wpf.Home.Models;
 using ScheduleTools.Wpf.Home.ViewModels;
-using ScheduleTools.Wpf.ProjectCreate.ViewModels;
 using ScheduleTools.Wpf.Services;
 using ScheduleTools.Wpf.Settings.ViewModels;
 using ScheduleTools.Wpf.Windows.Contracts;
@@ -19,11 +23,15 @@ namespace GirderSchedule.App.Infrastructure
     public static class AppServices
     {
         public static AppSettingService AppSetting { get; } = CreateAppSettingService();
-        public static ProjectFileService ProjectFile { get; } = new ProjectFileService();
+        public static DxfSettingService DxfSetting { get; } = new DxfSettingService(AppStoragePaths.CreateDxfStorageOptions());
+        public static ProjectFileService ProjectFile { get; } = new ProjectFileService(DxfSetting);
         public static ScheduleProjectFactory ProjectFactory { get; } = new ScheduleProjectFactory();
-        public static RecentProjectService RecentProject { get; } = new RecentProjectService(FileConstants.SettingPath);
+        public static RecentProjectService RecentProject { get; } = new RecentProjectService(AppStoragePaths.SettingsDirectory);
         public static IWindowService WindowService { get; } = new WindowService();
-        public static IProjectHomeHandler ProjectHomeHandler { get; } = new GirderProjectHomeHandler(ProjectFile, ProjectFactory, WindowService);
+        public static IFileDialogService FileDialogService { get; } = new FileDialogService();
+        public static IFolderDialogService FolderDialogService { get; } = new FolderDialogService();
+        public static IApplicationInfoService ApplicationInfo { get; } = new ApplicationInfoService(Assembly.GetExecutingAssembly());
+        public static IProjectHomeHandler ProjectHomeHandler { get; } = CreateGirderProjectHomeHandler();
 
         public static HomeStartViewModel CreateHomeStartViewModel()
         {
@@ -36,33 +44,36 @@ namespace GirderSchedule.App.Infrastructure
 
         public static ProjectCreateWindowViewModel CreateProjectCreateWindowViewModel()
         {
-            return new ProjectCreateWindowViewModel(AppSetting);
+            return new ProjectCreateWindowViewModel(AppSetting, FolderDialogService);
         }
 
         public static AppSettingWindowViewModel CreateAppSettingWindowViewModel()
         {
-            var version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "정보 없음";
-
             return new AppSettingWindowViewModel(
                 AppSetting,
-                version);
+                ApplicationInfo.InformationalVersion);
         }
 
         public static ProjectService CreateProjectService()
         {
-            return new ProjectService(
-                ProjectFile,
-                RecentProject,
-                AppSetting,
-                ProjectFactory,
-                WindowService);
+            return new ProjectService(ProjectFile, RecentProject, AppSetting, ProjectFactory, WindowService, FileDialogService, FolderDialogService);
+        }
+
+        public static ScheduleExportService CreateScheduleExportService()
+        {
+            return new ScheduleExportService(DxfSetting);
+        }
+
+        public static GirderProjectHomeHandler CreateGirderProjectHomeHandler()
+        {
+            return new GirderProjectHomeHandler(ProjectFile, ProjectFactory, FileDialogService, WindowService);
         }
 
         private static AppSettingService CreateAppSettingService()
         {
             var options = new AppSettingOptions(
-                FileConstants.AppSettingFilePath,
-                FileConstants.ProjectPath);
+                AppStoragePaths.AppSettingFilePath,
+                AppStoragePaths.DocumentsDirectory);
 
             return new AppSettingService(options);
         }

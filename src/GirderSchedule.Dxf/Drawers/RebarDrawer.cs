@@ -21,7 +21,7 @@ namespace GirderSchedule.Dxf.Drawers
         private readonly ScheduleItemQuery _query = new ScheduleItemQuery();
         private readonly RebarPointLayoutService _rebarLayoutService = new RebarPointLayoutService();
 
-        private BlockCircleInfo _rebarBlockCircleInfo;
+        private BlockCircleInfo? _rebarBlockCircleInfo;
 
         public RebarDrawer(DxfDocument document, DxfEntityStyler styler)
         {

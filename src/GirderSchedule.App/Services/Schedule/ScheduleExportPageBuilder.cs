@@ -1,7 +1,7 @@
-﻿using GirderSchedule.App.ViewModels.Settings;
-using GirderSchedule.App.ViewModels.Schedule;
+﻿using GirderSchedule.App.ViewModels.Schedule;
 using GirderSchedule.Domain.Models;
 using GirderSchedule.Domain.Models.Export;
+using ScheduleTools.Dxf.Export;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -16,7 +16,7 @@ namespace GirderSchedule.App.Services.Schedule
         private readonly ScheduleDisplayService _displayService = new ScheduleDisplayService();
         private readonly ScheduleSetCopyService _copyService = new ScheduleSetCopyService();
 
-        public List<ScheduleExportPage> Build(string scheduleTitle, ObservableCollection<FloorNodeViewModel> floors, DxfExportSetting setting)
+        public List<ScheduleExportPage> Build(string scheduleTitle, ObservableCollection<FloorNodeViewModel>? floors, DxfExportSetting? setting)
         {
             if (setting == null)
             {
@@ -31,9 +31,9 @@ namespace GirderSchedule.App.Services.Schedule
             return BuildFloorSeparated(scheduleTitle, floors);
         }
 
-        private List<ScheduleExportPage> BuildContinuous(string scheduleTitle, ObservableCollection<FloorNodeViewModel> floors)
+        private List<ScheduleExportPage> BuildContinuous(string scheduleTitle, ObservableCollection<FloorNodeViewModel>? floors)
         {
-            var sets = new List<ScheduleSet>();
+            var sets = new List<ScheduleSet?>();
 
             if (floors == null)
             {
@@ -48,9 +48,9 @@ namespace GirderSchedule.App.Services.Schedule
             return BuildPages(scheduleTitle, sets);
         }
 
-        private List<ScheduleExportPage> BuildFloorSeparated(string scheduleTitle, ObservableCollection<FloorNodeViewModel> floors)
+        private List<ScheduleExportPage> BuildFloorSeparated(string scheduleTitle, ObservableCollection<FloorNodeViewModel>? floors)
         {
-            var sets = new List<ScheduleSet>();
+            var sets = new List<ScheduleSet?>();
 
             if (floors == null)
             {
@@ -75,7 +75,7 @@ namespace GirderSchedule.App.Services.Schedule
             return BuildPages(scheduleTitle, sets);
         }
 
-        private void AddCheckedSets(List<ScheduleSet> sets, FloorNodeViewModel floor)
+        private void AddCheckedSets(List<ScheduleSet?> sets, FloorNodeViewModel floor)
         {
             if (sets == null || floor == null || !floor.IsChecked)
             {
@@ -98,7 +98,7 @@ namespace GirderSchedule.App.Services.Schedule
             }
         }
 
-        private void AddBlankSetsToCompleteRow(List<ScheduleSet> sets)
+        private void AddBlankSetsToCompleteRow(List<ScheduleSet?> sets)
         {
             var remainder = sets.Count % SetsPerRow;
 
@@ -115,7 +115,7 @@ namespace GirderSchedule.App.Services.Schedule
             }
         }
 
-        private void RemoveTrailingBlankSets(List<ScheduleSet> sets)
+        private void RemoveTrailingBlankSets(List<ScheduleSet?> sets)
         {
             while (sets.Count > 0 && sets[sets.Count - 1] == null)
             {
@@ -123,7 +123,7 @@ namespace GirderSchedule.App.Services.Schedule
             }
         }
 
-        private List<ScheduleExportPage> BuildPages(string scheduleTitle, List<ScheduleSet> sets)
+        private List<ScheduleExportPage> BuildPages(string scheduleTitle, List<ScheduleSet?> sets)
         {
             var pages = new List<ScheduleExportPage>();
 

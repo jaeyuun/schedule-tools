@@ -8,7 +8,7 @@ namespace GirderSchedule.App.Views.Schedule
 {
     public partial class ProjectExplorer : UserControl
     {
-        private ProjectTreeDragDropBehavior _dragDropBehavior;
+        private ProjectTreeDragDropBehavior? _dragDropBehavior;
 
         public ProjectExplorer()
         {

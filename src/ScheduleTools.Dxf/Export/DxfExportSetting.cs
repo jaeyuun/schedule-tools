@@ -1,4 +1,4 @@
-﻿namespace GirderSchedule.App.ViewModels.Settings
+namespace ScheduleTools.Dxf.Export
 {
     public sealed class DxfExportSetting
     {
@@ -8,7 +8,7 @@
         public DxfExportSetting()
         {
             ContinueAcrossFloors = true;
-            FormColumnCount = 3;
+            FormColumnCount = DxfExportConstants.DefaultFormColumnCount;
         }
     }
 }

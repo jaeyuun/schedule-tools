@@ -17,10 +17,10 @@ namespace GirderSchedule.App.Views.Schedule.Behaviors
         private readonly TreeView _treeView;
 
         private Point _dragStartPoint;
-        private object _dragItem;
-        private TreeViewItem _insertLineItem;
+        private object? _dragItem;
+        private TreeViewItem? _insertLineItem;
         private bool _insertLineAfter;
-        private FloorNodeViewModel _emptyAreaDropFloor;
+        private FloorNodeViewModel? _emptyAreaDropFloor;
         private bool _isAttached;
 
         public ProjectTreeDragDropBehavior(TreeView treeView)
@@ -103,7 +103,10 @@ namespace GirderSchedule.App.Views.Schedule.Behaviors
                 return;
             }
 
-            var data = new DataObject(_dragItem.GetType(), _dragItem);
+            var dragItem = _dragItem;
+            if (dragItem == null) return;
+
+            var data = new DataObject(dragItem.GetType(), dragItem);
             DragDrop.DoDragDrop(_treeView, data, DragDropEffects.Move);
 
             ClearInsertLine();
@@ -226,7 +229,7 @@ namespace GirderSchedule.App.Views.Schedule.Behaviors
             return true;
         }
 
-        private bool DropToEmptyArea(MainWindowViewModel viewModel, object source, FloorNodeViewModel emptyAreaDropFloor)
+        private bool DropToEmptyArea(MainWindowViewModel viewModel, object? source, FloorNodeViewModel? emptyAreaDropFloor)
         {
             var sourceSet = source as ScheduleSetNodeViewModel;
 
@@ -239,7 +242,7 @@ namespace GirderSchedule.App.Views.Schedule.Behaviors
             return true;
         }
 
-        private bool DropToTreeItem(MainWindowViewModel viewModel, object source, object target, bool isAfter)
+        private bool DropToTreeItem(MainWindowViewModel viewModel, object? source, object? target, bool isAfter)
         {
             var sourceFloor = source as FloorNodeViewModel;
             var targetFloor = target as FloorNodeViewModel;
@@ -291,7 +294,7 @@ namespace GirderSchedule.App.Views.Schedule.Behaviors
                    position.Y <= _treeView.ActualHeight;
         }
 
-        private object GetDragData(DragEventArgs e)
+        private object? GetDragData(DragEventArgs e)
         {
             if (e.Data.GetDataPresent(typeof(FloorNodeViewModel)))
             {
@@ -306,7 +309,7 @@ namespace GirderSchedule.App.Views.Schedule.Behaviors
             return null;
         }
 
-        private bool CanDropTreeItem(object source, object target)
+        private bool CanDropTreeItem(object? source, object? target)
         {
             if (source == null || target == null || ReferenceEquals(source, target))
             {
@@ -331,7 +334,7 @@ namespace GirderSchedule.App.Views.Schedule.Behaviors
             return false;
         }
 
-        private bool GetIsAfter(TreeViewItem item, DragEventArgs e)
+        private bool GetIsAfter(TreeViewItem? item, DragEventArgs e)
         {
             if (item == null)
             {
@@ -342,7 +345,7 @@ namespace GirderSchedule.App.Views.Schedule.Behaviors
             return point.Y >= item.ActualHeight / 2.0;
         }
 
-        private void ShowInsertLine(TreeViewItem item, bool isAfter)
+        private void ShowInsertLine(TreeViewItem? item, bool isAfter)
         {
             if (_insertLineItem != null && _insertLineItem != item)
             {
@@ -381,7 +384,7 @@ namespace GirderSchedule.App.Views.Schedule.Behaviors
             item.ClearValue(FrameworkElement.TagProperty);
         }
 
-        private FloorNodeViewModel GetLastClosedFloor()
+        private FloorNodeViewModel? GetLastClosedFloor()
         {
             var viewModel = _treeView.DataContext as MainWindowViewModel;
 
@@ -401,7 +404,7 @@ namespace GirderSchedule.App.Views.Schedule.Behaviors
             return lastFloor;
         }
 
-        private TreeViewItem GetTreeViewItem(ItemsControl parent, object data)
+        private TreeViewItem? GetTreeViewItem(ItemsControl? parent, object? data)
         {
             if (parent == null || data == null)
             {
@@ -435,7 +438,7 @@ namespace GirderSchedule.App.Views.Schedule.Behaviors
             return null;
         }
 
-        private bool IsDragIgnoredSource(DependencyObject source)
+        private bool IsDragIgnoredSource(DependencyObject? source)
         {
             if (source == null)
             {
@@ -455,13 +458,13 @@ namespace GirderSchedule.App.Views.Schedule.Behaviors
             return false;
         }
 
-        private object GetTreeViewItemData(DependencyObject source)
+        private object? GetTreeViewItemData(DependencyObject? source)
         {
             var item = FindVisualParent<TreeViewItem>(source);
             return item == null ? null : item.DataContext;
         }
 
-        private T FindVisualParent<T>(DependencyObject source) where T : DependencyObject
+        private T? FindVisualParent<T>(DependencyObject? source) where T : DependencyObject
         {
             while (source != null)
             {
@@ -480,11 +483,11 @@ namespace GirderSchedule.App.Views.Schedule.Behaviors
 
         private sealed class DropContext
         {
-            public object Source { get; private set; }
-            public TreeViewItem TargetItem { get; private set; }
-            public object Target { get; private set; }
+            public object? Source { get; private set; }
+            public TreeViewItem? TargetItem { get; private set; }
+            public object? Target { get; private set; }
 
-            public DropContext(object source, TreeViewItem targetItem, object target)
+            public DropContext(object? source, TreeViewItem? targetItem, object? target)
             {
                 Source = source;
                 TargetItem = targetItem;

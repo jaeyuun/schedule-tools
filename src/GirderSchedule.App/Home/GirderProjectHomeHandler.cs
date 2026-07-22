@@ -3,10 +3,11 @@ using GirderSchedule.App.Infrastructure;
 using GirderSchedule.App.Services.Project;
 using GirderSchedule.App.Services.Schedule;
 using GirderSchedule.App.Views.Main;
-using Microsoft.Win32;
+using ScheduleTools.Wpf.FileDialogs.Contracts;
+using ScheduleTools.Wpf.FileDialogs.Models;
 using ScheduleTools.Wpf.Home.Contracts;
 using ScheduleTools.Wpf.Home.Models;
-using ScheduleTools.Wpf.ProjectCreate.Views;
+using ScheduleTools.Wpf.Home.Views;
 using ScheduleTools.Wpf.Windows.Contracts;
 using System;
 using System.IO;
@@ -17,19 +18,18 @@ namespace GirderSchedule.App.Home
     {
         private readonly ProjectFileService _projectFileService;
         private readonly ScheduleProjectFactory _projectFactory;
+        private readonly IFileDialogService _fileDialogService;
         private readonly IWindowService _windowService;
 
-        public GirderProjectHomeHandler(
-            ProjectFileService projectFileService,
-            ScheduleProjectFactory projectFactory,
-            IWindowService windowService)
+        public GirderProjectHomeHandler(ProjectFileService projectFileService, ScheduleProjectFactory projectFactory, IFileDialogService fileDialogService, IWindowService windowService)
         {
             _projectFileService = projectFileService ?? throw new ArgumentNullException(nameof(projectFileService));
             _projectFactory = projectFactory ?? throw new ArgumentNullException(nameof(projectFactory));
+            _fileDialogService = fileDialogService ?? throw new ArgumentNullException(nameof(fileDialogService));
             _windowService = windowService ?? throw new ArgumentNullException(nameof(windowService));
         }
 
-        public string ProjectDialogTitle => FileConstants.ProjectDialogTitle;
+        public string ProjectDialogTitle => FileConstants.ProjectOpenDialogTitle;
 
         public string ProjectFilter => FileConstants.ProjectFilter;
 
@@ -81,21 +81,19 @@ namespace GirderSchedule.App.Home
 
         public HomeProjectLaunchResult OpenProject()
         {
-            var dialog = new OpenFileDialog
-            {
-                Title = ProjectDialogTitle,
-                Filter = ProjectFilter,
-                DefaultExt = DefaultExtension,
-                CheckFileExists = true,
-                Multiselect = false
-            };
+            var filePath = _fileDialogService.OpenFile(
+                new OpenFileDialogOptions
+                {
+                    Title = FileConstants.ProjectOpenDialogTitle,
+                    Filter = FileConstants.ProjectFilter,
+                    DefaultExtension = FileConstants.ProjectExtension,
+                    CheckFileExists = true,
+                    CheckPathExists = true
+                });
 
-            var owner = _windowService.GetMainWindow();
-
-            if (dialog.ShowDialog(owner) != true)
-                return HomeProjectLaunchResult.Cancel();
-
-            return OpenProject(dialog.FileName);
+            return string.IsNullOrWhiteSpace(filePath)
+                ? HomeProjectLaunchResult.Cancel()
+                : OpenProject(filePath);
         }
 
         public HomeProjectLaunchResult OpenProject(string filePath)

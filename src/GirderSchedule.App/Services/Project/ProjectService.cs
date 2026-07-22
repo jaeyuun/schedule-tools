@@ -1,11 +1,12 @@
 ﻿using GirderSchedule.App.Constants;
 using GirderSchedule.App.Services.Schedule;
 using GirderSchedule.Domain.Models;
-using Microsoft.Win32;
 using ScheduleTools.Core.RecentProjects;
 using ScheduleTools.Core.Settings;
-using ScheduleTools.Wpf.ProjectCreate.ViewModels;
-using ScheduleTools.Wpf.ProjectCreate.Views;
+using ScheduleTools.Wpf.FileDialogs.Contracts;
+using ScheduleTools.Wpf.FileDialogs.Models;
+using ScheduleTools.Wpf.Home.ViewModels;
+using ScheduleTools.Wpf.Home.Views;
 using ScheduleTools.Wpf.Services;
 using ScheduleTools.Wpf.Windows.Contracts;
 using System;
@@ -20,20 +21,23 @@ namespace GirderSchedule.App.Services.Project
         private readonly AppSettingService _appSettingService;
         private readonly ScheduleProjectFactory _projectFactory;
         private readonly IWindowService _windowService;
+        private readonly IFileDialogService _fileDialogService;
+        private readonly IFolderDialogService _folderDialogService;
 
-        public ProjectService(ProjectFileService fileService, RecentProjectService recentProjectService, AppSettingService appSettingService, ScheduleProjectFactory projectFactory, IWindowService windowService)
+        public ProjectService(ProjectFileService fileService, RecentProjectService recentProjectService, AppSettingService appSettingService, ScheduleProjectFactory projectFactory, IWindowService windowService, IFileDialogService fileDialogService, IFolderDialogService folderDialogService)
         {
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
             _recentProjectService = recentProjectService ?? throw new ArgumentNullException(nameof(recentProjectService));
             _appSettingService = appSettingService ?? throw new ArgumentNullException(nameof(appSettingService));
             _projectFactory = projectFactory ?? throw new ArgumentNullException(nameof(projectFactory));
             _windowService = windowService ?? throw new ArgumentNullException(nameof(windowService));
+            _fileDialogService = fileDialogService ?? throw new ArgumentNullException(nameof(fileDialogService));
+            _folderDialogService = folderDialogService ?? throw new ArgumentNullException(nameof(folderDialogService));
         }
 
         public ProjectOpenResult CreateNewProject()
         {
-            var viewModel = new ProjectCreateWindowViewModel(_appSettingService);
-
+            var viewModel = new ProjectCreateWindowViewModel(_appSettingService, _folderDialogService);
             var window = new ProjectCreateWindow
             {
                 DataContext = viewModel
@@ -81,31 +85,39 @@ namespace GirderSchedule.App.Services.Project
 
         public ProjectOpenResult OpenProject()
         {
-            var dialog = new OpenFileDialog
-            {
-                Title = FileConstants.ProjectDialogTitle,
-                Filter = FileConstants.ProjectFilter,
-                DefaultExt = FileConstants.ProjectExtension,
-                CheckFileExists = true,
-                Multiselect = false
-            };
+            var filePath = _fileDialogService.OpenFile(
+                new OpenFileDialogOptions
+                {
+                    Title = FileConstants.ProjectOpenDialogTitle,
+                    Filter = FileConstants.ProjectFilter,
+                    DefaultExtension = FileConstants.ProjectExtension,
+                    CheckFileExists = true,
+                    CheckPathExists = true
+                },
+                _windowService.GetMainWindow());
 
-            var owner = _windowService.GetMainWindow();
-
-            if (dialog.ShowDialog(owner) != true)
+            if (string.IsNullOrWhiteSpace(filePath))
                 return ProjectOpenResult.Cancel();
+
+            return OpenProject(filePath);
+        }
+
+        public ProjectOpenResult OpenProject(string filePath)
+        {
+            if (string.IsNullOrWhiteSpace(filePath))
+                return ProjectOpenResult.Fail();
 
             try
             {
-                var project = _fileService.Load(dialog.FileName);
+                var project = _fileService.Load(filePath);
 
                 _recentProjectService.AddOrUpdate(
-                    dialog.FileName,
+                    filePath,
                     project.ProjectName);
 
                 return ProjectOpenResult.Success(
                     project,
-                    dialog.FileName);
+                    filePath);
             }
             catch (Exception ex)
             {
@@ -145,28 +157,32 @@ namespace GirderSchedule.App.Services.Project
         {
             ArgumentNullException.ThrowIfNull(project);
 
-            var dialog = new SaveFileDialog
-            {
-                Title = FileConstants.ProjectDialogTitle,
-                Filter = FileConstants.ProjectFilter,
-                DefaultExt = FileConstants.ProjectExtension,
-                AddExtension = true,
-                FileName = string.IsNullOrWhiteSpace(project.ProjectName)
-                    ? FileConstants.DefaultProjectFileName
-                    : project.ProjectName + FileConstants.ProjectExtension
-            };
+            var defaultFileName = string.IsNullOrWhiteSpace(project.ProjectName)
+                ? FileConstants.DefaultProjectFileName
+                : project.ProjectName + FileConstants.ProjectExtension;
 
-            var owner = _windowService.GetMainWindow();
+            var filePath = _fileDialogService.SaveFile(
+                new SaveFileDialogOptions
+                {
+                    Title = FileConstants.ProjectSaveDialogTitle,
+                    Filter = FileConstants.ProjectFilter,
+                    DefaultExtension = FileConstants.ProjectExtension,
+                    FileName = defaultFileName,
+                    AddExtension = true,
+                    CheckPathExists = true,
+                    OverwritePrompt = true
+                },
+                _windowService.GetMainWindow());
 
-            if (dialog.ShowDialog(owner) != true)
+            if (string.IsNullOrWhiteSpace(filePath))
                 return ProjectSaveResult.Cancel();
 
             try
             {
-                _fileService.Save(dialog.FileName, project);
-                _recentProjectService.AddOrUpdate(dialog.FileName, project.ProjectName);
+                _fileService.Save(filePath, project);
+                _recentProjectService.AddOrUpdate(filePath, project.ProjectName);
 
-                return ProjectSaveResult.Success(dialog.FileName);
+                return ProjectSaveResult.Success(filePath);
             }
             catch (Exception ex)
             {

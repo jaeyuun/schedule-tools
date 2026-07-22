@@ -1,5 +1,6 @@
 ﻿using ScheduleTools.Wpf.Commands;
 using GirderSchedule.App.Services;
+using ScheduleTools.Dxf.Export;
 using System;
 using System.Windows.Input;
 using ScheduleTools.Wpf.Mvvm;
@@ -10,10 +11,10 @@ namespace GirderSchedule.App.ViewModels.Settings
     public sealed class DxfExportSettingWindowViewModel : ViewModelBase
     {
         private bool _continueAcrossFloors = true;
-        private string _formColumnCountText = "3";
+        private string _formColumnCountText = DxfExportConstants.DefaultFormColumnCount.ToString();
 
-        public event EventHandler Accepted;
-        public event EventHandler Cancelled;
+        public event EventHandler? Accepted;
+        public event EventHandler? Cancelled;
 
         public bool ContinueAcrossFloors
         {

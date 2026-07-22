@@ -2,6 +2,7 @@
 using GirderSchedule.Domain.Layouts;
 using GirderSchedule.Domain.Models;
 using GirderSchedule.Domain.Services;
+using ScheduleTools.Wpf.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Windows.Controls;

@@ -1,4 +1,4 @@
-﻿namespace ScheduleTools.Wpf.ProjectCreate.Models
+﻿namespace ScheduleTools.Wpf.Home.Models
 {
     public sealed class ProjectCreateResult
     {

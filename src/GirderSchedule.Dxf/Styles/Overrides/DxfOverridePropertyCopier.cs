@@ -5,7 +5,7 @@ namespace GirderSchedule.Dxf.Styles.Overrides
 {
     internal static class DxfOverridePropertyCopier
     {
-        public static PropertyInfo FindProperty(Type type, string name)
+        public static PropertyInfo? FindProperty(Type? type, string name)
         {
             while (type != null)
             {
@@ -22,7 +22,7 @@ namespace GirderSchedule.Dxf.Styles.Overrides
             return null;
         }
 
-        public static IEnumerable GetCollectionValues(object collection)
+        public static IEnumerable? GetCollectionValues(object? collection)
         {
             if (collection == null)
             {
@@ -39,7 +39,7 @@ namespace GirderSchedule.Dxf.Styles.Overrides
             return collection as IEnumerable;
         }
 
-        public static void ClearCollection(object collection)
+        public static void ClearCollection(object? collection)
         {
             if (collection == null)
             {
@@ -56,7 +56,7 @@ namespace GirderSchedule.Dxf.Styles.Overrides
             TryInvoke(clearMethod, collection, null);
         }
 
-        public static void AddObjectToCollection(object collection, object value)
+        public static void AddObjectToCollection(object? collection, object? value)
         {
             if (collection == null || value == null)
             {
@@ -73,7 +73,7 @@ namespace GirderSchedule.Dxf.Styles.Overrides
             TryInvoke(addMethod, collection, new[] { value });
         }
 
-        public static object CloneObject(object value)
+        public static object? CloneObject(object? value)
         {
             if (value == null)
             {
@@ -92,7 +92,7 @@ namespace GirderSchedule.Dxf.Styles.Overrides
             return clone ?? value;
         }
 
-        private static IEnumerable GetValuesProperty(object collection)
+        private static IEnumerable? GetValuesProperty(object collection)
         {
             var valuesProperty = collection.GetType().GetProperty("Values", BindingFlags.Instance | BindingFlags.Public);
 
@@ -104,7 +104,7 @@ namespace GirderSchedule.Dxf.Styles.Overrides
             return TryGetValue(valuesProperty, collection) as IEnumerable;
         }
 
-        private static MethodInfo FindAddMethod(Type collectionType, Type valueType)
+        private static MethodInfo? FindAddMethod(Type collectionType, Type valueType)
         {
             var methods = collectionType.GetMethods(BindingFlags.Instance | BindingFlags.Public);
 
@@ -135,7 +135,7 @@ namespace GirderSchedule.Dxf.Styles.Overrides
             return null;
         }
 
-        private static object TryGetValue(PropertyInfo property, object target)
+        private static object? TryGetValue(PropertyInfo property, object target)
         {
             try
             {
@@ -147,7 +147,7 @@ namespace GirderSchedule.Dxf.Styles.Overrides
             }
         }
 
-        private static object TryInvoke(MethodInfo method, object target, object[] parameters)
+        private static object? TryInvoke(MethodInfo method, object target, object?[]? parameters)
         {
             try
             {

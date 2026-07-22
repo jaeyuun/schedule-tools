@@ -1,8 +1,8 @@
 ﻿using GirderSchedule.Domain.Models.Settings;
 using GirderSchedule.Dxf.Drawers.Common;
-using GirderSchedule.Dxf.Geometry;
 using GirderSchedule.Dxf.Layouts;
 using GirderSchedule.Dxf.Styles;
+using ScheduleTools.Dxf.Geometry;
 
 namespace GirderSchedule.Dxf.Drawers
 {

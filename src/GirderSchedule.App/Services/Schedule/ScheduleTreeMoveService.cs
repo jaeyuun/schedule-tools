@@ -143,7 +143,7 @@ namespace GirderSchedule.App.Services.Schedule
             return MoveSetResult.Success(source, targetFloor);
         }
 
-        private FloorNodeViewModel FindFloorBySet(ObservableCollection<FloorNodeViewModel> floors, ScheduleSetNodeViewModel set)
+        private FloorNodeViewModel? FindFloorBySet(ObservableCollection<FloorNodeViewModel> floors, ScheduleSetNodeViewModel? set)
         {
             if (set == null)
             {
@@ -181,8 +181,8 @@ namespace GirderSchedule.App.Services.Schedule
     {
         public bool IsSuccess { get; private set; }
         public bool IsChanged { get; private set; }
-        public ScheduleSetNodeViewModel SelectedSet { get; private set; }
-        public FloorNodeViewModel SelectedFloor { get; private set; }
+        public ScheduleSetNodeViewModel? SelectedSet { get; private set; }
+        public FloorNodeViewModel? SelectedFloor { get; private set; }
 
         private MoveSetResult()
         {

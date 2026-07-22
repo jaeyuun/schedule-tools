@@ -15,7 +15,7 @@ namespace GirderSchedule.App.ViewModels.Main
     public sealed partial class MainWindowViewModel : ViewModelBase
     {
         private readonly ScheduleSetFactory _setFactory = new();
-        private readonly ScheduleExportService _exportService = new();
+        private readonly ScheduleExportService _exportService;
         private readonly ScheduleTreeMoveService _scheduleTreeMoveService = new();
         private readonly ProjectDisplayService _projectDisplayService = new();
 
@@ -23,14 +23,14 @@ namespace GirderSchedule.App.ViewModels.Main
         private readonly FloorSettingEditService _floorSettingEditService;
         private readonly ScheduleSetEditService _scheduleSetEditService;
 
-        private ScheduleProject _project;
-        private FloorNodeViewModel _selectedFloor;
-        private ScheduleSetNodeViewModel _selectedSet;
+        private ScheduleProject _project = null!;
+        private FloorNodeViewModel? _selectedFloor;
+        private ScheduleSetNodeViewModel? _selectedSet;
         private string _currentFilePath = string.Empty;
         private bool _isDirty;
 
-        public ObservableCollection<FloorNodeViewModel> Floors { get; private set; }
-        public ScheduleViewModel Editor { get; private set; }
+        public ObservableCollection<FloorNodeViewModel> Floors { get; private set; } = null!;
+        public ScheduleViewModel Editor { get; private set; } = null!;
 
         public ScheduleProject Project
         {
@@ -110,7 +110,7 @@ namespace GirderSchedule.App.ViewModels.Main
 
         public string ProjectDisplayName => _projectDisplayService.GetProjectDisplayName(Project, IsDirty);
 
-        public FloorNodeViewModel SelectedFloor
+        public FloorNodeViewModel? SelectedFloor
         {
             get { return _selectedFloor; }
             set
@@ -179,23 +179,24 @@ namespace GirderSchedule.App.ViewModels.Main
             }
         }
 
-        public ICommand NewProjectCommand { get; private set; }
-        public ICommand OpenProjectCommand { get; private set; }
-        public ICommand SaveProjectCommand { get; private set; }
-        public ICommand SaveAsProjectCommand { get; private set; }
-        public ICommand EditFloorSettingCommand { get; private set; }
-        public ICommand EditDxfLayerSettingCommand { get; private set; }
-        public ICommand EditAppSettingCommand { get; private set; }
-        public ICommand AddSetCommand { get; private set; }
-        public ICommand RemoveSetCommand { get; private set; }
-        public ICommand ExportCurrentSetCommand { get; private set; }
-        public ICommand ExportExcelCommand { get; private set; }
-        public ICommand CopyScheduleSetCommand { get; private set; }
-        public ICommand PasteScheduleSetCommand { get; private set; }
+        public ICommand NewProjectCommand { get; private set; } = null!;
+        public ICommand OpenProjectCommand { get; private set; } = null!;
+        public ICommand SaveProjectCommand { get; private set; } = null!;
+        public ICommand SaveAsProjectCommand { get; private set; } = null!;
+        public ICommand EditFloorSettingCommand { get; private set; } = null!;
+        public ICommand EditDxfLayerSettingCommand { get; private set; } = null!;
+        public ICommand EditAppSettingCommand { get; private set; } = null!;
+        public ICommand AddSetCommand { get; private set; } = null!;
+        public ICommand RemoveSetCommand { get; private set; } = null!;
+        public ICommand ExportCurrentSetCommand { get; private set; } = null!;
+        public ICommand ExportExcelCommand { get; private set; } = null!;
+        public ICommand CopyScheduleSetCommand { get; private set; } = null!;
+        public ICommand PasteScheduleSetCommand { get; private set; } = null!;
 
         private MainWindowViewModel(bool _)
         {
             _projectService = AppServices.CreateProjectService();
+            _exportService = AppServices.CreateScheduleExportService();
 
             _floorSettingEditService = new FloorSettingEditService(
                 _setFactory,

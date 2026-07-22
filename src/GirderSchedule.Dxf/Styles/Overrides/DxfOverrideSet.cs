@@ -84,7 +84,7 @@ namespace GirderSchedule.Dxf.Styles.Overrides
             DxfBlockInsertOverride.ApplyDefault(insert, defaultScale, defaultRotation);
         }
 
-        private DxfDimensionOverride FindDimensionOverride(Dimension dimension)
+        private DxfDimensionOverride? FindDimensionOverride(Dimension dimension)
         {
             for (var i = 0; i < _dimensionOverrides.Count; i++)
             {
@@ -97,7 +97,7 @@ namespace GirderSchedule.Dxf.Styles.Overrides
             return null;
         }
 
-        private DxfBlockInsertOverride FindBlockInsertOverride(Insert insert)
+        private DxfBlockInsertOverride? FindBlockInsertOverride(Insert insert)
         {
             for (var i = 0; i < _blockInsertOverrides.Count; i++)
             {

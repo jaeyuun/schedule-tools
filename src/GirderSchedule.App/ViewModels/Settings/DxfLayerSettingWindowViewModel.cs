@@ -1,4 +1,5 @@
 using GirderSchedule.App.Constants;
+using GirderSchedule.App.Infrastructure;
 using GirderSchedule.App.Services.Schedule;
 using GirderSchedule.Domain.Models;
 using GirderSchedule.Domain.Models.Settings;
@@ -8,6 +9,7 @@ using netDxf;
 using ScheduleTools.Wpf.Commands;
 using ScheduleTools.Wpf.Mvvm;
 using ScheduleTools.Wpf.Services;
+using ScheduleTools.Dxf.Constants;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -20,15 +22,15 @@ namespace GirderSchedule.App.ViewModels.Settings
     public sealed class DxfLayerSettingWindowViewModel : ViewModelBase
     {
         private readonly DxfSettingService _settingService;
-        private readonly ScheduleProject _project;
+        private readonly ScheduleProject? _project;
         private string _selectedSettingName = string.Empty;
         private string _settingNameText = string.Empty;
         private string _selectedTemplateName = string.Empty;
         private bool _isTemplateInvalid;
-        private DxfSettingProfile _loadedProfile;
+        private DxfSettingProfile? _loadedProfile;
         private bool _isApplyingProfile;
 
-        public event EventHandler Accepted;
+        public event EventHandler? Accepted;
 
         public ObservableCollection<string> SettingNames { get; private set; }
         public ObservableCollection<string> TemplateNames { get; private set; }
@@ -111,16 +113,16 @@ namespace GirderSchedule.App.ViewModels.Settings
         }
 
         public DxfLayerSettingWindowViewModel()
-            : this(null, new DxfSettingService())
+            : this(null, AppServices.DxfSetting)
         {
         }
 
-        public DxfLayerSettingWindowViewModel(ScheduleProject project)
-            : this(project, new DxfSettingService())
+        public DxfLayerSettingWindowViewModel(ScheduleProject? project)
+            : this(project, AppServices.DxfSetting)
         {
         }
 
-        public DxfLayerSettingWindowViewModel(ScheduleProject project, DxfSettingService settingService)
+        public DxfLayerSettingWindowViewModel(ScheduleProject? project, DxfSettingService settingService)
         {
             _project = project;
             _settingService = settingService;
@@ -180,7 +182,7 @@ namespace GirderSchedule.App.ViewModels.Settings
             RefreshTemplateNames();
             RefreshSettingNames();
 
-            var settingName = _project == null ? FileConstants.DxfSettingName : _project.DxfSettingName;
+            var settingName = _project == null ? DxfFileConstants.DefaultSettingName : _project.DxfSettingName;
             settingName = _settingService.NormalizeSettingName(settingName);
 
             if (_project != null && _project.DxfSettingName != settingName)
@@ -267,7 +269,7 @@ namespace GirderSchedule.App.ViewModels.Settings
         {
             var dialog = new OpenFileDialog();
             dialog.Title = FileConstants.DxfOpenDialogTitle;
-            dialog.Filter = FileConstants.DxfFilter;
+            dialog.Filter = DxfFileConstants.Filter;
             dialog.CheckFileExists = true;
             dialog.Multiselect = false;
 
@@ -410,7 +412,7 @@ namespace GirderSchedule.App.ViewModels.Settings
             }
 
             RefreshSettingNames();
-            SelectedSettingName = FileConstants.DxfSettingName;
+            SelectedSettingName = DxfFileConstants.DefaultSettingName;
         }
 
         private void Reset()
@@ -596,7 +598,7 @@ namespace GirderSchedule.App.ViewModels.Settings
             }
         }
 
-        private DxfSettingProfile CreateProfileSnapshot(DxfSettingProfile profile)
+        private DxfSettingProfile? CreateProfileSnapshot(DxfSettingProfile? profile)
         {
             if (profile == null)
             {

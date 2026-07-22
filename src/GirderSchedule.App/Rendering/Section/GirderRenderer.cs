@@ -1,5 +1,6 @@
 ﻿using GirderSchedule.App.Rendering.Models;
 using System.Windows;
+using ScheduleTools.Wpf.Rendering;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;

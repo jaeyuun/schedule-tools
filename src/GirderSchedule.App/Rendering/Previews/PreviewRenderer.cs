@@ -2,6 +2,7 @@ using GirderSchedule.App.Rendering.Formatting;
 using GirderSchedule.App.Rendering.Models;
 using GirderSchedule.Domain.Models;
 using GirderSchedule.Domain.Models.Export;
+using ScheduleTools.Wpf.Rendering;
 using System.Collections.Generic;
 using System.Windows.Controls;
 
@@ -27,7 +28,7 @@ namespace GirderSchedule.App.Rendering.Previews
             _tableRenderer = new PreviewTableRenderer(_drawer, _brushes);
         }
 
-        public void Draw(Canvas canvas, ScheduleExportPage page, int pageNumber, int pageCount)
+        public void Draw(Canvas canvas, ScheduleExportPage? page, int pageNumber, int pageCount)
         {
             if (canvas == null)
             {
@@ -54,7 +55,7 @@ namespace GirderSchedule.App.Rendering.Previews
             _drawer.DrawText(canvas, "미리보기할 부재가 없습니다. 오른쪽 프로젝트 목록에서 층과 부재를 체크하세요.", 310.0, 390.0, 18.0, _brushes.Disabled);
         }
 
-        private void DrawSets(Canvas canvas, IList<ScheduleSet> sets)
+        private void DrawSets(Canvas canvas, IList<ScheduleSet?> sets)
         {
             var count = sets.Count;
 
@@ -69,7 +70,7 @@ namespace GirderSchedule.App.Rendering.Previews
             }
         }
 
-        private void DrawSet(Canvas canvas, ScheduleSet set, int index)
+        private void DrawSet(Canvas canvas, ScheduleSet? set, int index)
         {
             var row = index / SchedulePreviewLayout.ColumnCount;
             var column = index % SchedulePreviewLayout.ColumnCount;

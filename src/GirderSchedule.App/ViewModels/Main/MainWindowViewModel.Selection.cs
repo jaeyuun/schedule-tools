@@ -18,7 +18,7 @@ namespace GirderSchedule.App.ViewModels.Main
             }
         }
 
-        private FloorNodeViewModel FindFloorBySet(ScheduleSetNodeViewModel set)
+        private FloorNodeViewModel? FindFloorBySet(ScheduleSetNodeViewModel? set)
         {
             if (set == null)
             {

@@ -1,76 +1,44 @@
-﻿using Microsoft.Win32;
-using ScheduleTools.Wpf.ProjectCreate.Models;
-using ScheduleTools.Wpf.ProjectCreate.ViewModels;
+﻿using ScheduleTools.Wpf.Home.Models;
+using ScheduleTools.Wpf.Home.ViewModels;
 using System.Windows;
 
-namespace ScheduleTools.Wpf.ProjectCreate.Views
+namespace ScheduleTools.Wpf.Home.Views
 {
     public partial class ProjectCreateWindow : Window
     {
-        private ProjectCreateWindowViewModel? _viewModel;
-
         public ProjectCreateResult? Result { get; private set; }
 
         public ProjectCreateWindow()
         {
             InitializeComponent();
-
             DataContextChanged += Window_DataContextChanged;
-            Closed += Window_Closed;
         }
 
         private void Window_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            UnsubscribeViewModel();
+            if (e.OldValue is ProjectCreateWindowViewModel oldViewModel)
+                oldViewModel.CloseRequested -= ViewModel_CloseRequested;
 
-            _viewModel = e.NewValue as ProjectCreateWindowViewModel;
-
-            if (_viewModel == null)
-                return;
-
-            _viewModel.BrowseFolderRequested += ViewModel_BrowseFolderRequested;
-            _viewModel.CloseRequested += ViewModel_CloseRequested;
+            if (e.NewValue is ProjectCreateWindowViewModel newViewModel)
+                newViewModel.CloseRequested += ViewModel_CloseRequested;
         }
 
-        private void ViewModel_BrowseFolderRequested(object? sender, EventArgs e)
+        private void ViewModel_CloseRequested(object? sender, bool confirmed)
         {
-            if (_viewModel == null)
-                return;
+            if (confirmed && DataContext is ProjectCreateWindowViewModel viewModel)
+                Result = viewModel.CreateResult();
 
-            var dialog = new OpenFolderDialog
-            {
-                Title = "프로젝트 저장 폴더 선택",
-                InitialDirectory = _viewModel.ProjectFolder,
-                Multiselect = false
-            };
-
-            if (dialog.ShowDialog(this) == true)
-                _viewModel.ProjectFolder = dialog.FolderName;
+            DialogResult = confirmed;
         }
 
-        private void ViewModel_CloseRequested(object? sender, bool result)
+        protected override void OnClosed(EventArgs e)
         {
-            if (result && _viewModel != null)
-                Result = _viewModel.CreateResult();
+            if (DataContext is ProjectCreateWindowViewModel viewModel)
+                viewModel.CloseRequested -= ViewModel_CloseRequested;
 
-            DialogResult = result;
-        }
-
-        private void Window_Closed(object? sender, EventArgs e)
-        {
-            UnsubscribeViewModel();
             DataContextChanged -= Window_DataContextChanged;
-            Closed -= Window_Closed;
-        }
 
-        private void UnsubscribeViewModel()
-        {
-            if (_viewModel == null)
-                return;
-
-            _viewModel.BrowseFolderRequested -= ViewModel_BrowseFolderRequested;
-            _viewModel.CloseRequested -= ViewModel_CloseRequested;
-            _viewModel = null;
+            base.OnClosed(e);
         }
     }
 }

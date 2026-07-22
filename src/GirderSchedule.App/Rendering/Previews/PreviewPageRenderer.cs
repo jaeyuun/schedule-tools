@@ -1,6 +1,7 @@
 ﻿using GirderSchedule.App.Rendering.Formatting;
 using GirderSchedule.App.Rendering.Models;
 using GirderSchedule.Domain.Models.Export;
+using ScheduleTools.Wpf.Rendering;
 using System.Windows.Controls;
 using System.Windows.Media;
 
@@ -22,7 +23,7 @@ namespace GirderSchedule.App.Rendering.Previews
             _brushes = brushes;
         }
 
-        public void Draw(Canvas canvas, ScheduleExportPage page, int pageNumber, int pageCount)
+        public void Draw(Canvas canvas, ScheduleExportPage? page, int pageNumber, int pageCount)
         {
             if (canvas == null)
             {

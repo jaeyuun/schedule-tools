@@ -1,10 +1,13 @@
 ﻿using GirderSchedule.Domain.Models;
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace GirderSchedule.App.Services.Schedule
 {
     public sealed class ScheduleSetCopyService
     {
-        public ScheduleSet Clone(ScheduleSet source)
+        [return: NotNullIfNotNull(nameof(source))]
+        public ScheduleSet? Clone(ScheduleSet? source)
         {
             if (source == null)
             {
@@ -32,7 +35,8 @@ namespace GirderSchedule.App.Services.Schedule
             CopyItem(source.Right, target.Right);
         }
 
-        private ScheduleItem CloneItem(ScheduleItem source)
+        [return: NotNullIfNotNull(nameof(source))]
+        private ScheduleItem? CloneItem(ScheduleItem? source)
         {
             if (source == null)
             {

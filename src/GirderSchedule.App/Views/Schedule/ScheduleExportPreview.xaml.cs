@@ -2,8 +2,8 @@
 using GirderSchedule.App.Services.Previews;
 using GirderSchedule.App.Services.Schedule;
 using GirderSchedule.App.ViewModels.Schedule;
-using GirderSchedule.App.ViewModels.Settings;
 using GirderSchedule.Domain.Models.Export;
+using ScheduleTools.Dxf.Export;
 using ScheduleTools.Wpf.Behaviors;
 using System;
 using System.Collections.Generic;
@@ -24,15 +24,15 @@ namespace GirderSchedule.App.Views.Schedule
 
         private readonly List<ScheduleExportPage> _pages = new List<ScheduleExportPage>();
 
-        private PreviewPanZoomController _panZoomController;
+        private PreviewPanZoomController? _panZoomController;
         private bool _isRefreshQueued;
         private int _currentPageIndex;
 
-        public event EventHandler PreviewStateChanged;
+        public event EventHandler? PreviewStateChanged;
 
-        public ObservableCollection<FloorNodeViewModel> Floors
+        public ObservableCollection<FloorNodeViewModel>? Floors
         {
-            get { return (ObservableCollection<FloorNodeViewModel>)GetValue(FloorsProperty); }
+            get { return (ObservableCollection<FloorNodeViewModel>?)GetValue(FloorsProperty); }
             set { SetValue(FloorsProperty, value); }
         }
 
@@ -298,7 +298,7 @@ namespace GirderSchedule.App.Views.Schedule
             RaisePreviewStateChanged();
         }
 
-        private ScheduleExportPage GetCurrentPage()
+        private ScheduleExportPage? GetCurrentPage()
         {
             if (_pages.Count == 0)
             {

@@ -34,12 +34,12 @@ namespace GirderSchedule.Dxf.Drawers.Common
             return circle;
         }
 
-        public Polyline2D AddPolyline(DxfLayerRole role, bool isClosed, params double[] values)
+        public Polyline2D? AddPolyline(DxfLayerRole role, bool isClosed, params double[] values)
         {
             return AddPolylineCore(role, isClosed, 0.0, values);
         }
 
-        private Polyline2D AddPolylineCore(DxfLayerRole role, bool isClosed, double width, params double[] values)
+        private Polyline2D? AddPolylineCore(DxfLayerRole role, bool isClosed, double width, params double[] values)
         {
             if (values == null || values.Length == 0 || values.Length % 2 != 0)
             {
@@ -61,7 +61,7 @@ namespace GirderSchedule.Dxf.Drawers.Common
             return polyline;
         }
 
-        public Insert AddOverriddenInsert(Block block, double x, double y, double defaultScale, double defaultRotation)
+        public Insert? AddOverriddenInsert(Block? block, double x, double y, double defaultScale, double defaultRotation)
         {
             var insert = CreateInsert(block, x, y, defaultScale, defaultRotation);
 
@@ -76,7 +76,7 @@ namespace GirderSchedule.Dxf.Drawers.Common
             return insert;
         }
 
-        private Insert CreateInsert(Block block, double x, double y, double scale, double rotation)
+        private Insert? CreateInsert(Block? block, double x, double y, double scale, double rotation)
         {
             if (block == null)
             {

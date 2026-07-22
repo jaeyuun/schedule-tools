@@ -10,8 +10,8 @@ namespace GirderSchedule.App.ViewModels.Schedule
         private readonly ScheduleItem _model;
         private readonly ScheduleTextFormatService _textService = new ScheduleTextFormatService();
 
-        public event EventHandler Changed;
-        public event EventHandler SectionEnabledChanged;
+        public event EventHandler? Changed;
+        public event EventHandler? SectionEnabledChanged;
 
         public ScheduleItem Model { get { return _model; } }
 

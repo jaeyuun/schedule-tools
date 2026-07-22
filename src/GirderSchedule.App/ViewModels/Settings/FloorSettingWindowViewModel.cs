@@ -15,7 +15,7 @@ namespace GirderSchedule.App.ViewModels.Settings
     {
         private readonly ScheduleSetFactory _setFactory = new ScheduleSetFactory();
         private readonly ScheduleTextFormatService _textService = new ScheduleTextFormatService();
-        private FloorNodeViewModel _selectedFloor;
+        private FloorNodeViewModel? _selectedFloor;
 
         private string _inputFloorNumber = string.Empty;
         private string _inputFloorName = string.Empty;
@@ -25,9 +25,9 @@ namespace GirderSchedule.App.ViewModels.Settings
         private bool _isUpdatingSelectedFloor;
 
         public ObservableCollection<FloorNodeViewModel> Floors { get; private set; }
-        public event EventHandler FloorSettingChanged;
+        public event EventHandler? FloorSettingChanged;
 
-        public FloorNodeViewModel SelectedFloor
+        public FloorNodeViewModel? SelectedFloor
         {
             get { return _selectedFloor; }
             set
@@ -291,7 +291,7 @@ namespace GirderSchedule.App.ViewModels.Settings
             floor.Changed -= Floor_Changed;
         }
 
-        private void Floor_Changed(object sender, EventArgs e)
+        private void Floor_Changed(object? sender, EventArgs e)
         {
             if (_isUpdatingSelectedFloor)
             {

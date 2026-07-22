@@ -3,7 +3,7 @@ using GirderSchedule.Domain.Models;
 using GirderSchedule.Excel.Constants;
 using GirderSchedule.Excel.Layouts;
 using GirderSchedule.Excel.Models;
-using GirderSchedule.Excel.Utils;
+using ScheduleTools.Excel;
 
 namespace GirderSchedule.Excel
 {
@@ -28,11 +28,12 @@ namespace GirderSchedule.Excel
                 options = new ExcelExportOptions();
             }
 
-            ExcelFileUtil.EnsureDirectory(filePath);
+            ExcelFile.EnsureDirectory(filePath);
 
             using (var workbook = new XLWorkbook())
             {
-                var sheet = workbook.Worksheets.Add(ExcelSheetNameUtil.GetSheetName(options));
+                var sheetName = ExcelWorksheetName.Sanitize(options.SheetName, ExcelLabels.DefaultSheetName);
+                var sheet = workbook.Worksheets.Add(sheetName);
                 var lastRow = DrawSheet(sheet, project, options);
 
                 ApplyPageSetup(sheet, lastRow);
@@ -229,13 +230,13 @@ namespace GirderSchedule.Excel
 
         private void DrawSetInfo(IXLWorksheet sheet, ExcelExportSet set, int row, int endRow)
         {
-            ExcelCellUtil.SetMergedValue(sheet, row, ExcelLayout.ColumnId, endRow, set.Id);
-            ExcelCellUtil.SetMergedValue(sheet, row, ExcelLayout.ColumnName, endRow, set.Name);
-            ExcelCellUtil.SetMergedValue(sheet, row, ExcelLayout.ColumnSectionWidth, endRow, set.Width);
-            ExcelCellUtil.SetMergedValue(sheet, row, ExcelLayout.ColumnSectionSymbol, endRow, ExcelLabels.SectionSymbol);
-            ExcelCellUtil.SetMergedValue(sheet, row, ExcelLayout.ColumnSectionHeight, endRow, set.Height);
-            ExcelCellUtil.SetMergedValue(sheet, row, ExcelLayout.ColumnRebarSection, endRow, set.RebarSection);
-            ExcelCellUtil.SetMergedValue(sheet, row, ExcelLayout.ColumnCover, endRow, set.Cover);
+            ExcelCell.SetMergedValue(sheet, row, ExcelLayout.ColumnId, endRow, set.Id);
+            ExcelCell.SetMergedValue(sheet, row, ExcelLayout.ColumnName, endRow, set.Name);
+            ExcelCell.SetMergedValue(sheet, row, ExcelLayout.ColumnSectionWidth, endRow, set.Width);
+            ExcelCell.SetMergedValue(sheet, row, ExcelLayout.ColumnSectionSymbol, endRow, ExcelLabels.SectionSymbol);
+            ExcelCell.SetMergedValue(sheet, row, ExcelLayout.ColumnSectionHeight, endRow, set.Height);
+            ExcelCell.SetMergedValue(sheet, row, ExcelLayout.ColumnRebarSection, endRow, set.RebarSection);
+            ExcelCell.SetMergedValue(sheet, row, ExcelLayout.ColumnCover, endRow, set.Cover);
         }
 
         private void DrawRebarInfo(IXLWorksheet sheet, ScheduleItem? item, int row)

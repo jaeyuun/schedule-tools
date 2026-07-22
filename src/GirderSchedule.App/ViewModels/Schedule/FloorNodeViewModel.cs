@@ -17,14 +17,14 @@ namespace GirderSchedule.App.ViewModels.Schedule
         private bool _isChildSelected;
         private bool _isInternalChanging;
 
-        public event EventHandler Changed;
+        public event EventHandler? Changed;
 
         public ScheduleFloor Model
         {
             get { return _model; }
         }
 
-        public ObservableCollection<ScheduleSetNodeViewModel> Sets { get; private set; }
+        public ObservableCollection<ScheduleSetNodeViewModel> Sets { get; private set; } = null!;
 
         public string FloorPrefix
         {
@@ -213,7 +213,7 @@ namespace GirderSchedule.App.ViewModels.Schedule
             InitializeSets();
         }
 
-        public ScheduleSetNodeViewModel AddSet(ScheduleSet set)
+        public ScheduleSetNodeViewModel? AddSet(ScheduleSet? set)
         {
             if (set == null)
             {

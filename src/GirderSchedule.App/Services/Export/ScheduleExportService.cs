@@ -9,6 +9,9 @@ using GirderSchedule.Dxf.Export;
 using GirderSchedule.Excel;
 using Microsoft.Win32;
 using ScheduleTools.Core.IO;
+using ScheduleTools.Dxf.Constants;
+using ScheduleTools.Dxf.Export;
+using ScheduleTools.Excel.Constants;
 using ScheduleTools.Wpf.Services;
 using System;
 using System.Collections.Generic;
@@ -22,7 +25,12 @@ namespace GirderSchedule.App.Services.Export
     {
         private readonly ScheduleExportPageBuilder _exportPageBuilder = new ScheduleExportPageBuilder();
         private readonly ScheduleExcelProjectBuilder _excelProjectBuilder = new ScheduleExcelProjectBuilder();
-        private readonly DxfSettingService _dxfSettingService = new DxfSettingService();
+        private readonly DxfSettingService _dxfSettingService;
+
+        public ScheduleExportService(DxfSettingService dxfSettingService)
+        {
+            _dxfSettingService = dxfSettingService ?? throw new ArgumentNullException(nameof(dxfSettingService));
+        }
 
         public List<ScheduleExportPage> BuildExportPages(string scheduleTitle, ObservableCollection<FloorNodeViewModel> floors, DxfExportSetting setting)
         {
@@ -36,8 +44,8 @@ namespace GirderSchedule.App.Services.Export
 
         public void ExportDxf(ScheduleProject project, ObservableCollection<FloorNodeViewModel> floors)
         {
-            var projectName = project == null ? string.Empty : project.ProjectName;
-            var scheduleTitle = project == null ? string.Empty : project.ScheduleTitle;
+            var projectName = project.ProjectName;
+            var scheduleTitle = project.ScheduleTitle;
             var setting = ShowDxfExportSettingWindow();
 
             if (setting == null)
@@ -57,9 +65,9 @@ namespace GirderSchedule.App.Services.Export
 
             var dialog = new SaveFileDialog();
             dialog.Title = FileConstants.DxfSaveDialogTitle;
-            dialog.Filter = FileConstants.DxfFilter;
+            dialog.Filter = DxfFileConstants.Filter;
             dialog.FileName = BuildDxfFileName(projectName, scheduleTitle);
-            dialog.DefaultExt = FileConstants.DxfExtension;
+            dialog.DefaultExt = DxfFileConstants.Extension;
             dialog.AddExtension = true;
 
             if (dialog.ShowDialog() != true)
@@ -84,10 +92,10 @@ namespace GirderSchedule.App.Services.Export
 
             var dialog = new SaveFileDialog();
             dialog.Title = FileConstants.ExcelSaveDialogTitle;
-            dialog.Filter = FileConstants.ExcelFilter;
-            dialog.InitialDirectory = FileConstants.ProjectPath;
+            dialog.Filter = ExcelFileConstants.Filter;
+            dialog.InitialDirectory = AppStoragePaths.DocumentsDirectory;
             dialog.FileName = BuildExcelFileName(exportProject.ProjectName, exportProject.ScheduleTitle);
-            dialog.DefaultExt = FileConstants.ExcelExtension;
+            dialog.DefaultExt = ExcelFileConstants.Extension;
             dialog.AddExtension = true;
 
             if (dialog.ShowDialog() != true)
@@ -98,7 +106,7 @@ namespace GirderSchedule.App.Services.Export
             ExportExcelSheet(exportProject, dialog.FileName);
         }
 
-        private DxfExportSetting ShowDxfExportSettingWindow()
+        private DxfExportSetting? ShowDxfExportSettingWindow()
         {
             var viewModel = new DxfExportSettingWindowViewModel();
 
@@ -118,7 +126,7 @@ namespace GirderSchedule.App.Services.Export
         {
             try
             {
-                var settingName = project == null ? FileConstants.DxfSettingName : project.DxfSettingName;
+                var settingName = project == null ? DxfFileConstants.DefaultSettingName : project.DxfSettingName;
                 var dxfProfile = _dxfSettingService.LoadSetting(settingName);
                 var templatePath = _dxfSettingService.GetTemplatePath(dxfProfile.TemplateName);
 
@@ -221,7 +229,7 @@ namespace GirderSchedule.App.Services.Export
                 scheduleTitle = FileConstants.DefaultScheduleTitleForExport;
             }
 
-            return projectName + "_" + scheduleTitle + FileConstants.DxfExtension;
+            return projectName + "_" + scheduleTitle + DxfFileConstants.Extension;
         }
 
         private string BuildExcelFileName(string projectName, string scheduleTitle)
@@ -239,7 +247,7 @@ namespace GirderSchedule.App.Services.Export
                 scheduleTitle = FileConstants.DefaultScheduleTitleForExport;
             }
 
-            return projectName + "_" + scheduleTitle + FileConstants.ExcelExtension;
+            return projectName + "_" + scheduleTitle + ExcelFileConstants.Extension;
         }
     }
 }

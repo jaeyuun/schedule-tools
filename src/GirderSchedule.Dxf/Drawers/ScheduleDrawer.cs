@@ -2,8 +2,8 @@ using GirderSchedule.Domain.Enums;
 using GirderSchedule.Domain.Models;
 using GirderSchedule.Domain.Models.Export;
 using GirderSchedule.Dxf.Export;
-using GirderSchedule.Dxf.Geometry;
 using GirderSchedule.Dxf.Layouts;
+using ScheduleTools.Dxf.Geometry;
 
 namespace GirderSchedule.Dxf.Drawers
 {
@@ -58,7 +58,7 @@ namespace GirderSchedule.Dxf.Drawers
             }
         }
 
-        private void DrawSet(ScheduleSet set, int setIndex, double baseX, double baseY, DxfExportOptions options)
+        private void DrawSet(ScheduleSet? set, int setIndex, double baseX, double baseY, DxfExportOptions options)
         {
             if (set == null)
             {
@@ -93,7 +93,7 @@ namespace GirderSchedule.Dxf.Drawers
             _textDrawer.DrawRebarValueText(sizeText, box.CenterX, baseY + rowOffsetY + ScheduleTextLayout.SectionSizeTextY, ScheduleTextLayout.HeaderTextHeight);
         }
 
-        private ScheduleItem GetHeaderItem(ScheduleSet set)
+        private ScheduleItem? GetHeaderItem(ScheduleSet? set)
         {
             if (set == null)
             {
@@ -131,6 +131,8 @@ namespace GirderSchedule.Dxf.Drawers
             }
 
             var sectionLayout = _layoutFactory.Create(sectionBox, item);
+
+            if (sectionLayout == null) return;
 
             DrawPositionText(item, ScheduleCellLayout.GetPositionBox(setIndex, type).Move(baseX, baseY));
             DrawMemberForceValues(item, ScheduleCellLayout.GetMemberForceBox(setIndex, type).Move(baseX, baseY));

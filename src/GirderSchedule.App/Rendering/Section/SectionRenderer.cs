@@ -3,6 +3,7 @@ using GirderSchedule.App.Rendering.Models;
 using GirderSchedule.Domain.Layouts;
 using GirderSchedule.Domain.Models;
 using GirderSchedule.Domain.Services;
+using ScheduleTools.Wpf.Rendering;
 using System.Windows.Controls;
 
 namespace GirderSchedule.App.Rendering.Section

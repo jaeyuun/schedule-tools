@@ -37,7 +37,7 @@ namespace ScheduleTools.Wpf.Services
             return dialog.Result;
         }
 
-        private static Window GetActiveWindow()
+        private static Window? GetActiveWindow()
         {
             if (Application.Current == null)
             {

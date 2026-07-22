@@ -1,5 +1,7 @@
 ﻿using GirderSchedule.Dxf.Styles;
 
+using ScheduleTools.Dxf.Export;
+
 namespace GirderSchedule.Dxf.Export
 {
     public sealed class DxfExportOptions
@@ -20,7 +22,7 @@ namespace GirderSchedule.Dxf.Export
             IncludeCenter = true;
             IncludeRight = true;
             TemplatePath = string.Empty;
-            FormColumnCount = 3;
+            FormColumnCount = DxfExportConstants.DefaultFormColumnCount;
             LayerNames = new DxfLayerNameSet();
             StyleNames = new DxfStyleNameSet();
         }
