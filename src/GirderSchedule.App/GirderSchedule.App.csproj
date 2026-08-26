@@ -24,9 +24,13 @@
 
 	<ItemGroup>
 		<Compile Remove="Resources\**" />
+		<Compile Remove="Settings\**" />
 		<EmbeddedResource Remove="Resources\**" />
 		<Compile Remove="Resource\**" />
 		<EmbeddedResource Remove="Resource\**" />
+		<EmbeddedResource Remove="Settings\**" />
+		<None Remove="Settings\**" />
+		<Page Remove="Settings\**" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -45,7 +49,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Folder Include="Settings\" />
 		<Folder Include="Resources\" />
 	</ItemGroup>
 
